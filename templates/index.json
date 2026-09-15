@@ -1,0 +1,212 @@
+{
+  "sections": {
+    "lp_hero": {
+      "type": "lp-hero",
+      "settings": {
+        "hero_layout": "centered",
+        "eyebrow": "Vorreni",
+        "heading": "havasta meerijdplankje",
+        "lede": "de havasta vasta qasta\nskfmkdm\nsfmkfm\nsjfmdskfmkmfkdfmskfmckdsvmkdsmcsdmcs,dlc,sdkvmksvmsdlvmskvvkmsv;s\nfskvmsk;lv,slv,s;lmvksd",
+        "price": "$29.99",
+        "compare_at": "$37",
+        "rating": "1,800+ reviews",
+        "cta_text": "Add to cart — $29.99",
+        "tag_title": "Why it works",
+        "tag_body": "havasta meerijdplankje is built from materials we can stand behind — chosen, not assembled",
+        "image_url": "https://pub-c78ad4b949584201a03628fda5a22167.r2.dev/users/07dc54bd-25c6-48e4-bdb5-4cfc2faff515/product/1789139867573-c61f0befd35f2176d653ce76.png"
+      },
+      "blocks": {
+        "chip_1": {
+          "type": "chip",
+          "settings": {
+            "label": "Ethically made"
+          }
+        },
+        "chip_2": {
+          "type": "chip",
+          "settings": {
+            "label": "Premium fabric"
+          }
+        },
+        "chip_3": {
+          "type": "chip",
+          "settings": {
+            "label": "True to size"
+          }
+        },
+        "chip_4": {
+          "type": "chip",
+          "settings": {
+            "label": "Free exchanges"
+          }
+        }
+      },
+      "block_order": [
+        "chip_1",
+        "chip_2",
+        "chip_3",
+        "chip_4"
+      ]
+    },
+    "lp_strip": {
+      "type": "lp-strip",
+      "settings": {},
+      "blocks": {
+        "item_1": {
+          "type": "item",
+          "settings": {
+            "label": "Loved by thousands"
+          }
+        },
+        "item_2": {
+          "type": "item",
+          "settings": {
+            "label": "Free shipping over $45"
+          }
+        },
+        "item_3": {
+          "type": "item",
+          "settings": {
+            "label": "Made with care"
+          }
+        },
+        "item_4": {
+          "type": "item",
+          "settings": {
+            "label": "Free 30-day returns"
+          }
+        }
+      },
+      "block_order": [
+        "item_1",
+        "item_2",
+        "item_3",
+        "item_4"
+      ]
+    },
+    "lp_benefits": {
+      "type": "lp-benefits",
+      "settings": {
+        "eyebrow": "What it does",
+        "heading": "Everything havasta meerijdplankje is for — nothing it isn’t."
+      },
+      "blocks": {
+        "point_1": {
+          "type": "point",
+          "settings": {
+            "title": "Made to last",
+            "desc": "havasta meerijdplankje is built from materials we can stand behind — chosen, not assembled."
+          }
+        },
+        "point_2": {
+          "type": "point",
+          "settings": {
+            "title": "Considered, not cluttered",
+            "desc": "One product, done properly. No filler, no upsell maze — just the thing you came for."
+          }
+        },
+        "point_3": {
+          "type": "point",
+          "settings": {
+            "title": "Backed by a promise",
+            "desc": "If it isn’t right, we make it right. Simple returns, real support."
+          }
+        }
+      },
+      "block_order": [
+        "point_1",
+        "point_2",
+        "point_3"
+      ]
+    },
+    "lp_steps": {
+      "type": "lp-steps",
+      "settings": {
+        "eyebrow": "How to use",
+        "heading": "Simple to use. Easy to love.",
+        "tone": "light"
+      },
+      "blocks": {
+        "step_1": {
+          "type": "step",
+          "settings": {
+            "title": "Find your size",
+            "desc": "True-to-size fit. Between sizes? We recommend sizing up for a relaxed cut."
+          }
+        },
+        "step_2": {
+          "type": "step",
+          "settings": {
+            "title": "Wear it in",
+            "desc": "havasta meerijdplankje is made to settle into your life — better with every wear."
+          }
+        },
+        "step_3": {
+          "type": "step",
+          "settings": {
+            "title": "Care simply",
+            "desc": "Cold wash, hang dry. Built to hold its shape for years, not seasons."
+          }
+        }
+      },
+      "block_order": [
+        "step_1",
+        "step_2",
+        "step_3"
+      ]
+    },
+    "lp_reviews": {
+      "type": "lp-reviews",
+      "settings": {
+        "eyebrow": "★★★★★ 4.9 average",
+        "heading": "The one people keep coming back for."
+      },
+      "blocks": {
+        "review_1": {
+          "type": "review",
+          "settings": {
+            "quote": "Exactly what I hoped havasta meerijdplankje would be. The quality is obvious the moment it arrives.",
+            "by": "Maya R. · verified buyer"
+          }
+        },
+        "review_2": {
+          "type": "review",
+          "settings": {
+            "quote": "First one I’ve found that actually does what it says. I cancelled the two others I was using.",
+            "by": "Devon L. · repeat customer"
+          }
+        },
+        "review_3": {
+          "type": "review",
+          "settings": {
+            "quote": "Simple, well-made, and it just works. The only one in my rotation now.",
+            "by": "Priya N. · verified buyer"
+          }
+        }
+      },
+      "block_order": [
+        "review_1",
+        "review_2",
+        "review_3"
+      ]
+    },
+    "lp_final": {
+      "type": "lp-final",
+      "settings": {
+        "eyebrow": "Ready when you are",
+        "heading": "Try havasta meerijdplankje today.",
+        "body": "$29.99 with free shipping over $45 — and a 30-day money-back guarantee if it isn’t for you.",
+        "cta_text": "Add to cart — $29.99",
+        "guarantee": "30-day money-back guarantee · free U.S. shipping over $45"
+      }
+    }
+  },
+  "order": [
+    "lp_hero",
+    "lp_strip",
+    "lp_benefits",
+    "lp_steps",
+    "lp_reviews",
+    "lp_final"
+  ]
+}

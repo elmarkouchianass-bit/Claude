@@ -1,0 +1,49 @@
+{%- comment -%}
+  Open Graph + Twitter Card meta tags (modeled on Dawn's snippets/meta-tags.liquid).
+  Rendered in the <head> of layout/theme.liquid. og:type resolves to
+  product/article contextually; og:image prefers the product image, then the
+  article image, then the merchant logo (admin-uploaded or bundled asset).
+{%- endcomment -%}
+
+{%- assign og_title = page_title | default: shop.name -%}
+{%- assign og_type = 'website' -%}
+{%- assign og_description = page_description | default: shop.description | default: shop.name -%}
+{%- assign og_image = '' -%}
+
+{%- if template.name contains 'product' and product -%}
+  {%- assign og_type = 'product' -%}
+  {%- if product.featured_image -%}
+    {%- assign og_image = product.featured_image | image_url: width: 1200 | prepend: 'https:' -%}
+  {%- endif -%}
+{%- elsif template.name contains 'article' and article -%}
+  {%- assign og_type = 'article' -%}
+  {%- if article.image -%}
+    {%- assign og_image = article.image | image_url: width: 1200 | prepend: 'https:' -%}
+  {%- endif -%}
+{%- endif -%}
+
+{%- if og_image == blank -%}
+  {%- if settings.logo != blank -%}
+    {%- assign og_image = settings.logo | image_url: width: 1200 | prepend: 'https:' -%}
+  {%- elsif settings.logo_bundled_filename != blank -%}
+    {%- assign og_image = settings.logo_bundled_filename | asset_url -%}
+  {%- endif -%}
+{%- endif -%}
+
+<meta property="og:site_name" content="{{ shop.name | escape }}">
+<meta property="og:url" content="{{ canonical_url }}">
+<meta property="og:title" content="{{ og_title | escape }}">
+<meta property="og:type" content="{{ og_type }}">
+<meta property="og:description" content="{{ og_description | strip_html | escape }}">
+{%- if og_image != blank %}
+<meta property="og:image" content="{{ og_image }}">
+<meta property="og:image:secure_url" content="{{ og_image }}">
+{%- endif %}
+{%- if og_type == 'product' %}
+<meta property="og:price:amount" content="{{ product.price | money_without_currency | strip_html }}">
+<meta property="og:price:currency" content="{{ cart.currency.iso_code | default: 'USD' }}">
+{%- endif %}
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ og_title | escape }}">
+<meta name="twitter:description" content="{{ og_description | strip_html | escape }}">

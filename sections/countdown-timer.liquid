@@ -1,0 +1,223 @@
+<style>
+  .countdown-section {
+    padding: 3rem 1rem;
+    text-align: center;
+  }
+
+  .countdown-section__inner {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .countdown-section__heading {
+    font-family: var(--font-heading);
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 0.5rem;
+  }
+
+  .countdown-section__subheading {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    opacity: 0.75;
+    margin: 0 0 2rem;
+    line-height: 1.5;
+  }
+
+  .countdown-timer {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .countdown-timer__block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+    padding: 1.25rem 1rem;
+    background: var(--color-background-card);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .countdown-timer__value {
+    font-family: var(--font-heading);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .countdown-timer__label {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 0.4rem;
+    opacity: 0.6;
+  }
+
+  .countdown-section__expired {
+    display: none;
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    font-weight: 600;
+    opacity: 0.7;
+    padding: 2rem 0;
+  }
+
+  .countdown-section__expired.is-visible {
+    display: block;
+  }
+
+  @media (max-width: 480px) {
+    .countdown-timer__block {
+      min-width: 64px;
+      padding: 1rem 0.75rem;
+    }
+  }
+</style>
+
+<section
+  class="countdown-section"
+  style="background: {{ section.settings.background_color }}; color: {{ section.settings.text_color }};"
+  data-countdown-section
+  data-end-date="{{ section.settings.end_date }}"
+  data-reveal
+>
+  <div class="countdown-section__inner">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="countdown-section__heading" style="color: {{ section.settings.text_color }};">
+        {{ section.settings.heading }}
+      </h2>
+    {%- endif -%}
+
+    {%- if section.settings.subheading != blank -%}
+      <p class="countdown-section__subheading" style="color: {{ section.settings.text_color }};">
+        {{ section.settings.subheading }}
+      </p>
+    {%- endif -%}
+
+    <div class="countdown-timer" data-countdown-display>
+      <div class="countdown-timer__block">
+        <span class="countdown-timer__value" data-countdown-days style="color: {{ section.settings.text_color }};">00</span>
+        <span class="countdown-timer__label" style="color: {{ section.settings.text_color }};">Days</span>
+      </div>
+      <div class="countdown-timer__block">
+        <span class="countdown-timer__value" data-countdown-hours style="color: {{ section.settings.text_color }};">00</span>
+        <span class="countdown-timer__label" style="color: {{ section.settings.text_color }};">Hours</span>
+      </div>
+      <div class="countdown-timer__block">
+        <span class="countdown-timer__value" data-countdown-minutes style="color: {{ section.settings.text_color }};">00</span>
+        <span class="countdown-timer__label" style="color: {{ section.settings.text_color }};">Minutes</span>
+      </div>
+      <div class="countdown-timer__block">
+        <span class="countdown-timer__value" data-countdown-seconds style="color: {{ section.settings.text_color }};">00</span>
+        <span class="countdown-timer__label" style="color: {{ section.settings.text_color }};">Seconds</span>
+      </div>
+    </div>
+
+    <p class="countdown-section__expired" data-countdown-expired style="color: {{ section.settings.text_color }};">
+      Sale has ended
+    </p>
+  </div>
+</section>
+
+<script>
+  (function() {
+    var section = document.querySelector('[data-countdown-section]');
+    if (!section) return;
+
+    var endDateStr = section.getAttribute('data-end-date');
+    if (!endDateStr) return;
+
+    var endDate = new Date(endDateStr).getTime();
+    if (isNaN(endDate)) return;
+
+    var daysEl = section.querySelector('[data-countdown-days]');
+    var hoursEl = section.querySelector('[data-countdown-hours]');
+    var minutesEl = section.querySelector('[data-countdown-minutes]');
+    var secondsEl = section.querySelector('[data-countdown-seconds]');
+    var display = section.querySelector('[data-countdown-display]');
+    var expired = section.querySelector('[data-countdown-expired]');
+
+    function pad(n) {
+      return n < 10 ? '0' + n : '' + n;
+    }
+
+    function tick() {
+      var now = Date.now();
+      var diff = endDate - now;
+
+      if (diff <= 0) {
+        display.style.display = 'none';
+        expired.classList.add('is-visible');
+        return;
+      }
+
+      var days = Math.floor(diff / 86400000);
+      var hours = Math.floor((diff % 86400000) / 3600000);
+      var minutes = Math.floor((diff % 3600000) / 60000);
+      var seconds = Math.floor((diff % 60000) / 1000);
+
+      daysEl.textContent = pad(days);
+      hoursEl.textContent = pad(hours);
+      minutesEl.textContent = pad(minutes);
+      secondsEl.textContent = pad(seconds);
+
+      setTimeout(tick, 1000);
+    }
+
+    tick();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Countdown Timer",
+  "class": "section-countdown-timer",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Limited Time Offer"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Don't miss out on these incredible deals."
+    },
+    {
+      "type": "text",
+      "id": "end_date",
+      "label": "End date (ISO format)",
+      "info": "Example: 2025-12-31T23:59:59",
+      "default": "2025-12-31T23:59:59"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Countdown Timer",
+      "category": "Promotional"
+    }
+  ]
+}
+{% endschema %}

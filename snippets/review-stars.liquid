@@ -1,0 +1,42 @@
+{%- comment -%}
+  Review stars — Free tier (static fallback).
+  Reads product.metafields.reviews.rating + rating_count (populated by any
+  Shopify review app: Judge.me free plan, Shopify Product Reviews, etc.).
+  If no rating exists, renders nothing.
+
+  Usage:
+    {% render 'review-stars', product: product %}           → compact (card)
+    {% render 'review-stars', product: product, expanded: true %} → with count text
+{%- endcomment -%}
+
+{%- assign _rating = product.metafields.reviews.rating -%}
+{%- assign _count = product.metafields.reviews.rating_count -%}
+
+{%- if _rating and _count and _count != 0 -%}
+  {%- assign _rating_num = _rating | times: 1.0 -%}
+  {%- assign _full = _rating_num | floor -%}
+  {%- assign _has_half = false -%}
+  {%- assign _frac = _rating_num | minus: _full -%}
+  {%- if _frac >= 0.25 and _frac < 0.75 -%}{%- assign _has_half = true -%}{%- endif -%}
+  {%- if _frac >= 0.75 -%}{%- assign _full = _full | plus: 1 -%}{%- endif -%}
+  {%- assign _half_index = _full | plus: 1 -%}
+
+  <div class="review-stars{% if expanded %} review-stars--expanded{% endif %}" role="img" aria-label="{{ _rating_num }} out of 5 stars, {{ _count }} reviews">
+    <span class="review-stars__row" aria-hidden="true">
+      {%- for i in (1..5) -%}
+        {%- if i <= _full -%}
+          <svg class="review-stars__star review-stars__star--full" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        {%- elsif i == _half_index and _has_half -%}
+          <svg class="review-stars__star review-stars__star--half" width="14" height="14" viewBox="0 0 24 24"><defs><linearGradient id="half-{{ product.id }}-{{ i }}"><stop offset="50%" stop-color="currentColor"/><stop offset="50%" stop-color="transparent"/></linearGradient></defs><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="url(#half-{{ product.id }}-{{ i }})" stroke="currentColor" stroke-width="1"/></svg>
+        {%- else -%}
+          <svg class="review-stars__star review-stars__star--empty" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        {%- endif -%}
+      {%- endfor -%}
+    </span>
+    {%- if expanded -%}
+      <span class="review-stars__text">{{ _rating_num }} <span class="review-stars__count">({{ _count }} review{% if _count != 1 %}s{% endif %})</span></span>
+    {%- else -%}
+      <span class="visually-hidden">{{ _rating_num }} out of 5 stars ({{ _count }} reviews)</span>
+    {%- endif -%}
+  </div>
+{%- endif -%}

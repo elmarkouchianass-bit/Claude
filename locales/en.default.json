@@ -1,0 +1,58 @@
+{
+  "navigation": {
+    "shop": "Shop",
+    "collections": "Products",
+    "about": "About",
+    "journal": "Journal",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "shipping": "Shipping",
+    "returns": "Returns"
+  },
+  "accessibility": {
+    "skip_to_content": "Skip to content",
+    "announcement_bar": "Announcement",
+    "dismiss": "Dismiss",
+    "toggle_menu": "Toggle menu",
+    "open_cart": "Open cart",
+    "search": "Search",
+    "close": "Close",
+    "account": "Account",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty",
+    "item_count": "{{ count }} items"
+  },
+  "newsletter": {
+    "email_placeholder": "Your email",
+    "submit": "Subscribe",
+    "success": "Thanks for subscribing!"
+  },
+  "gift_cards": {
+    "issued": {
+      "title": "Gift card",
+      "subtext": "Here's your gift card!",
+      "redeem": "Use this code at checkout to redeem your {{ value }} gift card",
+      "expires_on": "Expires {{ expiry }}",
+      "shop_link": "Continue shopping"
+    }
+  },
+  "sections": {
+    "404": {
+      "heading": "Page not found",
+      "subheading": "The page you were looking for doesn't exist.",
+      "button": "Back to home"
+    },
+    "newsletter": {
+      "email_placeholder": "Your email",
+      "submit": "Subscribe",
+      "success": "Thanks for subscribing!"
+    },
+    "featured_collection": {
+      "sample_product": "Sample Product"
+    }
+  }
+}

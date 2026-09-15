@@ -1,0 +1,38 @@
+{%- comment -%} Free single-product landing — final CTA {%- endcomment -%}
+<section class="lp-block lp-final" id="buy" data-reveal>
+  <div class="lp-wrap lp-final__grid">
+    <div class="lp-final__img">
+      {%- if section.settings.media != blank -%}
+        {{ section.settings.media | image_url: width: 1100 | image_tag: alt: section.settings.heading, width: 1100, height: 1100, class: 'lp-img', loading: 'lazy' }}
+      {%- elsif section.settings.image_url != blank -%}
+        <img class="lp-img" src="{{ section.settings.image_url }}" alt="{{ section.settings.heading }}" width="1100" height="1100" loading="lazy">
+      {%- else -%}
+        <img class="lp-img" src="{{ 'hero-2.png' | asset_url }}" alt="{{ section.settings.heading }}" width="1100" height="1100" loading="lazy">
+      {%- endif -%}
+    </div>
+    <div class="lp-final__body">
+      {%- if section.settings.eyebrow != blank -%}<span class="lp-eyebrow">{{ section.settings.eyebrow }}</span>{%- endif -%}
+      {%- if section.settings.heading != blank -%}<h2>{{ section.settings.heading }}</h2>{%- endif -%}
+      {%- if section.settings.body != blank -%}<p>{{ section.settings.body }}</p>{%- endif -%}
+      <a href="{{ section.settings.cta_url | default: routes.all_products_collection_url }}" class="lp-btn lp-btn--lg">{{ section.settings.cta_text | default: 'Add to cart' }}</a>
+      {%- if section.settings.guarantee != blank -%}<div class="lp-guarantee"><i class="lp-dot"></i>{{ section.settings.guarantee }}</div>{%- endif -%}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "Landing final CTA",
+  "class": "section-lp-final",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+    { "type": "text", "id": "heading", "label": "Heading" },
+    { "type": "textarea", "id": "body", "label": "Body" },
+    { "type": "text", "id": "cta_text", "label": "Button text" },
+    { "type": "url", "id": "cta_url", "label": "Button link" },
+    { "type": "text", "id": "guarantee", "label": "Guarantee line" },
+    { "type": "image_picker", "id": "media", "label": "Image (overrides the fallback)" },
+    { "type": "text", "id": "image_url", "label": "Image URL (used when no image is picked)" }
+  ],
+  "presets": [ { "name": "Landing final CTA" } ]
+}
+{% endschema %}

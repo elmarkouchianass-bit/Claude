@@ -1,0 +1,602 @@
+{%- assign _layout = section.settings.layout | default: 'single-row' -%}
+{%- assign _right_only_layout = false -%}
+{%- if _layout == 'inline-left' -%}{%- assign _right_only_layout = true -%}{%- endif -%}
+<header class="site-header" role="banner" data-layout="{{ _layout }}">
+  <div class="header__row container">
+    <nav class="header__nav header__nav--left" aria-label="{{ 'accessibility.toggle_menu' | t }}">
+      {%- if section.settings.menu != blank -%}
+        {%- for link in linklists[section.settings.menu].links -%}
+          {%- if forloop.index <= 2 -%}
+            {%- assign has_grandchildren = false -%}
+            {%- if link.links.size > 0 -%}
+              {%- for child in link.links -%}
+                {%- if child.links.size > 0 -%}
+                  {%- assign has_grandchildren = true -%}
+                  {%- break -%}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
+            <div class="nav-item{% if has_grandchildren %} nav-item--mega{% endif %}"{% if has_grandchildren %} data-mega-menu{% endif %}>
+              <a href="{{ link.url }}" class="nav-link{% if link.links.size > 0 %} has-dropdown{% endif %}">
+                {{ link.title }}
+                {%- if link.links.size > 0 -%}
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                {%- endif -%}
+              </a>
+              {%- if link.links.size > 0 -%}
+                {%- if has_grandchildren -%}
+                  <div class="mega-menu" aria-hidden="true">
+                    <div class="mega-menu__inner container">
+                      {%- for child in link.links -%}
+                        <div class="mega-menu__column">
+                          <a href="{{ child.url }}" class="mega-menu__column-title">{{ child.title }}</a>
+                          {%- if child.links.size > 0 -%}
+                            <ul class="mega-menu__links">
+                              {%- for grandchild in child.links -%}
+                                <li><a href="{{ grandchild.url }}" class="mega-menu__link">{{ grandchild.title }}</a></li>
+                              {%- endfor -%}
+                            </ul>
+                          {%- endif -%}
+                        </div>
+                      {%- endfor -%}
+                    </div>
+                  </div>
+                {%- else -%}
+                  <div class="dropdown">
+                    {%- for child in link.links -%}
+                      <a href="{{ child.url }}" class="dropdown__link">{{ child.title }}</a>
+                    {%- endfor -%}
+                  </div>
+                {%- endif -%}
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- else -%}
+        {%- unless _right_only_layout -%}
+          <a href="/collections/all" class="nav-link">{{ 'navigation.shop' | t }}</a>
+          <a href="/pages/about" class="nav-link">{{ 'navigation.about' | t }}</a>
+        {%- endunless -%}
+      {%- endif -%}
+    </nav>
+
+    <a href="/" class="header__logo">
+      {%- if settings.logo != blank -%}
+        <img src="{{ settings.logo | image_url: width: 280 }}" alt="{{ shop.name }}" width="{{ settings.logo_max_width }}" height="auto" loading="eager">
+      {%- elsif settings.logo_bundled_filename != blank -%}
+        <img src="{{ settings.logo_bundled_filename | asset_url }}" alt="{{ shop.name }}" width="{{ settings.logo_max_width }}" height="auto" loading="eager" class="header__logo-img--bundled">
+      {%- else -%}
+        <span class="header__logo-text">{{ shop.name }}</span>
+      {%- endif -%}
+    </a>
+
+    <div class="header__nav header__nav--right">
+      {%- if section.settings.menu != blank -%}
+        {%- for link in linklists[section.settings.menu].links -%}
+          {%- comment -%}
+            single-row + stacked: items 1-2 go left of the wordmark, items 3+ go right.
+            inline-left: left nav is CSS-hidden, so render ALL items on the right.
+          {%- endcomment -%}
+          {%- if _layout == 'inline-left' or forloop.index > 2 -%}
+            {%- assign has_grandchildren = false -%}
+            {%- if link.links.size > 0 -%}
+              {%- for child in link.links -%}
+                {%- if child.links.size > 0 -%}
+                  {%- assign has_grandchildren = true -%}
+                  {%- break -%}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
+            <div class="nav-item{% if has_grandchildren %} nav-item--mega{% endif %}"{% if has_grandchildren %} data-mega-menu{% endif %}>
+              <a href="{{ link.url }}" class="nav-link{% if link.links.size > 0 %} has-dropdown{% endif %}">
+                {{ link.title }}
+                {%- if link.links.size > 0 -%}
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                {%- endif -%}
+              </a>
+              {%- if link.links.size > 0 -%}
+                {%- if has_grandchildren -%}
+                  <div class="mega-menu" aria-hidden="true">
+                    <div class="mega-menu__inner container">
+                      {%- for child in link.links -%}
+                        <div class="mega-menu__column">
+                          <a href="{{ child.url }}" class="mega-menu__column-title">{{ child.title }}</a>
+                          {%- if child.links.size > 0 -%}
+                            <ul class="mega-menu__links">
+                              {%- for grandchild in child.links -%}
+                                <li><a href="{{ grandchild.url }}" class="mega-menu__link">{{ grandchild.title }}</a></li>
+                              {%- endfor -%}
+                            </ul>
+                          {%- endif -%}
+                        </div>
+                      {%- endfor -%}
+                    </div>
+                  </div>
+                {%- else -%}
+                  <div class="dropdown">
+                    {%- for child in link.links -%}
+                      <a href="{{ child.url }}" class="dropdown__link">{{ child.title }}</a>
+                    {%- endfor -%}
+                  </div>
+                {%- endif -%}
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- else -%}
+        {%- comment -%}
+          Fallback nav when merchant hasn't configured a menu in Shopify Admin.
+          Only links to pages that ship with every theme tier — no Journal here
+          because /blogs/<handle> requires the merchant to have created a blog
+          with that handle (Shopify's default blog handle is "news", not
+          "journal"), and Starter tier ships with a generic blog.json but no
+          custom handle. Merchants who want a Journal link add it via Admin.
+        {%- endcomment -%}
+        {%- if _right_only_layout -%}
+          <a href="/collections/all" class="nav-link">{{ 'navigation.shop' | t }}</a>
+          <a href="/collections" class="nav-link">{{ 'navigation.collections' | t | default: 'Collections' }}</a>
+          <a href="/pages/about" class="nav-link">{{ 'navigation.about' | t }}</a>
+          <a href="/pages/contact" class="nav-link">{{ 'navigation.contact' | t }}</a>
+        {%- else -%}
+          <a href="/collections" class="nav-link">{{ 'navigation.collections' | t | default: 'Collections' }}</a>
+          <a href="/pages/about" class="nav-link">{{ 'navigation.about' | t }}</a>
+          <a href="/pages/contact" class="nav-link">{{ 'navigation.contact' | t }}</a>
+        {%- endif -%}
+      {%- endif -%}
+      <div class="header__icons">
+        {%- if section.settings.show_locale_switcher and localization.available_countries.size > 1 -%}
+          <details class="locale-switcher" data-locale-switcher>
+            <summary class="locale-switcher__trigger" aria-label="Change country or region">
+              <span class="locale-switcher__code">{{ localization.country.iso_code }}</span>
+              <svg class="locale-switcher__chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </summary>
+            <div class="locale-switcher__menu" role="menu">
+              {%- form 'localization', class: 'locale-switcher__form' -%}
+                {%- for country in localization.available_countries -%}
+                  <button type="submit" name="country_code" value="{{ country.iso_code }}" class="locale-switcher__option{% if country.iso_code == localization.country.iso_code %} is-active{% endif %}" role="menuitemradio" aria-checked="{% if country.iso_code == localization.country.iso_code %}true{% else %}false{% endif %}">
+                    <span class="locale-switcher__iso">{{ country.iso_code }}</span>
+                    <span class="locale-switcher__name">{{ country.name }}</span>
+                    <span class="locale-switcher__currency">{{ country.currency.iso_code }}</span>
+                  </button>
+                {%- endfor -%}
+              {%- endform -%}
+            </div>
+          </details>
+        {%- endif -%}
+        <div class="header__search-wrap">
+          <button type="button" class="header__icon header__search-toggle" aria-label="{{ 'accessibility.search' | t }}" data-search-toggle>
+            {%- render 'icon-sets', icon: 'search', set: section.settings.icon_set -%}
+          </button>
+          <div class="predictive-search" data-predictive-search aria-hidden="true">
+            <form action="/search" method="get" class="predictive-search__form" role="search">
+              <input
+                type="search"
+                name="q"
+                class="predictive-search__input"
+                placeholder="Search..."
+                autocomplete="off"
+                aria-label="Search"
+                data-predictive-input
+              >
+              <button type="button" class="predictive-search__close" data-search-close aria-label="Close search">
+                {%- render 'icon-sets', icon: 'close', set: section.settings.icon_set -%}
+              </button>
+            </form>
+            <div class="predictive-search__results" data-predictive-results></div>
+          </div>
+        </div>
+        <a href="/account" class="header__icon" aria-label="{{ 'accessibility.account' | t }}">
+          {%- render 'icon-sets', icon: 'account', set: section.settings.icon_set -%}
+        </a>
+        <a href="/cart" class="header__icon header__cart" data-cart-trigger aria-label="{{ 'accessibility.open_cart' | t }}">
+          {%- render 'icon-sets', icon: 'cart', set: section.settings.icon_set -%}
+          <span class="cart-count">{{ cart.item_count }}</span>
+        </a>
+      </div>
+    </div>
+
+    <button class="nav-toggle" aria-label="{{ 'accessibility.toggle_menu' | t }}" aria-expanded="false" aria-controls="mobile-nav">
+      {%- render 'icon-sets', icon: 'menu', set: section.settings.icon_set -%}
+    </button>
+  </div>
+
+  <div class="mobile-nav-overlay" aria-hidden="true"></div>
+  <nav class="mobile-nav" id="mobile-nav" aria-hidden="true" aria-label="{{ 'accessibility.toggle_menu' | t }}">
+    <div class="mobile-nav__inner">
+      {%- if section.settings.menu != blank -%}
+        {%- for link in linklists[section.settings.menu].links -%}
+          <a href="{{ link.url }}" class="mobile-nav__link">{{ link.title }}</a>
+        {%- endfor -%}
+      {%- else -%}
+        <a href="/collections/all" class="mobile-nav__link">{{ 'navigation.shop' | t }}</a>
+        <a href="/pages/about" class="mobile-nav__link">{{ 'navigation.about' | t }}</a>
+        <a href="/pages/contact" class="mobile-nav__link">{{ 'navigation.contact' | t }}</a>
+      {%- endif -%}
+    </div>
+  </nav>
+</header>
+
+{%- comment -%} Stacked layout: centered nav row below header {%- endcomment -%}
+<nav class="header__nav-stacked" aria-label="Main navigation">
+  {%- if section.settings.menu != blank -%}
+    {%- for link in linklists[section.settings.menu].links -%}
+      <a href="{{ link.url }}" class="nav-link">{{ link.title }}</a>
+    {%- endfor -%}
+  {%- else -%}
+    <a href="/collections/all" class="nav-link">{{ 'navigation.shop' | t }}</a>
+    <a href="/collections" class="nav-link">{{ 'navigation.collections' | t }}</a>
+    <a href="/pages/about" class="nav-link">{{ 'navigation.about' | t }}</a>
+    <a href="/pages/contact" class="nav-link">{{ 'navigation.contact' | t }}</a>
+  {%- endif -%}
+</nav>
+
+<style>
+  /* -- Predictive Search -- */
+  .header__search-wrap {
+    position: relative;
+  }
+
+  .predictive-search {
+    position: absolute;
+    top: calc(100% + 0.75rem);
+    right: -1rem;
+    width: 380px;
+    max-width: calc(100vw - 2rem);
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s 0.2s;
+    z-index: 150;
+    overflow: hidden;
+  }
+
+  .predictive-search.is-open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s 0s;
+  }
+
+  .predictive-search__form {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--color-border);
+    padding: 0.5rem 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .predictive-search__input {
+    flex: 1;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    border: none;
+    background: transparent;
+    color: var(--color-text);
+    outline: none;
+    padding: 0.4rem 0;
+  }
+
+  .predictive-search__input::placeholder {
+    color: var(--color-text);
+    opacity: 0.4;
+  }
+
+  .predictive-search__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    color: var(--color-text);
+    opacity: 0.4;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 50%;
+    transition: opacity 0.15s ease;
+  }
+
+  .predictive-search__close:hover {
+    opacity: 1;
+  }
+
+  .predictive-search__results {
+    max-height: 360px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .predictive-search__group {
+    padding: 0.5rem 0;
+  }
+
+  .predictive-search__group-title {
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text);
+    opacity: 0.45;
+    padding: 0.25rem 0.875rem 0.35rem;
+    margin: 0;
+  }
+
+  .predictive-search__item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.875rem;
+    text-decoration: none;
+    color: var(--color-text);
+    transition: background 0.1s ease;
+  }
+
+  .predictive-search__item:hover {
+    background: var(--color-background-card);
+  }
+
+  .predictive-search__item-image {
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+    border-radius: 6px;
+    background: var(--color-background-card);
+    flex-shrink: 0;
+  }
+
+  .predictive-search__item-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .predictive-search__item-title {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .predictive-search__item-price {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    opacity: 0.6;
+  }
+
+  .predictive-search__item-meta {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    opacity: 0.45;
+  }
+
+  .predictive-search__empty {
+    padding: 1.5rem 0.875rem;
+    text-align: center;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--color-text);
+    opacity: 0.5;
+  }
+
+  .predictive-search__view-all {
+    display: block;
+    text-align: center;
+    padding: 0.65rem;
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-decoration: none;
+    border-top: 1px solid var(--color-border);
+    transition: background 0.1s ease;
+  }
+
+  .predictive-search__view-all:hover {
+    background: var(--color-background-card);
+  }
+</style>
+
+<script>
+  (function() {
+    var toggle = document.querySelector('[data-search-toggle]');
+    var panel = document.querySelector('[data-predictive-search]');
+    var input = document.querySelector('[data-predictive-input]');
+    var results = document.querySelector('[data-predictive-results]');
+    var closeBtn = document.querySelector('[data-search-close]');
+    if (!toggle || !panel || !input || !results) return;
+
+    var debounceTimer = null;
+    var isOpen = false;
+
+    function openSearch() {
+      panel.classList.add('is-open');
+      panel.setAttribute('aria-hidden', 'false');
+      isOpen = true;
+      setTimeout(function() { input.focus(); }, 50);
+    }
+
+    function closeSearch() {
+      panel.classList.remove('is-open');
+      panel.setAttribute('aria-hidden', 'true');
+      isOpen = false;
+      input.value = '';
+      results.innerHTML = '';
+    }
+
+    toggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (isOpen) { closeSearch(); } else { openSearch(); }
+    });
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function() { closeSearch(); });
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && isOpen) closeSearch();
+    });
+
+    document.addEventListener('click', function(e) {
+      if (isOpen && !panel.contains(e.target) && !toggle.contains(e.target)) {
+        closeSearch();
+      }
+    });
+
+    function escapeHtml(str) {
+      var d = document.createElement('div');
+      d.appendChild(document.createTextNode(str));
+      return d.innerHTML;
+    }
+
+    input.addEventListener('input', function() {
+      clearTimeout(debounceTimer);
+      var q = input.value.trim();
+      if (q.length < 2) {
+        results.innerHTML = '';
+        return;
+      }
+      debounceTimer = setTimeout(function() {
+        fetch('/search/suggest.json?q=' + encodeURIComponent(q) + '&resources[type]=product,collection,page&resources[limit]=4')
+          .then(function(res) { return res.ok ? res.json() : null; })
+          .then(function(data) {
+            if (!data || !data.resources || !data.resources.results) {
+              results.innerHTML = '<div class="predictive-search__empty">No results</div>';
+              return;
+            }
+            var r = data.resources.results;
+            var html = '';
+
+            /* Products */
+            if (r.products && r.products.length > 0) {
+              html += '<div class="predictive-search__group">';
+              html += '<p class="predictive-search__group-title">Products</p>';
+              r.products.forEach(function(p) {
+                var img = p.image ? '<img class="predictive-search__item-image" src="' + p.image + '&width=88" alt="" loading="lazy" width="44" height="44">' : '';
+                var price = p.price ? '$' + parseFloat(p.price).toFixed(2) : '';
+                html += '<a href="' + p.url + '" class="predictive-search__item">';
+                html += img;
+                html += '<div class="predictive-search__item-info">';
+                html += '<span class="predictive-search__item-title">' + escapeHtml(p.title) + '</span>';
+                if (price) html += '<span class="predictive-search__item-price">' + price + '</span>';
+                html += '</div></a>';
+              });
+              html += '</div>';
+            }
+
+            /* Collections */
+            if (r.collections && r.collections.length > 0) {
+              html += '<div class="predictive-search__group">';
+              html += '<p class="predictive-search__group-title">Collections</p>';
+              r.collections.forEach(function(c) {
+                html += '<a href="' + c.url + '" class="predictive-search__item">';
+                html += '<div class="predictive-search__item-info">';
+                html += '<span class="predictive-search__item-title">' + escapeHtml(c.title) + '</span>';
+                html += '</div></a>';
+              });
+              html += '</div>';
+            }
+
+            /* Pages */
+            if (r.pages && r.pages.length > 0) {
+              html += '<div class="predictive-search__group">';
+              html += '<p class="predictive-search__group-title">Pages</p>';
+              r.pages.forEach(function(pg) {
+                html += '<a href="' + pg.url + '" class="predictive-search__item">';
+                html += '<div class="predictive-search__item-info">';
+                html += '<span class="predictive-search__item-title">' + escapeHtml(pg.title) + '</span>';
+                html += '</div></a>';
+              });
+              html += '</div>';
+            }
+
+            if (!html) {
+              html = '<div class="predictive-search__empty">No results for "' + escapeHtml(q) + '"</div>';
+            } else {
+              html += '<a href="/search?q=' + encodeURIComponent(q) + '" class="predictive-search__view-all">View all results</a>';
+            }
+
+            results.innerHTML = html;
+          })
+          .catch(function() {
+            results.innerHTML = '';
+          });
+      }, 300);
+    });
+
+    /* Enter key submits to full search page */
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        var q = input.value.trim();
+        if (q) {
+          window.location.href = '/search?q=' + encodeURIComponent(q);
+        }
+        e.preventDefault();
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "section-header",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Header layout",
+      "default": "single-row",
+      "options": [
+        { "value": "single-row", "label": "Single row (nav | logo | nav)" },
+        { "value": "stacked", "label": "Stacked (logo above nav)" },
+        { "value": "inline-left", "label": "Inline (logo left, nav right)" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "icon_set",
+      "label": "Icon style",
+      "default": "outline",
+      "options": [
+        { "value": "outline", "label": "Outline (rounded)" },
+        { "value": "sharp", "label": "Sharp (angular)" },
+        { "value": "filled", "label": "Filled (solid)" },
+        { "value": "minimal", "label": "Minimal (thin)" }
+      ]
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Main menu"
+    },
+    {
+      "type": "header",
+      "content": "Country/region switcher"
+    },
+    {
+      "type": "paragraph",
+      "content": "Shows a compact ISO-code dropdown (US, CA, GB, etc.) in the header. Auto-hides when the store has only one market."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_locale_switcher",
+      "label": "Show country/region switcher",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Header"
+    }
+  ]
+}
+{% endschema %}

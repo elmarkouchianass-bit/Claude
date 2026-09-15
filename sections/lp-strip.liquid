@@ -1,0 +1,19 @@
+{%- comment -%} Free single-product landing — trust strip {%- endcomment -%}
+<div class="lp-strip">
+  <div class="lp-wrap lp-strip__row">
+    {%- for block in section.blocks -%}
+      <div class="lp-strip__item" {{ block.shopify_attributes }}><i class="lp-sq"></i>{{ block.settings.label }}</div>
+    {%- endfor -%}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "Landing trust strip",
+  "class": "section-lp-strip",
+  "settings": [],
+  "blocks": [
+    { "type": "item", "name": "Item", "settings": [ { "type": "text", "id": "label", "label": "Label" } ] }
+  ],
+  "presets": [ { "name": "Landing trust strip", "blocks": [ { "type": "item" }, { "type": "item" }, { "type": "item" }, { "type": "item" } ] } ]
+}
+{% endschema %}

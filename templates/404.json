@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "four_oh_four": {
+      "type": "404",
+      "settings": {}
+    }
+  },
+  "order": ["four_oh_four"]
+}

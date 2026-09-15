@@ -1,0 +1,1703 @@
+<style>
+  .product-page {
+    padding: 2rem 1rem 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .product-page__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .product-page__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+    }
+  }
+
+  /* --- Gallery --- */
+  .product-gallery {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 768px) {
+    .product-gallery {
+      flex-direction: row;
+    }
+  }
+
+  .product-gallery__thumbnails {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+  }
+
+  @media (min-width: 768px) {
+    .product-gallery__thumbnails {
+      flex-direction: column;
+      overflow-x: visible;
+      overflow-y: auto;
+      max-height: 560px;
+      width: 72px;
+      flex-shrink: 0;
+    }
+  }
+
+  .product-gallery__thumb {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid var(--color-border);
+    opacity: 0.6;
+    transition: opacity 0.25s ease, border-color 0.25s ease;
+  }
+
+  .product-gallery__thumb:hover,
+  .product-gallery__thumb.is-active {
+    opacity: 1;
+    border-color: var(--color-primary);
+  }
+
+  .product-gallery__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .product-gallery__main {
+    flex: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--color-border);
+    aspect-ratio: 1 / 1;
+    position: relative;
+  }
+
+  .product-gallery__main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+
+  .product-gallery__main img.is-active,
+  .product-gallery__main .product-gallery__video.is-active,
+  .product-gallery__main .product-gallery__model.is-active {
+    opacity: 1;
+  }
+
+  .product-gallery__video,
+  .product-gallery__model {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-background);
+  }
+
+  .product-gallery__video video,
+  .product-gallery__video iframe {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border: none;
+  }
+
+  .product-gallery__thumb--video {
+    position: relative;
+  }
+
+  .product-gallery__play-badge {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.3);
+    color: #fff;
+    border-radius: 4px;
+  }
+
+  /* ── Image zoom on hover (desktop only) ── */
+  @media (min-width: 768px) {
+    .product-gallery__main {
+      background-size: 200%;
+      background-repeat: no-repeat;
+      background-position: center center;
+      cursor: zoom-in;
+    }
+    .product-gallery__main:hover img.is-active {
+      opacity: 0;
+    }
+  }
+
+  /* --- Product info --- */
+  .product-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .product-info__vendor {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .product-info__title {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    line-height: 1.2;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  @media (min-width: 768px) {
+    .product-info__title {
+      font-size: 2.25rem;
+    }
+  }
+
+  .product-info__price {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .product-info__price-current {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    color: var(--color-text);
+  }
+
+  .product-info__price-compare {
+    font-size: 1rem;
+    color: var(--color-text);
+    opacity: 0.5;
+    text-decoration: line-through;
+  }
+
+  .product-info__badge {
+    display: inline-block;
+    padding: 0.2em 0.6em;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--color-primary);
+    color: var(--color-background);
+    border-radius: 4px;
+  }
+
+  /* --- Stock counter --- */
+  .product-stock {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .product-stock--low {
+    color: #b45309;
+  }
+
+  .product-stock--in-stock {
+    color: #16a34a;
+  }
+
+  .product-stock--sold-out {
+    color: var(--color-text);
+    opacity: 0.45;
+  }
+
+  .product-stock__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  .product-stock--low .product-stock__dot {
+    background: #b45309;
+  }
+
+  .product-stock--in-stock .product-stock__dot {
+    background: #16a34a;
+  }
+
+  .product-stock--sold-out .product-stock__dot {
+    background: var(--color-text);
+    opacity: 0.45;
+  }
+
+  /* --- Size chart modal --- */
+  .size-chart-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    color: var(--color-primary);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: opacity 0.2s ease;
+    margin-left: 0.75rem;
+  }
+
+  .size-chart-trigger:hover {
+    opacity: 0.7;
+  }
+
+  .size-chart-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    padding: 1rem;
+  }
+
+  .size-chart-overlay.is-active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .size-chart-modal {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    background: var(--color-background-card);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.15);
+    transform: translateY(16px);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .size-chart-overlay.is-active .size-chart-modal {
+    transform: translateY(0);
+  }
+
+  .size-chart-modal__close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--color-text);
+    opacity: 0.4;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    padding: 0;
+  }
+
+  .size-chart-modal__close:hover {
+    opacity: 1;
+  }
+
+  .size-chart-modal__title {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 1rem;
+  }
+
+  .size-chart-modal__content {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--color-text);
+  }
+
+  .size-chart-modal__content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.75rem 0;
+  }
+
+  .size-chart-modal__content th,
+  .size-chart-modal__content td {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-border);
+    text-align: left;
+    font-size: 0.85rem;
+  }
+
+  .size-chart-modal__content th {
+    background: color-mix(in srgb, var(--color-primary) 6%, var(--color-background));
+    font-weight: 600;
+  }
+
+  .product-info__description {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--color-text);
+    opacity: 0.8;
+  }
+
+  .product-info__description p {
+    margin: 0 0 0.75rem;
+  }
+
+  .product-info__description p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* --- Options --- */
+  .product-option {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.15rem;
+  }
+
+  .product-option__label {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+
+  .product-option__select {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    max-width: 320px;
+    padding: 0.7rem 2.5rem 0.7rem 0.9rem;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--color-text);
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: var(--btn-radius, 6px);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.9rem center;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+  }
+
+  .product-option__select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  /* --- Swatches --- */
+  .product-option__swatches {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  /* Behaviour only. Every theme Themr has generated shipped a 28px circular
+     swatch with an identical hover scale and an identical double-ring selected
+     state, because this file is emitted byte-identical everywhere and these
+     rules carried real specificity. The look now sits inside :where(), which
+     has zero specificity — any rule an AI theme writes wins without needing
+     !important, and these survive only as a fallback when it writes none. */
+  .product-option__swatch {
+    cursor: pointer;
+    position: relative;
+  }
+
+  :where(.product-option__swatch) {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--color-border);
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  :where(.product-option__swatch:hover) {
+    transform: scale(1.12);
+  }
+
+  :where(.product-option__swatch.is-active) {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px var(--color-primary);
+  }
+
+  /* Colour swatches are EMPTY elements — the value lives in aria-label and
+     title, exactly as product-card.liquid has always written them. Putting the
+     text inside them collides with the round 28px shape: "Cream" and "Navy"
+     overflowed their circles and overlapped each other. Only text swatches
+     carry a label, and they size to it. */
+  :where(.product-option__swatch.swatch--text) {
+    width: auto;
+    height: auto;
+    min-width: 2.5rem;
+    padding: 0.4rem 0.7rem;
+    border-radius: var(--btn-radius, 4px);
+    font-size: 0.8125rem;
+  }
+
+  /* Belt and braces: if a theme does put content in a colour swatch, it is
+     clipped to the circle rather than spilling across its neighbours. */
+  :where(.product-option__swatch.swatch--color) {
+    overflow: hidden;
+    font-size: 0;
+    padding: 0;
+  }
+
+  /* The hidden native select, by class rather than an inline style, so a theme
+     can bring it back — a twenty-value option is a list, not a swatch row, and
+     only the theme can see which it is looking at. */
+  .product-option__select--replaced {
+    display: none;
+  }
+
+  /* Accelerated checkout. The button itself renders in shadow DOM and is not
+     ours to style; this single declaration makes its corner follow the theme's
+     own button radius instead of Shopify's default, so it varies per theme
+     rather than being identical everywhere. */
+  .product-actions {
+    --shopify-accelerated-checkout-button-border-radius: var(--btn-radius, 6px);
+  }
+
+  /* ── PRODUCT-PAGE VARIANTS ──────────────────────────────────────────
+     Reusing the preset token that already drives the shop page, because the
+     product page is about to carry three mechanics every theme shares and a
+     shared mechanic with one look is how the shop page became identical across
+     every brand in the first place (Bug #13, commit 744f80c: "the presets had
+     tokens for header/hero/buttons/logos but zero tokens for the collection
+     page, so /collections/all felt identical across themes whose homepages were
+     dramatically different").
+
+     These only set the DEFAULT per preset. Each is a plain class selector an
+     AI theme outranks, and the mechanics — the swatches, the media ids, the
+     variant wiring — are identical underneath regardless of which one applies.
+     Structure shared, appearance not. */
+
+  /* Editorial: tall portrait gallery, square text chips, generous rhythm. */
+  [data-product-style="editorial"] .product-gallery__main { aspect-ratio: 4 / 5; border-radius: 0; }
+  [data-product-style="editorial"] .product-option__swatch.swatch--text { border-radius: 0; letter-spacing: 0.06em; }
+  [data-product-style="editorial"] .product-option { margin-bottom: 1.6rem; }
+
+  /* Catalog: dense and square, small controls, information-first. */
+  [data-product-style="catalog"] .product-gallery__main { aspect-ratio: 1 / 1; border-radius: 2px; }
+  [data-product-style="catalog"] .product-option__swatch { width: 24px; height: 24px; }
+  [data-product-style="catalog"] .product-option__swatch.swatch--text { min-width: 2.1rem; padding: 0.3rem 0.5rem; font-size: 0.75rem; }
+  [data-product-style="catalog"] .product-option { margin-bottom: 0.85rem; }
+
+  /* Minimal: soft, roomy, quiet edges. */
+  [data-product-style="minimal"] .product-gallery__main { aspect-ratio: 3 / 4; border-radius: 14px; }
+  [data-product-style="minimal"] .product-option__swatch.swatch--text { border-radius: 999px; padding: 0.45rem 0.9rem; }
+
+  /* Bold: wide crop, heavy chips, shouted labels. */
+  [data-product-style="bold"] .product-gallery__main { aspect-ratio: 4 / 3; border-radius: 4px; }
+  [data-product-style="bold"] .product-option__swatch { width: 34px; height: 34px; }
+  [data-product-style="bold"] .product-option__swatch.swatch--text { font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+  [data-product-style="bold"] .product-option__label { font-weight: 700; text-transform: uppercase; }
+
+  /* --- Quantity --- */
+  .product-quantity {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .product-quantity__label {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+
+  .product-quantity__control {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--btn-radius, 6px);
+    overflow: hidden;
+    max-width: 140px;
+  }
+
+  .product-quantity__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    color: var(--color-text);
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background 0.15s ease;
+  }
+
+  .product-quantity__btn:hover {
+    background: var(--color-border);
+  }
+
+  .product-quantity__input {
+    width: 48px;
+    height: 40px;
+    text-align: center;
+    border: none;
+    border-left: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--color-text);
+    background: var(--color-background);
+    -moz-appearance: textfield;
+  }
+
+  .product-quantity__input::-webkit-inner-spin-button,
+  .product-quantity__input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* --- Buttons --- */
+  .product-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .product-actions__add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.85rem 1.5rem;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: var(--btn-letter-spacing, 0.06em);
+    text-transform: var(--btn-transform, uppercase);
+    color: var(--color-background);
+    background: var(--color-primary);
+    border: none;
+    border-radius: var(--btn-radius, 6px);
+    cursor: pointer;
+    transition: opacity 0.25s ease, transform 0.15s ease;
+  }
+
+  .product-actions__add:hover {
+    opacity: 0.88;
+  }
+
+  .product-actions__add:active {
+    transform: scale(0.98);
+  }
+
+  .product-actions__add:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+
+  /* --- Trust Badges --- */
+  .product-trust-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.5rem;
+    padding: 0.75rem 0;
+  }
+
+  .product-trust-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .product-trust-badge__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text);
+    opacity: 0.45;
+    flex-shrink: 0;
+  }
+
+  .product-trust-badge__text {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: var(--color-text);
+    opacity: 0.55;
+    letter-spacing: 0.02em;
+  }
+
+  /* --- Sticky Add-to-Cart Bar --- */
+  .sticky-atc-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: var(--color-background);
+    border-top: 1px solid var(--color-border);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+    padding: 0.75rem 1.5rem;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .sticky-atc-bar.is-visible {
+    display: flex;
+    transform: translateY(0);
+  }
+
+  .sticky-atc-bar.is-hidden {
+    display: flex;
+    transform: translateY(100%);
+  }
+
+  .sticky-atc-bar__title {
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 240px;
+  }
+
+  .sticky-atc-bar__price {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+    flex-shrink: 0;
+  }
+
+  .sticky-atc-bar__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.65rem 1.75rem;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: var(--btn-letter-spacing, 0.06em);
+    text-transform: var(--btn-transform, uppercase);
+    color: var(--color-background);
+    background: var(--color-primary);
+    border: none;
+    border-radius: var(--btn-radius, 6px);
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .sticky-atc-bar__btn:hover {
+    opacity: 0.88;
+  }
+
+  .sticky-atc-bar__btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  @media (min-width: 900px) {
+    .sticky-atc-bar {
+      display: none !important;
+    }
+  }
+
+  /* --- Share --- */
+  .product-share {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .product-share__label {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text);
+    opacity: 0.6;
+  }
+
+  .product-share__link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    color: var(--color-text);
+    opacity: 0.5;
+    transition: opacity 0.2s ease, color 0.2s ease;
+  }
+
+  .product-share__link:hover {
+    opacity: 1;
+    color: var(--color-primary);
+  }
+
+  /* --- Variant JSON select (hidden) --- */
+  .product-variants-select {
+    display: none;
+  }
+
+  /* ── Product tabs ── */
+  .product-tabs {
+    margin-top: 3rem;
+    max-width: 1200px;
+    padding: 0 1rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .product-tabs__nav {
+    display: flex;
+    border-bottom: 2px solid var(--color-border);
+    gap: 0;
+    margin-bottom: 0;
+  }
+
+  .product-tabs__btn {
+    padding: 0.75rem 1.5rem;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--color-text);
+    opacity: 0.5;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    transition: opacity 0.2s ease, border-color 0.2s ease;
+  }
+
+  .product-tabs__btn:hover {
+    opacity: 0.8;
+  }
+
+  .product-tabs__btn.is-active {
+    opacity: 1;
+    border-bottom-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  .product-tabs__panel {
+    display: none;
+    padding: 1.5rem 0;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--color-text);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .product-tabs__panel.is-active {
+    display: block;
+    opacity: 1;
+  }
+
+  .product-tabs__panel p {
+    margin: 0 0 0.75rem;
+  }
+</style>
+
+{%- comment -%}
+  data-product-style mirrors data-collection-style on main-collection.liquid,
+  and exists for the same reason. Bug #13: every generated theme rendered the
+  same shop page because presets carried tokens for the header, hero and buttons
+  but none for the collection page, so brands whose homepages looked nothing
+  alike had identical category pages. This file is emitted byte-identical in
+  every theme and the AI never reads it, so a mechanic added here with exactly
+  one visual treatment makes the product page the next such surface. The hook
+  costs nothing today and is the difference between a shared mechanism and a
+  shared appearance.
+{%- endcomment -%}
+<section class="product-page" data-product-style="{{ settings.preset_product_style | default: settings.preset_collection_style | default: 'minimal' }}" data-reveal>
+  <div class="product-page__grid">
+    {%- comment -%} Media gallery (images + videos) {%- endcomment -%}
+    <div class="product-gallery" data-product-gallery>
+      {%- if product.media.size > 1 -%}
+        <div class="product-gallery__thumbnails">
+          {%- for media in product.media -%}
+            <button
+              type="button"
+              class="product-gallery__thumb{% if forloop.first %} is-active{% endif %}{% if media.media_type == 'video' or media.media_type == 'external_video' %} product-gallery__thumb--video{% endif %}"
+              data-thumb-index="{{ forloop.index0 }}"
+              data-media-id="{{ media.id }}"
+              aria-label="View {{ media.media_type | default: 'image' }} {{ forloop.index }}"
+            >
+              <img
+                src="{{ media.preview_image | image_url: width: 150 }}"
+                alt="{{ media.alt | default: product.title | escape }}"
+                loading="lazy"
+                width="64"
+                height="64"
+              >
+              {%- if media.media_type == 'video' or media.media_type == 'external_video' -%}
+                <span class="product-gallery__play-badge" aria-hidden="true">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg>
+                </span>
+              {%- endif -%}
+            </button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      <div class="product-gallery__main">
+        {%- for media in product.media -%}
+          {%- if media.media_type == 'image' -%}
+            <img
+              src="{{ media | image_url: width: 800 }}"
+              srcset="
+                {{ media | image_url: width: 400 }} 400w,
+                {{ media | image_url: width: 600 }} 600w,
+                {{ media | image_url: width: 800 }} 800w,
+                {{ media | image_url: width: 1000 }} 1000w
+              "
+              sizes="(max-width: 767px) 100vw, 50vw"
+              alt="{{ media.alt | default: product.title | escape }}"
+              width="{{ media.preview_image.width }}"
+              height="{{ media.preview_image.height }}"
+              loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+              {% if forloop.first %}fetchpriority="high"{% endif %}
+              class="{% if forloop.first %}is-active{% endif %}"
+              data-media-index="{{ forloop.index0 }}"
+              data-media-id="{{ media.id }}"
+              data-media-type="image"
+            >
+          {%- elsif media.media_type == 'video' -%}
+            <div class="product-gallery__video{% if forloop.first %} is-active{% endif %}" data-media-index="{{ forloop.index0 }}" data-media-id="{{ media.id }}" data-media-type="video">
+              {{ media | video_tag: autoplay: false, loop: true, muted: false, controls: true, preload: 'metadata' }}
+            </div>
+          {%- elsif media.media_type == 'external_video' -%}
+            <div class="product-gallery__video{% if forloop.first %} is-active{% endif %}" data-media-index="{{ forloop.index0 }}" data-media-id="{{ media.id }}" data-media-type="external_video">
+              {{ media | external_video_tag: loading: 'lazy' }}
+            </div>
+          {%- elsif media.media_type == 'model' -%}
+            <div class="product-gallery__model{% if forloop.first %} is-active{% endif %}" data-media-index="{{ forloop.index0 }}" data-media-id="{{ media.id }}" data-media-type="model">
+              {{ media | model_viewer_tag }}
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+        {%- if product.media.size == 0 -%}
+          <img
+            src="{{ product.featured_image | image_url: width: 800 }}"
+            alt="{{ product.title | escape }}"
+            width="{{ product.featured_image.width }}"
+            height="{{ product.featured_image.height }}"
+            loading="eager"
+            fetchpriority="high"
+            class="is-active"
+          >
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- comment -%} Product info {%- endcomment -%}
+    <div class="product-info">
+      {%- if section.settings.show_vendor and product.vendor != blank -%}
+        <span class="product-info__vendor">{{ product.vendor }}</span>
+      {%- endif -%}
+
+      <h1 class="product-info__title">{{ product.title }}</h1>
+
+      <div class="product-info__price" data-product-price>
+        {%- if product.compare_at_price > product.price -%}
+          <span class="product-info__price-compare">{{ product.compare_at_price | money }}</span>
+          <span class="product-info__badge">Sale</span>
+        {%- endif -%}
+        <span class="product-info__price-current">{{ product.price | money }}</span>
+      </div>
+
+      {%- if section.settings.show_stock_counter -%}
+        {%- assign current_variant = product.selected_or_first_available_variant -%}
+        {%- if current_variant.inventory_management == 'shopify' -%}
+          {%- if current_variant.inventory_quantity <= 0 and current_variant.available == false -%}
+            <div class="product-stock product-stock--sold-out">
+              <span class="product-stock__dot"></span>
+              Sold out
+            </div>
+          {%- elsif current_variant.inventory_quantity <= 5 and current_variant.inventory_quantity > 0 -%}
+            <div class="product-stock product-stock--low">
+              <span class="product-stock__dot"></span>
+              Only {{ current_variant.inventory_quantity }} left in stock
+            </div>
+          {%- else -%}
+            <div class="product-stock product-stock--in-stock">
+              <span class="product-stock__dot"></span>
+              In stock
+            </div>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endif -%}
+
+      {%- if product.description != blank -%}
+        <div class="product-info__description">{{ product.description }}</div>
+      {%- endif -%}
+
+      {% form 'product', product %}
+        {%- comment -%} Variant selector {%- endcomment -%}
+        {%- for option in product.options_with_values -%}
+          <div class="product-option">
+            <label class="product-option__label" for="Option-{{ section.id }}-{{ forloop.index0 }}">
+              {{ option.name }}
+              {%- assign option_name_check = option.name | downcase -%}
+              {%- if option_name_check == 'size' and section.settings.size_chart != blank -%}
+                <button type="button" class="size-chart-trigger" data-size-chart-open aria-label="View size chart">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 10H3M21 6H3M21 14H3M21 18H3"/></svg>
+                  Size Chart
+                </button>
+              {%- endif -%}
+            </label>
+
+            {%- comment -%}
+              Buttons for EVERY option, not only colour. Replacing dropdowns with
+              visible choices is the one design change with a measured number
+              behind it in this space (an agency case study moved a client from
+              2.8% to 3.1% conversion doing exactly this).
+
+              Everything here is structure and state; nothing decides how it
+              looks. The colour rides in as a CUSTOM PROPERTY rather than an
+              inline background, so a theme can override it — an inline style
+              cannot be beaten without !important, and this file ships
+              byte-identical in every theme, so an inline visual decision here
+              is a decision made for every store Themr will ever generate.
+
+              The option name and the value are exposed as data attributes so a
+              theme can style size chips square and colour chips round if it
+              wants to. That is the theme's call to make, not this file's.
+            {%- endcomment -%}
+            {%- assign option_name_lower = option.name | downcase -%}
+            {%- assign is_color = false -%}
+            {%- if option_name_lower == 'color' or option_name_lower == 'colour' -%}
+              {%- assign is_color = true -%}
+            {%- endif -%}
+            {%- assign option_index = forloop.index0 -%}
+            {%- assign selected_value = '' -%}
+            {%- if product.selected_or_first_available_variant -%}
+              {%- assign selected_value = product.selected_or_first_available_variant.options[option_index] -%}
+            {%- endif -%}
+
+            <div
+              class="swatch-row product-option__swatches"
+              data-option-index="{{ forloop.index0 }}"
+              data-option-name="{{ option.name | downcase | handle }}"
+              role="group"
+              aria-label="{{ option.name }}"
+            >
+              {%- for value in option.values -%}
+                {%- comment -%}
+                  Availability per value, matching what product-card.liquid
+                  already does. Sold out is carried by a data attribute and by
+                  the accessible name, never by colour alone — Adam is
+                  colourblind and a greyed-out swatch says nothing to him.
+                {%- endcomment -%}
+                {%- assign value_available = false -%}
+                {%- for variant in product.variants -%}
+                  {%- comment -%}
+                    option_index, captured above. Three loops deep, forloop
+                    .parentloop is the VALUE loop rather than the option loop, so
+                    a parentloop chain here reads the wrong option column and
+                    every value after the first reports the wrong availability.
+                  {%- endcomment -%}
+                  {%- if variant.available and variant.options[option_index] == value -%}
+                    {%- assign value_available = true -%}
+                    {%- break -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                {%- assign swatch_color = value | downcase | replace: ' ', '' | replace: '-', '' -%}
+                {%- comment -%}
+                  The GLOBAL .swatch classes, not the local product-option__*
+                  duplicate this file used to carry. product-card.liquid has
+                  rendered every option this way for a long time; the product
+                  page was the one lagging behind. Reusing them means the
+                  colourblind-safe sold-out treatment — opacity AND a rotated
+                  strikethrough AND an aria-label suffix, never colour alone —
+                  comes along without being re-solved.
+                {%- endcomment -%}
+                <button
+                  type="button"
+                  class="swatch {% if is_color %}swatch--color{% else %}swatch--text{% endif %}{% if value == selected_value %} is-active{% endif %}{% unless value_available %} swatch--unavailable{% endunless %} product-option__swatch"
+                  {%- if is_color %} style="--swatch-color: {{ swatch_color }}; background-color: var(--swatch-color);"{% endif %}
+                  data-swatch-value="{{ value | escape }}"
+                  data-option-value="{{ value | handle }}"
+                  data-available="{{ value_available }}"
+                  aria-pressed="{% if value == selected_value %}true{% else %}false{% endif %}"
+                  {%- comment -%}
+                    aria-disabled rather than disabled: a sold-out size is worth
+                    finding with a keyboard, it just must not be selectable. The
+                    CSS blocks the mouse with pointer-events, which does nothing
+                    to Enter — so the click handler checks this too.
+                  {%- endcomment -%}
+                  {%- unless value_available %} aria-disabled="true"{% endunless %}
+                  title="{{ option.name }}: {{ value }}"
+                  aria-label="{{ option.name }}: {{ value }}{% unless value_available %} - Sold out{% endunless %}"
+                >{%- unless is_color -%}{{ value }}{%- endunless -%}</button>
+              {%- endfor -%}
+            </div>
+
+            {%- comment -%}
+              The select still holds the state and still works without JS. Hidden
+              by a CLASS rather than an inline style so a theme can bring it back
+              — twenty-four values is a list, not a swatch row, and only the
+              theme knows which it is looking at.
+            {%- endcomment -%}
+            <select
+              class="product-option__select product-option__select--replaced"
+              id="Option-{{ section.id }}-{{ forloop.index0 }}"
+              data-option-index="{{ forloop.index0 }}"
+            >
+              {%- for value in option.values -%}
+                <option value="{{ value | escape }}"{% if value == selected_value %} selected{% endif %}>
+                  {{ value }}
+                </option>
+              {%- endfor -%}
+            </select>
+          </div>
+        {%- endfor -%}
+
+        {%- comment -%} Hidden variant ID select {%- endcomment -%}
+        <select name="id" class="product-variants-select" data-variant-select>
+          {%- for variant in product.variants -%}
+            <option
+              value="{{ variant.id }}"
+              {% if variant == product.selected_or_first_available_variant %}selected{% endif %}
+              {% unless variant.available %}disabled{% endunless %}
+              data-variant-options='{{ variant.options | json }}'
+              data-variant-media="{{ variant.featured_media.id }}"
+              data-variant-price="{{ variant.price | money }}"
+              data-variant-compare="{% if variant.compare_at_price > variant.price %}{{ variant.compare_at_price | money }}{% endif %}"
+              data-variant-available="{{ variant.available }}"
+            >
+              {{ variant.title }} - {{ variant.price | money }}
+            </option>
+          {%- endfor -%}
+        </select>
+
+        {%- comment -%} Quantity {%- endcomment -%}
+        {%- if section.settings.show_quantity -%}
+          <div class="product-quantity">
+            <span class="product-quantity__label">Quantity</span>
+            <div class="product-quantity__control">
+              <button type="button" class="product-quantity__btn" data-qty-minus aria-label="Decrease quantity">-</button>
+              <input
+                type="number"
+                name="quantity"
+                value="1"
+                min="1"
+                class="product-quantity__input"
+                data-qty-input
+                aria-label="Quantity"
+              >
+              <button type="button" class="product-quantity__btn" data-qty-plus aria-label="Increase quantity">+</button>
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- comment -%} Add to Cart + Buy Now {%- endcomment -%}
+        <div class="product-actions">
+          <button
+            type="submit"
+            name="add"
+            class="product-actions__add"
+            {% unless product.available %}disabled{% endunless %}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+            {%- if product.available -%}
+              Add to Cart
+            {%- else -%}
+              Sold Out
+            {%- endif -%}
+          </button>
+
+          {%- comment -%}
+            REMOVED, 2026-08-31: a second button labelled "Buy It Now", carrying
+            a data-buy-now attribute that appeared exactly once in the entire
+            codebase — on the button itself. No JavaScript was ever bound to it.
+            It was a plain submit with formaction="/cart", so it added the item
+            and landed the shopper on the cart page. Every customer who clicked
+            it got the opposite of what the label promised, and leaving it
+            beside a genuine accelerated-checkout button would have put a real
+            instant buy next to a fake one.
+
+            Shop Pay / Apple Pay / Google Pay, which is what that button was
+            pretending to be. Absent from every theme Themr has ever generated —
+            payment_button appeared nowhere in the boilerplate.
+
+            Nothing here decides appearance, and nothing here could: Shopify
+            renders these inside shadow DOM, so the theme's whole surface is a
+            few custom properties. It is a third flex child of .product-actions
+            and inherits that column layout for free.
+
+            Renders as an empty string in the local preview, which rewrites the
+            form tag away and has no form object — so the wrapper deliberately has
+            no height, border or background, or every preview screenshot would
+            show a box that is not there on the real storefront.
+          {%- endcomment -%}
+          {{ form | payment_button }}
+        </div>
+      {% endform %}
+
+      {%- comment -%} Trust Badges {%- endcomment -%}
+      {%- if section.settings.show_trust_badges -%}
+        <div class="product-trust-badges">
+          <div class="product-trust-badge">
+            <span class="product-trust-badge__icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </span>
+            <span class="product-trust-badge__text">{{ section.settings.trust_badge_1 }}</span>
+          </div>
+          <div class="product-trust-badge">
+            <span class="product-trust-badge__icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            <span class="product-trust-badge__text">{{ section.settings.trust_badge_2 }}</span>
+          </div>
+          <div class="product-trust-badge">
+            <span class="product-trust-badge__icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            </span>
+            <span class="product-trust-badge__text">{{ section.settings.trust_badge_3 }}</span>
+          </div>
+          <div class="product-trust-badge">
+            <span class="product-trust-badge__icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </span>
+            <span class="product-trust-badge__text">{{ section.settings.trust_badge_4 }}</span>
+          </div>
+        </div>
+      {%- endif -%}
+
+      {%- comment -%}
+        App blocks. Any Shopify app that installs as an app block — reviews,
+        upsells, size charts, subscriptions, trust badges — renders here once
+        the merchant adds it in the theme editor. Requires { "type": "@app" }
+        in the schema below; without it the editor's Apps tab is empty and the
+        app cannot be placed anywhere on the product page.
+      {%- endcomment -%}
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when '@app' -%}
+            <div class="theme-app-block" {{ block.shopify_attributes }}>{% render block %}</div>
+        {%- endcase -%}
+      {%- endfor -%}
+
+      {%- comment -%} Share buttons {%- endcomment -%}
+      {%- if section.settings.show_share_buttons -%}
+        <div class="product-share">
+          <span class="product-share__label">Share</span>
+          <a
+            href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url }}{{ product.url }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="product-share__link"
+            aria-label="Share on Facebook"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+            </svg>
+          </a>
+          <a
+            href="https://twitter.com/intent/tweet?url={{ shop.url }}{{ product.url }}&text={{ product.title | url_encode }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="product-share__link"
+            aria-label="Share on Twitter"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+            </svg>
+          </a>
+          <a
+            href="https://pinterest.com/pin/create/button/?url={{ shop.url }}{{ product.url }}&media={{ product.featured_image | image_url: width: 1000 }}&description={{ product.title | url_encode }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="product-share__link"
+            aria-label="Share on Pinterest"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.08 3.15 9.42 7.6 11.18-.1-.94-.2-2.38.04-3.4.22-.92 1.4-5.92 1.4-5.92s-.36-.72-.36-1.78c0-1.66.97-2.9 2.17-2.9 1.02 0 1.52.77 1.52 1.7 0 1.03-.66 2.58-1 4.01-.28 1.2.6 2.17 1.78 2.17 2.13 0 3.77-2.25 3.77-5.5 0-2.87-2.06-4.88-5.01-4.88-3.41 0-5.42 2.56-5.42 5.2 0 1.03.4 2.13.89 2.73.1.12.11.22.08.34-.09.37-.29 1.2-.33 1.36-.05.22-.18.26-.4.16-1.5-.7-2.43-2.88-2.43-4.64 0-3.78 2.75-7.25 7.92-7.25 4.16 0 7.4 2.97 7.4 6.93 0 4.14-2.6 7.46-6.22 7.46-1.21 0-2.36-.63-2.75-1.38l-.75 2.85c-.27 1.04-1 2.35-1.49 3.15C9.57 23.81 10.75 24 12 24c6.63 0 12-5.37 12-12S18.63 0 12 0z"/>
+            </svg>
+          </a>
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} Size chart modal {%- endcomment -%}
+      {%- if section.settings.size_chart != blank -%}
+        {%- assign has_size_option = false -%}
+        {%- for option in product.options -%}
+          {%- assign opt_lower = option | downcase -%}
+          {%- if opt_lower == 'size' -%}
+            {%- assign has_size_option = true -%}
+          {%- endif -%}
+        {%- endfor -%}
+        {%- if has_size_option -%}
+          <div class="size-chart-overlay" data-size-chart-overlay aria-hidden="true">
+            <div class="size-chart-modal" role="dialog" aria-modal="true" aria-label="Size Chart">
+              <button type="button" class="size-chart-modal__close" data-size-chart-close aria-label="Close size chart">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+              <h3 class="size-chart-modal__title">Size Chart</h3>
+              <div class="size-chart-modal__content">
+                {{ section.settings.size_chart }}
+              </div>
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- comment -%} Product tabs {%- endcomment -%}
+  <div class="product-tabs" data-product-tabs>
+    <div class="product-tabs__nav" role="tablist">
+      <button type="button" class="product-tabs__btn is-active" role="tab" aria-selected="true" aria-controls="tab-description" data-tab="description">Description</button>
+      <button type="button" class="product-tabs__btn" role="tab" aria-selected="false" aria-controls="tab-shipping" data-tab="shipping">Shipping</button>
+      <button type="button" class="product-tabs__btn" role="tab" aria-selected="false" aria-controls="tab-reviews" data-tab="reviews">Reviews</button>
+    </div>
+    <div id="tab-description" class="product-tabs__panel is-active" role="tabpanel" data-tab-panel="description">
+      {{ product.description }}
+    </div>
+    <div id="tab-shipping" class="product-tabs__panel" role="tabpanel" data-tab-panel="shipping">
+      {{ section.settings.shipping_info }}
+    </div>
+    <div id="tab-reviews" class="product-tabs__panel" role="tabpanel" data-tab-panel="reviews">
+      {% render 'review-stars', product: product, expanded: true %}
+      {%- unless product.metafields.reviews.rating -%}
+        <p>No reviews yet.</p>
+      {%- endunless -%}
+    </div>
+  </div>
+
+</section>
+
+{%- comment -%} Sticky Add-to-Cart Bar (desktop only) — must be outside .product-page[data-reveal] so position:fixed works {%- endcomment -%}
+{%- if product.available -%}
+  <div class="sticky-atc-bar" id="sticky-atc-bar" aria-hidden="true">
+    <span class="sticky-atc-bar__title">{{ product.title }}</span>
+    <span class="sticky-atc-bar__price">{{ product.price | money }}</span>
+    <button type="button" class="sticky-atc-bar__btn" id="sticky-atc-btn" {% unless product.available %}disabled{% endunless %}>
+      Add to Cart
+    </button>
+  </div>
+{%- endif -%}
+
+<script>
+  (function() {
+    var section = document.querySelector('[data-product-gallery]');
+    if (!section) return;
+
+    /* Thumbnail click — swap main media (images, videos, models) */
+    var thumbs = section.querySelectorAll('[data-thumb-index]');
+    var mainMedia = section.querySelectorAll('.product-gallery__main [data-media-index]');
+
+    thumbs.forEach(function(thumb) {
+      thumb.addEventListener('click', function() {
+        var idx = this.getAttribute('data-thumb-index');
+        thumbs.forEach(function(t) { t.classList.remove('is-active'); });
+        this.classList.add('is-active');
+
+        mainMedia.forEach(function(el) {
+          var isTarget = el.getAttribute('data-media-index') === idx;
+          el.classList.toggle('is-active', isTarget);
+          /* Pause videos when switching away */
+          if (!isTarget) {
+            var video = el.querySelector('video');
+            if (video) video.pause();
+          }
+        });
+      });
+    });
+
+    /* Color swatch click — sync with hidden select */
+    var swatchGroups = section.closest('.product-page').querySelectorAll('.product-option__swatches');
+    swatchGroups.forEach(function(group) {
+      var optionIndex = group.getAttribute('data-option-index');
+      var select = group.parentElement.querySelector('.product-option__select');
+      var swatches = group.querySelectorAll('.product-option__swatch');
+
+      swatches.forEach(function(swatch) {
+        swatch.addEventListener('click', function() {
+          /* pointer-events blocks the mouse; Enter still fires a click. */
+          if (this.getAttribute('aria-disabled') === 'true') return;
+          swatches.forEach(function(s) { s.classList.remove('is-active'); });
+          this.classList.add('is-active');
+          if (select) {
+            select.value = this.getAttribute('data-swatch-value');
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        });
+      });
+    });
+
+    /* Option change — update hidden variant select */
+    var optionSelects = section.closest('.product-page').querySelectorAll('.product-option__select');
+    var variantSelect = section.closest('.product-page').querySelector('[data-variant-select]');
+
+    function updateVariant() {
+      if (!variantSelect) return;
+      var page = section.closest('.product-page');
+      var selectedOptions = [];
+      optionSelects.forEach(function(sel) {
+        selectedOptions.push(sel.value);
+      });
+      var options = variantSelect.querySelectorAll('option');
+      var chosen = null;
+      for (var i = 0; i < options.length; i++) {
+        var optData = JSON.parse(options[i].getAttribute('data-variant-options') || '[]');
+        var match = true;
+        for (var j = 0; j < selectedOptions.length; j++) {
+          if (optData[j] !== selectedOptions[j]) {
+            match = false;
+            break;
+          }
+        }
+        if (match) {
+          variantSelect.value = options[i].value;
+          chosen = options[i];
+          break;
+        }
+      }
+      if (!chosen) return;
+
+      /* Everything below used to be missing. Choosing a sold-out size left the
+         first variant's price on screen and the Add to Cart button enabled. */
+      var available = chosen.getAttribute('data-variant-available') === 'true';
+
+      /* Price. Written into the container that already existed for it and was
+         never used, keeping its own classes so themes keep control of the look. */
+      var priceEl = page.querySelector('[data-product-price]');
+      if (priceEl) {
+        var price = chosen.getAttribute('data-variant-price') || '';
+        var compare = chosen.getAttribute('data-variant-compare') || '';
+        var html = '';
+        if (compare) html += '<span class="product-info__price-compare">' + compare + '</span>';
+        html += '<span class="product-info__price-current">' + price + '</span>';
+        priceEl.innerHTML = html;
+      }
+      var stickyPrice = page.querySelector('.sticky-atc-bar__price');
+      if (stickyPrice) stickyPrice.textContent = chosen.getAttribute('data-variant-price') || '';
+
+      /* Buy button. The label comes from the button's own data attributes so a
+         theme (or a translation) can say something other than "Sold Out". */
+      [page.querySelector('.product-actions__add'), page.querySelector('#sticky-atc-btn')]
+        .forEach(function(btn) {
+          if (!btn) return;
+          btn.disabled = !available;
+          var label = btn.querySelector('[data-atc-label]') || btn;
+          var soldOut = btn.getAttribute('data-label-sold-out') || 'Sold Out';
+          var inStock = btn.getAttribute('data-label-available') || 'Add to Cart';
+          if (label !== btn) label.textContent = available ? inStock : soldOut;
+        });
+
+      /* The photo follows the selection. Reuses the thumbnail click path rather
+         than duplicating it, so the theme's own transition, video pausing and
+         zoom handling all come along for free. */
+      var mediaId = chosen.getAttribute('data-variant-media');
+      if (mediaId) {
+        var thumb = page.querySelector('[data-thumb-index][data-media-id="' + mediaId + '"]');
+        if (thumb) {
+          thumb.click();
+        } else {
+          var main = page.querySelector('[data-media-id="' + mediaId + '"]');
+          if (main) {
+            page.querySelectorAll('.product-gallery__main > [data-media-index]').forEach(function(el) {
+              el.classList.remove('is-active');
+            });
+            main.classList.add('is-active');
+          }
+        }
+      }
+
+      /* A shareable URL, and a hook for AI-authored sections so they never have
+         to re-implement the option-matching loop. Prefix matches the existing
+         themr:wishlist-change / themr:bundle-added convention. */
+      try {
+        var url = new URL(window.location.href);
+        url.searchParams.set('variant', variantSelect.value);
+        window.history.replaceState({}, '', url);
+      } catch (e) { /* older browsers: the URL is cosmetic, never block on it */ }
+      window.dispatchEvent(new CustomEvent('themr:variant-change', {
+        detail: { variantId: variantSelect.value, available: available, mediaId: mediaId || null }
+      }));
+    }
+
+    optionSelects.forEach(function(sel) {
+      sel.addEventListener('change', updateVariant);
+    });
+
+    /* Image zoom on hover (desktop only) */
+    if (window.matchMedia('(min-width: 768px)').matches) {
+      var mainGallery = section.querySelector('.product-gallery__main');
+      if (mainGallery) {
+        var activeImg = mainGallery.querySelector('img.is-active');
+        if (activeImg) {
+          mainGallery.style.backgroundImage = 'url(' + activeImg.src + ')';
+        }
+        mainGallery.addEventListener('mousemove', function(e) {
+          var rect = mainGallery.getBoundingClientRect();
+          var x = ((e.clientX - rect.left) / rect.width) * 100;
+          var y = ((e.clientY - rect.top) / rect.height) * 100;
+          mainGallery.style.backgroundPosition = x + '% ' + y + '%';
+        });
+        mainGallery.addEventListener('mouseleave', function() {
+          mainGallery.style.backgroundPosition = 'center center';
+        });
+        /* Update background image when thumbnail changes the active image */
+        var galleryObserver = new MutationObserver(function() {
+          var current = mainGallery.querySelector('img.is-active');
+          if (current) {
+            mainGallery.style.backgroundImage = 'url(' + current.src + ')';
+          }
+        });
+        mainGallery.querySelectorAll('img').forEach(function(img) {
+          galleryObserver.observe(img, { attributes: true, attributeFilter: ['class'] });
+        });
+      }
+    }
+
+    /* Product tabs */
+    var tabContainer = document.querySelector('[data-product-tabs]');
+    if (tabContainer) {
+      var tabBtns = tabContainer.querySelectorAll('.product-tabs__btn');
+      var tabPanels = tabContainer.querySelectorAll('.product-tabs__panel');
+      tabBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var target = btn.getAttribute('data-tab');
+          tabBtns.forEach(function(b) {
+            b.classList.remove('is-active');
+            b.setAttribute('aria-selected', 'false');
+          });
+          tabPanels.forEach(function(p) { p.classList.remove('is-active'); });
+          btn.classList.add('is-active');
+          btn.setAttribute('aria-selected', 'true');
+          var panel = tabContainer.querySelector('[data-tab-panel="' + target + '"]');
+          if (panel) panel.classList.add('is-active');
+        });
+      });
+    }
+
+    /* Quantity +/- */
+    var qtyInput = section.closest('.product-page').querySelector('[data-qty-input]');
+    var minusBtn = section.closest('.product-page').querySelector('[data-qty-minus]');
+    var plusBtn = section.closest('.product-page').querySelector('[data-qty-plus]');
+
+    if (qtyInput && minusBtn && plusBtn) {
+      minusBtn.addEventListener('click', function() {
+        var val = parseInt(qtyInput.value, 10) || 1;
+        if (val > 1) qtyInput.value = val - 1;
+      });
+      plusBtn.addEventListener('click', function() {
+        var val = parseInt(qtyInput.value, 10) || 1;
+        qtyInput.value = val + 1;
+      });
+    }
+
+    /* Sticky Add-to-Cart Bar */
+    var stickyBar = document.getElementById('sticky-atc-bar');
+    var mainAddBtn = section.closest('.product-page').querySelector('.product-actions__add');
+    if (stickyBar && mainAddBtn) {
+      var stickyBtn = document.getElementById('sticky-atc-btn');
+      var stickyShown = false;
+
+      var stickyObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (!entry.isIntersecting) {
+            stickyBar.classList.add('is-visible');
+            stickyBar.classList.remove('is-hidden');
+            stickyBar.setAttribute('aria-hidden', 'false');
+            stickyShown = true;
+          } else {
+            if (stickyShown) {
+              stickyBar.classList.add('is-hidden');
+              stickyBar.classList.remove('is-visible');
+              stickyBar.setAttribute('aria-hidden', 'true');
+            }
+          }
+        });
+      }, { threshold: 0 });
+
+      stickyObserver.observe(mainAddBtn);
+
+      if (stickyBtn) {
+        stickyBtn.addEventListener('click', function() {
+          mainAddBtn.click();
+        });
+      }
+    }
+
+    /* Size chart modal */
+    var sizeChartOverlay = document.querySelector('[data-size-chart-overlay]');
+    if (sizeChartOverlay) {
+      var openBtns = document.querySelectorAll('[data-size-chart-open]');
+      var closeBtn = sizeChartOverlay.querySelector('[data-size-chart-close]');
+
+      function openSizeChart() {
+        sizeChartOverlay.classList.add('is-active');
+        sizeChartOverlay.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeSizeChart() {
+        sizeChartOverlay.classList.remove('is-active');
+        sizeChartOverlay.setAttribute('aria-hidden', 'true');
+      }
+
+      openBtns.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          openSizeChart();
+        });
+      });
+
+      if (closeBtn) closeBtn.addEventListener('click', closeSizeChart);
+
+      sizeChartOverlay.addEventListener('click', function(e) {
+        if (e.target === sizeChartOverlay) closeSizeChart();
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sizeChartOverlay.classList.contains('is-active')) {
+          closeSizeChart();
+        }
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Product page",
+  "class": "section-main-product",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quantity",
+      "label": "Show quantity selector",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_share_buttons",
+      "label": "Show share buttons",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "shipping_info",
+      "label": "Shipping information",
+      "default": "<p>Free standard shipping on orders over $50. Standard delivery takes 5-7 business days. Express shipping is available at checkout.</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stock_counter",
+      "label": "Show stock counter",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "size_chart",
+      "label": "Size chart content",
+      "info": "Only shown if the product has a Size option. Supports tables in rich text."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badges",
+      "label": "Show trust badges",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_1",
+      "label": "Trust badge 1 text",
+      "default": "Free Shipping"
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_2",
+      "label": "Trust badge 2 text",
+      "default": "Secure Payment"
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_3",
+      "label": "Trust badge 3 text",
+      "default": "30-Day Returns"
+    },
+    {
+      "type": "text",
+      "id": "trust_badge_4",
+      "label": "Trust badge 4 text",
+      "default": "Quality Guaranteed"
+    }
+  ],
+  "blocks": [
+    { "type": "@app" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,43 @@
+<section class="section-404" aria-label="{{ 'sections.404.heading' | t }}">
+  <div class="container">
+    <div class="four-oh-four">
+      <h1 class="four-oh-four__heading">{{ section.settings.heading }}</h1>
+      <p class="four-oh-four__text">{{ section.settings.text }}</p>
+      {% if section.settings.button_text != blank %}
+        <a href="/" class="btn btn--primary">{{ section.settings.button_text }}</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "404",
+  "class": "section-404",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Page not found"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "The page you were looking for doesn't exist."
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Back to home"
+    }
+  ],
+  "presets": [
+    {
+      "name": "404"
+    }
+  ]
+}
+{% endschema %}

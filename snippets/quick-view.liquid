@@ -1,0 +1,459 @@
+{%- comment -%}
+  Quick View Modal — renders on every page, activated via JS
+  Fetches product data from /products/{handle}.json and renders client-side
+{%- endcomment -%}
+
+<style>
+  /* -- Quick View Modal -- */
+  .quick-view-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 299;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s 0.3s;
+  }
+
+  .quick-view-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0s 0s;
+  }
+
+  .quick-view {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 300;
+    width: 700px;
+    max-width: calc(100vw - 2rem);
+    max-height: calc(100vh - 4rem);
+    background: var(--color-background);
+    border-radius: 12px;
+    transform: translate(-50%, -50%) scale(0.95);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, visibility 0s 0.3s;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+  }
+
+  .quick-view.is-open {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    visibility: visible;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, visibility 0s 0s;
+  }
+
+  body.quick-view-active {
+    overflow: hidden;
+  }
+
+  .quick-view__close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: var(--color-background);
+    color: var(--color-text);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: background 0.15s ease;
+    padding: 0;
+  }
+
+  .quick-view__close:hover {
+    background: var(--color-background-card);
+  }
+
+  .quick-view__body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .quick-view__image-col {
+    position: relative;
+    background: var(--color-background-card);
+    min-height: 300px;
+  }
+
+  .quick-view__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 12px 0 0 12px;
+  }
+
+  .quick-view__info {
+    padding: 2rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .quick-view__title {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .quick-view__price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .quick-view__price-current {
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .quick-view__price-compare {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--color-text);
+    opacity: 0.5;
+    text-decoration: line-through;
+  }
+
+  .quick-view__description {
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    color: var(--color-text);
+    opacity: 0.7;
+    line-height: 1.6;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .quick-view__variants {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .quick-view__variant-label {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .quick-view__variant-select {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    padding: 0.55rem 2rem 0.55rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--btn-radius, 6px);
+    background: var(--color-background);
+    color: var(--color-text);
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.6rem center;
+    width: 100%;
+  }
+
+  .quick-view__add-btn {
+    display: block;
+    width: 100%;
+    padding: 0.8rem 1.5rem;
+    margin-top: 0.5rem;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--btn-radius, 6px);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: var(--btn-transform, none);
+    letter-spacing: var(--btn-letter-spacing, 0);
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .quick-view__add-btn:hover {
+    opacity: 0.85;
+  }
+
+  .quick-view__add-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .quick-view__view-full {
+    display: block;
+    text-align: center;
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    color: var(--color-text);
+    opacity: 0.6;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: opacity 0.15s ease;
+  }
+
+  .quick-view__view-full:hover {
+    opacity: 1;
+  }
+
+  .quick-view__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    grid-column: 1 / -1;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--color-text);
+    opacity: 0.5;
+  }
+
+  @media (max-width: 600px) {
+    .quick-view__body {
+      grid-template-columns: 1fr;
+    }
+
+    .quick-view__image {
+      border-radius: 12px 12px 0 0;
+      max-height: 280px;
+    }
+
+    .quick-view__info {
+      padding: 1.25rem 1.25rem 1.5rem;
+    }
+  }
+</style>
+
+<div class="quick-view-overlay" data-quick-view-overlay></div>
+
+<div class="quick-view" id="quick-view" role="dialog" aria-modal="true" aria-label="Quick view">
+  <button class="quick-view__close" data-quick-view-close aria-label="Close quick view">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </button>
+  <div class="quick-view__body" data-quick-view-body>
+    <div class="quick-view__loading">Loading...</div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    var modal = document.getElementById('quick-view');
+    var overlay = document.querySelector('[data-quick-view-overlay]');
+    var body = modal.querySelector('[data-quick-view-body]');
+    if (!modal || !overlay || !body) return;
+
+    function openQuickView(handle) {
+      modal.classList.add('is-open');
+      overlay.classList.add('is-open');
+      document.body.classList.add('quick-view-active');
+      body.innerHTML = '<div class="quick-view__loading">Loading...</div>';
+
+      fetch('/products/' + handle + '.json')
+        .then(function(res) {
+          if (!res.ok) throw new Error('Product not found');
+          return res.json();
+        })
+        .then(function(data) {
+          renderProduct(data.product, handle);
+        })
+        .catch(function() {
+          body.innerHTML = '<div class="quick-view__loading">Could not load product.</div>';
+        });
+    }
+
+    function closeQuickView() {
+      modal.classList.remove('is-open');
+      overlay.classList.remove('is-open');
+      document.body.classList.remove('quick-view-active');
+    }
+
+    function formatMoney(cents) {
+      return '$' + (cents / 100).toFixed(2);
+    }
+
+    function stripHtml(html) {
+      var tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      return tmp.textContent || tmp.innerText || '';
+    }
+
+    function renderProduct(product, handle) {
+      var imgSrc = product.image ? product.image.src : '';
+      var desc = product.body_html ? stripHtml(product.body_html) : '';
+      if (desc.length > 200) desc = desc.substring(0, 200) + '...';
+
+      var hasVariants = product.variants && product.variants.length > 1;
+      var firstVariant = product.variants[0];
+      var priceHtml = '';
+      if (firstVariant.compare_at_price && firstVariant.compare_at_price > firstVariant.price) {
+        priceHtml = '<span class="quick-view__price-compare">' + formatMoney(parseInt(firstVariant.compare_at_price, 10)) + '</span>';
+      }
+      priceHtml += '<span class="quick-view__price-current">' + formatMoney(parseInt(firstVariant.price, 10)) + '</span>';
+
+      var variantHtml = '';
+      if (hasVariants) {
+        variantHtml = '<div class="quick-view__variants">';
+        var options = product.options || [];
+        for (var oi = 0; oi < options.length; oi++) {
+          var opt = options[oi];
+          variantHtml += '<p class="quick-view__variant-label">' + escapeHtml(opt.name) + '</p>';
+          variantHtml += '<select class="quick-view__variant-select" data-qv-option="' + oi + '">';
+          var vals = opt.values || [];
+          for (var vi = 0; vi < vals.length; vi++) {
+            variantHtml += '<option value="' + escapeHtml(vals[vi]) + '">' + escapeHtml(vals[vi]) + '</option>';
+          }
+          variantHtml += '</select>';
+        }
+        variantHtml += '</div>';
+      }
+
+      var html = '';
+      html += '<div class="quick-view__image-col">';
+      if (imgSrc) {
+        html += '<img class="quick-view__image" src="' + imgSrc + '" alt="' + escapeHtml(product.title) + '">';
+      }
+      html += '</div>';
+      html += '<div class="quick-view__info">';
+      html += '<h2 class="quick-view__title">' + escapeHtml(product.title) + '</h2>';
+      html += '<div class="quick-view__price">' + priceHtml + '</div>';
+      if (desc) html += '<p class="quick-view__description">' + escapeHtml(desc) + '</p>';
+      html += variantHtml;
+      html += '<button type="button" class="quick-view__add-btn" data-qv-add>Add to Cart</button>';
+      html += '<a href="/products/' + handle + '" class="quick-view__view-full">View Full Details</a>';
+      html += '</div>';
+
+      body.innerHTML = html;
+
+      /* Bind variant selectors to find the correct variant ID */
+      var selects = body.querySelectorAll('[data-qv-option]');
+      var addBtn = body.querySelector('[data-qv-add]');
+
+      function getSelectedVariantId() {
+        if (!hasVariants) return firstVariant.id;
+        var selected = [];
+        selects.forEach(function(s) { selected.push(s.value); });
+        for (var i = 0; i < product.variants.length; i++) {
+          var v = product.variants[i];
+          var opts = (v.option1 ? [v.option1] : [])
+            .concat(v.option2 ? [v.option2] : [])
+            .concat(v.option3 ? [v.option3] : []);
+          var match = true;
+          for (var j = 0; j < selected.length; j++) {
+            if (opts[j] !== selected[j]) { match = false; break; }
+          }
+          if (match) return v.id;
+        }
+        return firstVariant.id;
+      }
+
+      function updatePrice() {
+        var variantId = getSelectedVariantId();
+        for (var i = 0; i < product.variants.length; i++) {
+          if (product.variants[i].id === variantId) {
+            var v = product.variants[i];
+            var pHtml = '';
+            if (v.compare_at_price && v.compare_at_price > v.price) {
+              pHtml += '<span class="quick-view__price-compare">' + formatMoney(parseInt(v.compare_at_price, 10)) + '</span>';
+            }
+            pHtml += '<span class="quick-view__price-current">' + formatMoney(parseInt(v.price, 10)) + '</span>';
+            var priceEl = body.querySelector('.quick-view__price');
+            if (priceEl) priceEl.innerHTML = pHtml;
+            if (v.featured_image) {
+              var imgEl = body.querySelector('.quick-view__image');
+              if (imgEl) imgEl.src = v.featured_image.src;
+            }
+            addBtn.disabled = !v.available;
+            addBtn.textContent = v.available ? 'Add to Cart' : 'Sold Out';
+            break;
+          }
+        }
+      }
+
+      selects.forEach(function(s) {
+        s.addEventListener('change', updatePrice);
+      });
+
+      if (addBtn) {
+        addBtn.addEventListener('click', function() {
+          var variantId = getSelectedVariantId();
+          addBtn.disabled = true;
+          addBtn.textContent = 'Adding...';
+          fetch('/cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: variantId, quantity: 1 })
+          })
+          .then(function(res) {
+            if (!res.ok) throw new Error('Add to cart failed');
+            return res.json();
+          })
+          .then(function() {
+            closeQuickView();
+            document.dispatchEvent(new CustomEvent('cart:updated'));
+          })
+          .catch(function() {
+            addBtn.disabled = false;
+            addBtn.textContent = 'Add to Cart';
+          });
+        });
+      }
+
+      /* Update for initial variant availability */
+      addBtn.disabled = !firstVariant.available;
+      if (!firstVariant.available) addBtn.textContent = 'Sold Out';
+    }
+
+    function escapeHtml(str) {
+      var div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
+    }
+
+    /* Close triggers */
+    modal.querySelector('[data-quick-view-close]').addEventListener('click', closeQuickView);
+    overlay.addEventListener('click', closeQuickView);
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+        closeQuickView();
+      }
+    });
+
+    /* Global open function + event delegation for Quick View buttons */
+    window.openQuickView = openQuickView;
+
+    document.addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-quick-view-trigger]');
+      if (btn) {
+        e.preventDefault();
+        e.stopPropagation();
+        var handle = btn.getAttribute('data-quick-view-trigger');
+        if (handle) openQuickView(handle);
+      }
+    });
+  })();
+</script>

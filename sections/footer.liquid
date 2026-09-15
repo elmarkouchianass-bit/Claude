@@ -1,0 +1,483 @@
+{%- liquid
+  assign footer_style = section.settings.footer_style | default: 'standard'
+  assign shop_name = shop.name
+  assign shop_words = shop_name | split: ' '
+  assign shop_first_words = ''
+  assign shop_last_word = shop_name
+  if shop_words.size > 1
+    assign shop_last_word = shop_words | last
+    assign first_count = shop_words.size | minus: 1
+    assign shop_first_words = shop_words | slice: 0, first_count | join: ' '
+  endif
+  assign current_year = 'now' | date: '%Y'
+-%}
+
+{%- capture social_icons -%}
+  {%- if settings.social_instagram != blank -%}
+    <a href="{{ settings.social_instagram }}" class="footer__social-link" aria-label="Instagram" target="_blank" rel="noopener">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+    </a>
+  {%- endif -%}
+  {%- if settings.social_tiktok != blank -%}
+    <a href="{{ settings.social_tiktok }}" class="footer__social-link" aria-label="TikTok" target="_blank" rel="noopener">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
+    </a>
+  {%- endif -%}
+  {%- if settings.social_facebook != blank -%}
+    <a href="{{ settings.social_facebook }}" class="footer__social-link" aria-label="Facebook" target="_blank" rel="noopener">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+    </a>
+  {%- endif -%}
+  {%- if settings.social_pinterest != blank -%}
+    <a href="{{ settings.social_pinterest }}" class="footer__social-link" aria-label="Pinterest" target="_blank" rel="noopener">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 20l4-9"/><path d="M10.7 14c-.5 1.5.4 3.5 1.8 4.5"/><circle cx="12" cy="11" r="8"/><path d="M16 8c-2-2-6-1.5-6 2s3.5 4.5 6 3"/></svg>
+    </a>
+  {%- endif -%}
+  {%- if settings.social_twitter != blank -%}
+    <a href="{{ settings.social_twitter }}" class="footer__social-link" aria-label="X / Twitter" target="_blank" rel="noopener">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 4l6.8 9.6M4 20l6.8-9.6m0 0L20 20M10.8 13.6L20 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  {%- endif -%}
+  {%- if settings.social_youtube != blank -%}
+    <a href="{{ settings.social_youtube }}" class="footer__social-link" aria-label="YouTube" target="_blank" rel="noopener">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="4"/><polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none"/></svg>
+    </a>
+  {%- endif -%}
+  {%- if settings.social_threads != blank -%}
+    <a href="{{ settings.social_threads }}" class="footer__social-link" aria-label="Threads" target="_blank" rel="noopener">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.4 0 0 5.4 0 12c0 6.6 5.4 12 12 12s12-5.4 12-12C24 5.4 18.6 0 12 0zm5.4 11.8c.2 3.8-1.9 6.2-6.4 6.2-2.8 0-5.2-1.3-5.5-4.1-.2-1.5.5-2.8 1.9-3.2.6-.2 1.3-.3 2-.3 1.5 0 2.8.5 3.4 1.8l-1.4.8c-.4-.7-1.1-1-2-1-.5 0-.9.1-1.3.2-.6.2-1 .6-.9 1.3.1 1.4 1.7 2.1 3.7 2.1 2.4 0 4.1-1 4.3-3.2.1-1.6-.7-2.6-2-3.1l.4-1.3c1.8.6 3 2 2.8 4zM12 6c-1.8 0-3 .8-3.5 2.2l1.4.6c.3-.8 1-1.3 2.1-1.3.8 0 1.5.3 1.9 1l1.4-.8C14.6 6.6 13.4 6 12 6z"/></svg>
+    </a>
+  {%- endif -%}
+  {%- if settings.social_reddit != blank -%}
+    <a href="{{ settings.social_reddit }}" class="footer__social-link" aria-label="Reddit" target="_blank" rel="noopener">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12c0-1.6-1.3-2.9-2.9-2.9-.8 0-1.5.3-2 .8-2-1.4-4.7-2.3-7.7-2.4l1.3-6.1 4.3.9c0 1.1.9 1.9 1.9 1.9 1.1 0 1.9-.9 1.9-1.9C20.9.3 20 .3 19 .3c-.8 0-1.4.4-1.7 1.1l-4.8-1c-.2 0-.4.1-.4.3l-1.5 6.8c-3 .1-5.7 1-7.7 2.4-.5-.5-1.2-.8-2-.8C1.3 9.1 0 10.4 0 12c0 1.1.7 2.1 1.7 2.6-.1.3-.1.7-.1 1 0 3.5 4 6.3 9 6.3s9-2.8 9-6.3c0-.3 0-.7-.1-1 1-.5 1.7-1.5 1.7-2.6zM7.2 13.7c0-1 .8-1.8 1.8-1.8 1 0 1.8.8 1.8 1.8 0 1-.8 1.8-1.8 1.8-1 0-1.8-.8-1.8-1.8zm8.7 5.4c-1.1 1.1-2.9 1.5-3.9 1.5s-2.8-.4-3.9-1.5c-.1-.1-.1-.3 0-.4.1-.1.3-.1.4 0 .7.7 2.1 1 3.5 1s2.8-.3 3.5-1c.1-.1.3-.1.4 0 .1.1.1.3 0 .4zm-.8-3.6c-1 0-1.8-.8-1.8-1.8 0-1 .8-1.8 1.8-1.8 1 0 1.8.8 1.8 1.8 0 1-.8 1.8-1.8 1.8z"/></svg>
+    </a>
+  {%- endif -%}
+  {%- if settings.social_linkedin != blank -%}
+    <a href="{{ settings.social_linkedin }}" class="footer__social-link" aria-label="LinkedIn" target="_blank" rel="noopener">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.3 6.5a1.78 1.78 0 01-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0013 14.19a.66.66 0 000 .14V19h-3v-9h2.9v1.3a3.11 3.11 0 012.7-1.4c1.55 0 3.36.86 3.36 3.66z"/></svg>
+    </a>
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- capture payment_icons -%}
+  <div class="footer__payment" aria-label="Accepted payment methods">
+    <svg width="38" height="24" viewBox="0 0 38 24" role="img" aria-label="Visa"><rect width="38" height="24" rx="3" fill="#1A1F71"/><text x="19" y="16" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-weight="900" font-style="italic" font-size="9" letter-spacing="0.5">VISA</text></svg>
+    <svg width="38" height="24" viewBox="0 0 38 24" role="img" aria-label="Mastercard"><rect width="38" height="24" rx="3" fill="#fff" stroke="#e6e6e6"/><circle cx="16" cy="12" r="6" fill="#EB001B"/><circle cx="22" cy="12" r="6" fill="#F79E1B"/><path d="M19 7.5a6 6 0 0 0 0 9 6 6 0 0 0 0-9z" fill="#FF5F00"/></svg>
+    <svg width="38" height="24" viewBox="0 0 38 24" role="img" aria-label="American Express"><rect width="38" height="24" rx="3" fill="#1F72CD"/><text x="19" y="11" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-weight="700" font-size="5">AMERICAN</text><text x="19" y="18" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-weight="700" font-size="5">EXPRESS</text></svg>
+    <svg width="38" height="24" viewBox="0 0 38 24" role="img" aria-label="PayPal"><rect width="38" height="24" rx="3" fill="#fff" stroke="#e6e6e6"/><text x="19" y="16" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="9"><tspan fill="#003087">Pay</tspan><tspan fill="#0070BA">Pal</tspan></text></svg>
+    <svg width="38" height="24" viewBox="0 0 38 24" role="img" aria-label="Apple Pay"><rect width="38" height="24" rx="3" fill="#000"/><path d="M11.4 9.3a2 2 0 0 1-.5 1.5 1.7 1.7 0 0 1-1.4.7 2 2 0 0 1 .5-1.4 2 2 0 0 1 1.4-.8zm.5 2.4c-.8 0-1.5.5-1.9.5s-1-.5-1.7-.5a2.5 2.5 0 0 0-2.1 1.3c-.9 1.6-.2 4 .7 5.3.4.6 1 1.3 1.6 1.3s.9-.4 1.7-.4 1 .4 1.7.4 1.1-.6 1.5-1.3a5.4 5.4 0 0 0 .7-1.4 2.2 2.2 0 0 1-1.3-2 2.3 2.3 0 0 1 1.1-2 2.4 2.4 0 0 0-1.9-1z" fill="#fff"/><text x="22" y="16" fill="#fff" font-family="Arial,sans-serif" font-weight="600" font-size="8">Pay</text></svg>
+  </div>
+{%- endcapture -%}
+
+{%- capture locale_pill -%}
+  <span class="footer__locale">{{ localization.country.currency.iso_code | default: 'USD' }} · {{ localization.language.iso_code | upcase | default: 'EN' }}</span>
+{%- endcapture -%}
+
+<footer class="site-footer" data-footer-style="{{ footer_style }}" role="contentinfo">
+  <div class="container">
+    {%- case footer_style -%}
+
+    {%- when 'editorial' -%}
+      <div class="footer__main">
+        {%- if settings.logo != blank -%}
+          <img src="{{ settings.logo | image_url: width: 400 }}" alt="{{ shop_name }}" class="footer__logo" width="{{ 400 | at_most: settings.logo.width }}" height="{{ 400 | at_most: settings.logo.width | divided_by: settings.logo.aspect_ratio | round }}" loading="lazy">
+        {%- elsif settings.logo_bundled_filename != blank -%}
+          <img src="{{ settings.logo_bundled_filename | asset_url }}" alt="{{ shop_name }}" class="footer__logo" width="{{ settings.logo_max_width }}" height="auto" loading="lazy">
+        {%- else -%}
+          <h2 class="footer__wordmark">{{ shop_name }}</h2>
+        {%- endif -%}
+        {%- if section.settings.description != blank -%}
+          <p class="footer__desc">{{ section.settings.description }}</p>
+        {%- endif -%}
+        {%- assign social_icons_trimmed = social_icons | strip -%}{%- if social_icons_trimmed != blank -%}<div class="footer__social">{{ social_icons }}</div>{%- endif -%}
+        <nav class="footer__menu-inline" aria-label="Footer navigation">
+          {%- if section.settings.col2_menu != blank -%}
+            {%- for link in linklists[section.settings.col2_menu].links -%}
+              <a href="{{ link.url }}" class="footer__link">{{ link.title }}</a>
+            {%- endfor -%}
+          {%- endif -%}
+          {%- if section.settings.col3_menu != blank -%}
+            {%- for link in linklists[section.settings.col3_menu].links -%}
+              <a href="{{ link.url }}" class="footer__link">{{ link.title }}</a>
+            {%- endfor -%}
+          {%- endif -%}
+          {%- if section.settings.col2_menu == blank and section.settings.col3_menu == blank -%}
+            <a href="/collections/all" class="footer__link">{{ 'navigation.shop' | t }}</a>
+            <a href="/pages/about" class="footer__link">{{ 'navigation.about' | t }}</a>
+            <a href="/pages/contact" class="footer__link">{{ 'navigation.contact' | t }}</a>
+            <a href="/policies/shipping-policy" class="footer__link">{{ 'navigation.shipping' | t }}</a>
+            <a href="/policies/refund-policy" class="footer__link">{{ 'navigation.returns' | t }}</a>
+          {%- endif -%}
+        </nav>
+      </div>
+      <div class="footer__bottom">
+        {{ payment_icons }}
+        <p class="footer__copyright">&copy; {{ current_year }} {{ shop_name }}. All rights reserved.</p>
+        {{ locale_pill }}
+      </div>
+
+    {%- when 'brutalist' -%}
+      <div class="footer__top">
+        <h2>{{ shop_name | upcase }}<br>/ {{ current_year }}</h2>
+        <p>Est. {{ current_year | minus: 7 }}</p>
+      </div>
+      <div class="footer__cols">
+        <div>
+          <h3>{{ section.settings.col2_heading | default: 'Shop' }}</h3>
+          {%- if section.settings.col2_menu != blank -%}
+            {%- for link in linklists[section.settings.col2_menu].links limit: 5 -%}
+              <a href="{{ link.url }}">{{ link.title }}</a>
+            {%- endfor -%}
+          {%- else -%}
+            <a href="/collections/all">All Gear</a>
+            <a href="/collections">New Drops</a>
+            <a href="/pages/about">Our Story</a>
+            <a href="/pages/gift-cards">Gift Cards</a>
+          {%- endif -%}
+        </div>
+        <div>
+          <h3>{{ section.settings.col3_heading | default: 'Support' }}</h3>
+          {%- if section.settings.col3_menu != blank -%}
+            {%- for link in linklists[section.settings.col3_menu].links limit: 5 -%}
+              <a href="{{ link.url }}">{{ link.title }}</a>
+            {%- endfor -%}
+          {%- else -%}
+            <a href="/pages/faq">FAQ</a>
+            <a href="/pages/contact">Contact</a>
+            <a href="/policies/shipping-policy">Shipping</a>
+            <a href="/policies/refund-policy">Returns</a>
+          {%- endif -%}
+        </div>
+        <div>
+          <h3>Company</h3>
+          <a href="/pages/about">Our Mission</a>
+          <a href="/blogs/news">Field Notes</a>
+          <a href="/pages/stores">Stores</a>
+          <a href="/pages/careers">Careers</a>
+        </div>
+        <div>
+          <h3>Legal</h3>
+          <a href="/policies/terms-of-service">Terms</a>
+          <a href="/policies/privacy-policy">Privacy</a>
+          <a href="/pages/accessibility">Accessibility</a>
+          <a href="/policies/refund-policy">Refunds</a>
+        </div>
+      </div>
+      <div class="footer__social-row">
+        {%- assign socials_list = '' -%}
+        {%- if settings.social_instagram != blank -%}{%- assign socials_list = socials_list | append: '|instagram|' | append: settings.social_instagram -%}{%- endif -%}
+        {%- if settings.social_tiktok != blank -%}{%- assign socials_list = socials_list | append: '||tiktok||' | append: settings.social_tiktok -%}{%- endif -%}
+        {%- if settings.social_facebook != blank -%}{%- assign socials_list = socials_list | append: '||facebook||' | append: settings.social_facebook -%}{%- endif -%}
+        {%- if settings.social_pinterest != blank -%}{%- assign socials_list = socials_list | append: '||pinterest||' | append: settings.social_pinterest -%}{%- endif -%}
+        {%- if settings.social_twitter != blank -%}{%- assign socials_list = socials_list | append: '||x||' | append: settings.social_twitter -%}{%- endif -%}
+        {%- if settings.social_youtube != blank -%}{%- assign socials_list = socials_list | append: '||youtube||' | append: settings.social_youtube -%}{%- endif -%}
+        {%- if settings.social_threads != blank -%}{%- assign socials_list = socials_list | append: '||threads||' | append: settings.social_threads -%}{%- endif -%}
+        {%- if settings.social_reddit != blank -%}{%- assign socials_list = socials_list | append: '||reddit||' | append: settings.social_reddit -%}{%- endif -%}
+        {%- if settings.social_linkedin != blank -%}{%- assign socials_list = socials_list | append: '||linkedin||' | append: settings.social_linkedin -%}{%- endif -%}
+        {%- if settings.social_instagram != blank -%}<a href="{{ settings.social_instagram }}" target="_blank" rel="noopener">INSTAGRAM</a>{%- endif -%}
+        {%- if settings.social_tiktok != blank -%}<span class="sep">·</span><a href="{{ settings.social_tiktok }}" target="_blank" rel="noopener">TIKTOK</a>{%- endif -%}
+        {%- if settings.social_facebook != blank -%}<span class="sep">·</span><a href="{{ settings.social_facebook }}" target="_blank" rel="noopener">FACEBOOK</a>{%- endif -%}
+        {%- if settings.social_pinterest != blank -%}<span class="sep">·</span><a href="{{ settings.social_pinterest }}" target="_blank" rel="noopener">PINTEREST</a>{%- endif -%}
+        {%- if settings.social_twitter != blank -%}<span class="sep">·</span><a href="{{ settings.social_twitter }}" target="_blank" rel="noopener">X</a>{%- endif -%}
+        {%- if settings.social_youtube != blank -%}<span class="sep">·</span><a href="{{ settings.social_youtube }}" target="_blank" rel="noopener">YOUTUBE</a>{%- endif -%}
+        {%- if settings.social_threads != blank -%}<span class="sep">·</span><a href="{{ settings.social_threads }}" target="_blank" rel="noopener">THREADS</a>{%- endif -%}
+        {%- if settings.social_reddit != blank -%}<span class="sep">·</span><a href="{{ settings.social_reddit }}" target="_blank" rel="noopener">REDDIT</a>{%- endif -%}
+        {%- if settings.social_linkedin != blank -%}<span class="sep">·</span><a href="{{ settings.social_linkedin }}" target="_blank" rel="noopener">LINKEDIN</a>{%- endif -%}
+      </div>
+      <div class="footer__meta">
+        <span>&copy; {{ current_year }} {{ shop_name | upcase }} // ALL RIGHTS RESERVED</span>
+        <span>{{ localization.country.currency.iso_code | default: 'USD' }} / {{ localization.language.iso_code | upcase | default: 'EN' }}</span>
+      </div>
+
+    {%- when 'anchored' -%}
+      <div>
+        <h2 class="footer__monument">
+          {%- if shop_first_words != '' -%}
+            {{ shop_first_words }} <em>{{ shop_last_word }}.</em>
+          {%- else -%}
+            <em>{{ shop_name }}.</em>
+          {%- endif -%}
+        </h2>
+        {%- if section.settings.description != blank -%}
+          <p class="footer__under">{{ section.settings.description }}</p>
+        {%- endif -%}
+      </div>
+      <div class="footer__bar">
+        <div class="footer__bar-nav-wrap">
+          <nav class="footer__bar-nav" aria-label="Footer navigation">
+            {%- if section.settings.col2_menu != blank -%}
+              {%- for link in linklists[section.settings.col2_menu].links -%}
+                <a href="{{ link.url }}">{{ link.title }}</a>
+              {%- endfor -%}
+            {%- endif -%}
+            {%- if section.settings.col3_menu != blank -%}
+              {%- for link in linklists[section.settings.col3_menu].links -%}
+                <a href="{{ link.url }}">{{ link.title }}</a>
+              {%- endfor -%}
+            {%- endif -%}
+            {%- if section.settings.col2_menu == blank and section.settings.col3_menu == blank -%}
+              <a href="/collections/all">Shop</a>
+              <a href="/pages/about">About</a>
+              <a href="/pages/contact">Contact</a>
+              <a href="/policies/refund-policy">Returns</a>
+              <a href="/policies/privacy-policy">Privacy</a>
+            {%- endif -%}
+          </nav>
+        </div>
+        <div class="footer__bar-meta">
+          {{ payment_icons }}
+          {{ locale_pill }}
+          <span>&copy; {{ current_year }} {{ shop_name }}</span>
+        </div>
+      </div>
+
+    {%- when 'dictionary' -%}
+      <div class="footer__intro">
+        <h2>{{ shop_name }}</h2>
+        <p>Site Directory · {{ current_year }}</p>
+      </div>
+      <div class="footer__grid-dict">
+        <div>
+          <h3>{{ section.settings.col2_heading | default: 'Shop' }}</h3>
+          {%- if section.settings.col2_menu != blank -%}
+            {%- for link in linklists[section.settings.col2_menu].links limit: 4 -%}
+              <a href="{{ link.url }}">{{ link.title }}</a>
+            {%- endfor -%}
+          {%- else -%}
+            <a href="/collections/all">All</a>
+            <a href="/collections">New</a>
+            <a href="/collections/bestsellers">Bestsellers</a>
+            <a href="/pages/gift-cards">Gift Cards</a>
+          {%- endif -%}
+        </div>
+        <div>
+          <h3>{{ section.settings.col3_heading | default: 'Support' }}</h3>
+          {%- if section.settings.col3_menu != blank -%}
+            {%- for link in linklists[section.settings.col3_menu].links limit: 4 -%}
+              <a href="{{ link.url }}">{{ link.title }}</a>
+            {%- endfor -%}
+          {%- else -%}
+            <a href="/pages/faq">FAQ</a>
+            <a href="/pages/contact">Contact</a>
+            <a href="/policies/shipping-policy">Shipping</a>
+            <a href="/policies/refund-policy">Returns</a>
+          {%- endif -%}
+        </div>
+        <div>
+          <h3>Company</h3>
+          <a href="/pages/about">Our Mission</a>
+          <a href="/blogs/news">Journal</a>
+          <a href="/pages/careers">Careers</a>
+          <a href="/pages/press">Press</a>
+        </div>
+        <div>
+          <h3>Legal</h3>
+          <a href="/policies/terms-of-service">Terms</a>
+          <a href="/policies/privacy-policy">Privacy</a>
+          <a href="/pages/accessibility">Accessibility</a>
+          <a href="/policies/refund-policy">Refunds</a>
+        </div>
+      </div>
+      <div class="footer__tail">
+        {{ payment_icons }}
+        {{ locale_pill }}
+        <span>&copy; {{ current_year }} {{ shop_name }}</span>
+      </div>
+
+    {%- when 'minimal' -%}
+      <div class="footer__hr"></div>
+      <div class="footer__row">
+        {%- if settings.logo != blank -%}
+          <img src="{{ settings.logo | image_url: width: 160 }}" alt="{{ shop_name }}" class="footer__row-logo-img" width="{{ 160 | at_most: settings.logo.width }}" height="{{ 160 | at_most: settings.logo.width | divided_by: settings.logo.aspect_ratio | round }}" loading="lazy">
+        {%- elsif settings.logo_bundled_filename != blank -%}
+          <img src="{{ settings.logo_bundled_filename | asset_url }}" alt="{{ shop_name }}" class="footer__row-logo-img" width="{{ settings.logo_max_width }}" height="auto" loading="lazy">
+        {%- else -%}
+          <span class="footer__row-logo">{{ shop_name }}</span>
+        {%- endif -%}
+        <nav class="footer__row-links" aria-label="Footer navigation">
+          {%- assign combined_links = '' -%}
+          {%- if section.settings.col2_menu != blank -%}
+            {%- for link in linklists[section.settings.col2_menu].links limit: 2 -%}
+              <a href="{{ link.url }}">{{ link.title }}</a>
+              {%- unless forloop.last -%}<span class="dot">·</span>{%- endunless -%}
+            {%- endfor -%}
+          {%- endif -%}
+          {%- if section.settings.col2_menu != blank and section.settings.col3_menu != blank -%}
+            <span class="dot">·</span>
+          {%- endif -%}
+          {%- if section.settings.col3_menu != blank -%}
+            {%- for link in linklists[section.settings.col3_menu].links limit: 2 -%}
+              <a href="{{ link.url }}">{{ link.title }}</a>
+              {%- unless forloop.last -%}<span class="dot">·</span>{%- endunless -%}
+            {%- endfor -%}
+          {%- endif -%}
+          {%- if section.settings.col2_menu == blank and section.settings.col3_menu == blank -%}
+            <a href="/collections/all">Shop</a><span class="dot">·</span>
+            <a href="/pages/faq">FAQ</a><span class="dot">·</span>
+            <a href="/policies/refund-policy">Returns</a><span class="dot">·</span>
+            <a href="/pages/contact">Contact</a>
+          {%- endif -%}
+        </nav>
+        <div class="footer__row-meta">
+          {{ payment_icons }}
+          <span>&copy; {{ current_year }}</span>
+          {{ locale_pill }}
+        </div>
+      </div>
+
+    {%- when '4col-sparse' -%}
+      <div class="footer__main">
+        <div class="footer__brand">
+          {%- if settings.logo != blank -%}
+            <img src="{{ settings.logo | image_url: width: 200 }}" alt="{{ shop_name }}" class="footer__logo" width="{{ 200 | at_most: settings.logo.width }}" height="{{ 200 | at_most: settings.logo.width | divided_by: settings.logo.aspect_ratio | round }}" loading="lazy">
+          {%- elsif settings.logo_bundled_filename != blank -%}
+            <img src="{{ settings.logo_bundled_filename | asset_url }}" alt="{{ shop_name }}" class="footer__logo" width="{{ settings.logo_max_width }}" height="auto" loading="lazy">
+          {%- else -%}
+            <span class="footer__logo-text">{{ shop_name }}</span>
+          {%- endif -%}
+          {%- assign social_icons_trimmed = social_icons | strip -%}{%- if social_icons_trimmed != blank -%}<div class="footer__social">{{ social_icons }}</div>{%- endif -%}
+        </div>
+        <div class="footer__links">
+          <h3 class="footer__heading">About</h3>
+          {%- if section.settings.description != blank -%}
+            <p class="footer__desc">{{ section.settings.description }}</p>
+          {%- endif -%}
+        </div>
+        <div class="footer__links">
+          <h3 class="footer__heading">{{ section.settings.col2_heading }}</h3>
+          {%- if section.settings.col2_menu != blank -%}
+            {%- for link in linklists[section.settings.col2_menu].links -%}
+              <a href="{{ link.url }}" class="footer__link">{{ link.title }}</a>
+            {%- endfor -%}
+          {%- else -%}
+            <a href="/collections/all" class="footer__link">{{ 'navigation.shop' | t }}</a>
+            <a href="/collections" class="footer__link">{{ 'navigation.collections' | t }}</a>
+            <a href="/pages/about" class="footer__link">{{ 'navigation.about' | t }}</a>
+          {%- endif -%}
+        </div>
+        <div class="footer__links">
+          <h3 class="footer__heading">{{ section.settings.col3_heading }}</h3>
+          {%- if section.settings.col3_menu != blank -%}
+            {%- for link in linklists[section.settings.col3_menu].links -%}
+              <a href="{{ link.url }}" class="footer__link">{{ link.title }}</a>
+            {%- endfor -%}
+          {%- else -%}
+            <a href="/pages/faq" class="footer__link">{{ 'navigation.faq' | t }}</a>
+            <a href="/pages/contact" class="footer__link">{{ 'navigation.contact' | t }}</a>
+            <a href="/policies/shipping-policy" class="footer__link">{{ 'navigation.shipping' | t }}</a>
+            <a href="/policies/refund-policy" class="footer__link">{{ 'navigation.returns' | t }}</a>
+          {%- endif -%}
+        </div>
+      </div>
+      <div class="footer__bottom">
+        {{ payment_icons }}
+        <p class="footer__copyright">&copy; {{ current_year }} {{ shop_name }}. All rights reserved.</p>
+      </div>
+
+    {%- else -%}
+      {%- comment -%} standard (default fallback) {%- endcomment -%}
+      <div class="footer__main">
+        <div class="footer__brand">
+          {%- if settings.logo != blank -%}
+            <img src="{{ settings.logo | image_url: width: 200 }}" alt="{{ shop_name }}" class="footer__logo" width="{{ 200 | at_most: settings.logo.width }}" height="{{ 200 | at_most: settings.logo.width | divided_by: settings.logo.aspect_ratio | round }}" loading="lazy">
+          {%- elsif settings.logo_bundled_filename != blank -%}
+            <img src="{{ settings.logo_bundled_filename | asset_url }}" alt="{{ shop_name }}" class="footer__logo" width="{{ settings.logo_max_width }}" height="auto" loading="lazy">
+          {%- else -%}
+            <span class="footer__logo-text">{{ shop_name }}</span>
+          {%- endif -%}
+          <p class="footer__desc">{{ section.settings.description }}</p>
+          {%- assign social_icons_trimmed = social_icons | strip -%}{%- if social_icons_trimmed != blank -%}<div class="footer__social">{{ social_icons }}</div>{%- endif -%}
+        </div>
+        <div class="footer__links">
+          <h3 class="footer__heading">{{ section.settings.col2_heading }}</h3>
+          {%- if section.settings.col2_menu != blank -%}
+            {%- for link in linklists[section.settings.col2_menu].links -%}
+              <a href="{{ link.url }}" class="footer__link">{{ link.title }}</a>
+            {%- endfor -%}
+          {%- else -%}
+            <a href="/collections/all" class="footer__link">{{ 'navigation.shop' | t }}</a>
+            <a href="/collections" class="footer__link">{{ 'navigation.collections' | t }}</a>
+            <a href="/pages/about" class="footer__link">{{ 'navigation.about' | t }}</a>
+          {%- endif -%}
+        </div>
+        <div class="footer__links">
+          <h3 class="footer__heading">{{ section.settings.col3_heading }}</h3>
+          {%- if section.settings.col3_menu != blank -%}
+            {%- for link in linklists[section.settings.col3_menu].links -%}
+              <a href="{{ link.url }}" class="footer__link">{{ link.title }}</a>
+            {%- endfor -%}
+          {%- else -%}
+            <a href="/pages/faq" class="footer__link">{{ 'navigation.faq' | t }}</a>
+            <a href="/pages/contact" class="footer__link">{{ 'navigation.contact' | t }}</a>
+            <a href="/policies/shipping-policy" class="footer__link">{{ 'navigation.shipping' | t }}</a>
+            <a href="/policies/refund-policy" class="footer__link">{{ 'navigation.returns' | t }}</a>
+          {%- endif -%}
+        </div>
+      </div>
+      <div class="footer__bottom">
+        {{ payment_icons }}
+        <p class="footer__copyright">&copy; {{ current_year }} {{ shop_name }}. All rights reserved.</p>
+      </div>
+
+    {%- endcase -%}
+    {% render 'watermark' %}
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "class": "section-footer",
+  "settings": [
+    {
+      "type": "select",
+      "id": "footer_style",
+      "label": "Footer layout",
+      "options": [
+        { "value": "standard", "label": "Standard (3-column)" },
+        { "value": "editorial", "label": "Editorial (centered masthead)" },
+        { "value": "4col-sparse", "label": "4-column sparse" },
+        { "value": "brutalist", "label": "Brutalist (inverted, heavy rules)" },
+        { "value": "anchored", "label": "Anchored (large wordmark)" },
+        { "value": "dictionary", "label": "Dictionary (4-col small-caps)" },
+        { "value": "minimal", "label": "Minimal (compact row)" }
+      ],
+      "default": "standard"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Brand description",
+      "default": "Hand-poured soy candles crafted in small batches. Every scent tells a story."
+    },
+    {
+      "type": "text",
+      "id": "col2_heading",
+      "label": "Column 2 heading",
+      "default": "Shop"
+    },
+    {
+      "type": "link_list",
+      "id": "col2_menu",
+      "label": "Column 2 menu"
+    },
+    {
+      "type": "text",
+      "id": "col3_heading",
+      "label": "Column 3 heading",
+      "default": "Help"
+    },
+    {
+      "type": "link_list",
+      "id": "col3_menu",
+      "label": "Column 3 menu"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer"
+    }
+  ]
+}
+{% endschema %}

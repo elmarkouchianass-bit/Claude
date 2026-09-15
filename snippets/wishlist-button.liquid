@@ -1,0 +1,7 @@
+{%- comment -%}
+  Wishlist is a Pro-tier feature.
+  Free tier ships this empty snippet so {% render 'wishlist-button' %}
+  in product-card resolves to zero DOM. Pro/Agency tiers receive
+  wishlist-button.premium.liquid instead (tier decision in
+  src/lib/theme-assembler.ts tieredSnippets).
+{%- endcomment -%}

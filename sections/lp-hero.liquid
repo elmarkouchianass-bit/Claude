@@ -1,0 +1,75 @@
+{%- comment -%} Free single-product landing — hero (layout varies by style pack) {%- endcomment -%}
+{{ 'landing.css' | asset_url | stylesheet_tag }}
+{%- assign hl = section.settings.hero_layout | default: 'split-right' -%}
+{%- capture lp_copy -%}
+  {%- if section.settings.eyebrow != blank -%}<span class="lp-eyebrow">{{ section.settings.eyebrow }}</span>{%- endif -%}
+  <h1 class="lp-hero__title">{{ section.settings.heading }}</h1>
+  {%- if section.settings.lede != blank -%}<p class="lp-hero__lede">{{ section.settings.lede }}</p>{%- endif -%}
+  <div class="lp-buyrow">
+    {%- if section.settings.price != blank -%}<span class="lp-price">{{ section.settings.price }}{%- if section.settings.compare_at != blank -%}<s>{{ section.settings.compare_at }}</s>{%- endif -%}</span>{%- endif -%}
+    {%- if section.settings.rating != blank -%}<span class="lp-rate"><span class="lp-stars">★★★★★</span> {{ section.settings.rating }}</span>{%- endif -%}
+  </div>
+  <a href="{{ section.settings.cta_url | default: routes.all_products_collection_url }}" class="lp-btn lp-btn--lg">{{ section.settings.cta_text | default: 'Add to cart' }}</a>
+  {%- if section.blocks.size > 0 -%}<div class="lp-hero__chips">{%- for block in section.blocks -%}<span class="lp-chip" {{ block.shopify_attributes }}><i class="lp-dot"></i>{{ block.settings.label }}</span>{%- endfor -%}</div>{%- endif -%}
+{%- endcapture -%}
+<section class="lp-hero lp-hero--{{ hl }}" data-reveal>
+  {%- case hl -%}
+  {%- when 'overlay' -%}
+    <div class="lp-hero__bg">{%- if section.settings.media != blank -%}
+        {{ section.settings.media | image_url: width: 1800 | image_tag: alt: section.settings.heading, width: 1800, height: 1200, class: 'lp-img', loading: 'lazy' }}
+      {%- elsif section.settings.image_url != blank -%}
+        <img class="lp-img" src="{{ section.settings.image_url }}" alt="{{ section.settings.heading }}" width="1800" height="1200" loading="lazy">
+      {%- else -%}
+        <img class="lp-img" src="{{ 'hero-1.png' | asset_url }}" alt="{{ section.settings.heading }}" width="1800" height="1200" loading="lazy">
+      {%- endif -%}</div>
+    <div class="lp-wrap lp-hero__overlay"><div class="lp-hero__copy">{{ lp_copy }}</div></div>
+  {%- when 'centered' -%}
+    <div class="lp-wrap lp-hero__centered"><div class="lp-hero__copy">{{ lp_copy }}</div></div>
+    <div class="lp-hero__band">{%- if section.settings.media != blank -%}
+        {{ section.settings.media | image_url: width: 2000 | image_tag: alt: section.settings.heading, width: 2000, height: 900, class: 'lp-img', loading: 'lazy' }}
+      {%- elsif section.settings.image_url != blank -%}
+        <img class="lp-img" src="{{ section.settings.image_url }}" alt="{{ section.settings.heading }}" width="2000" height="900" loading="lazy">
+      {%- else -%}
+        <img class="lp-img" src="{{ 'hero-1.png' | asset_url }}" alt="{{ section.settings.heading }}" width="2000" height="900" loading="lazy">
+      {%- endif -%}</div>
+  {%- else -%}
+    <div class="lp-wrap lp-hero__grid">
+      <div class="lp-hero__copy">{{ lp_copy }}</div>
+      <div class="lp-hero__media">
+        <div class="lp-shot">{%- if section.settings.media != blank -%}
+        {{ section.settings.media | image_url: width: 1200 | image_tag: alt: section.settings.heading, width: 1200, height: 1500, class: 'lp-img', loading: 'lazy' }}
+      {%- elsif section.settings.image_url != blank -%}
+        <img class="lp-img" src="{{ section.settings.image_url }}" alt="{{ section.settings.heading }}" width="1200" height="1500" loading="lazy">
+      {%- else -%}
+        <img class="lp-img" src="{{ 'hero-1.png' | asset_url }}" alt="{{ section.settings.heading }}" width="1200" height="1500" loading="lazy">
+      {%- endif -%}</div>
+        {%- if section.settings.tag_body != blank -%}<div class="lp-tag">{%- if section.settings.tag_title != blank -%}<div class="lp-tag__k">{{ section.settings.tag_title }}</div>{%- endif -%}<p>{{ section.settings.tag_body }}</p></div>{%- endif -%}
+      </div>
+    </div>
+  {%- endcase -%}
+</section>
+{% schema %}
+{
+  "name": "Landing hero",
+  "class": "section-lp-hero",
+  "settings": [
+    { "type": "select", "id": "hero_layout", "label": "Hero layout", "default": "split-right", "options": [ { "value": "split-right", "label": "Split — image right" }, { "value": "split-left", "label": "Split — image left" }, { "value": "centered", "label": "Centered + image band" }, { "value": "overlay", "label": "Full-bleed overlay" }, { "value": "stacked", "label": "Stacked" } ] },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+    { "type": "text", "id": "heading", "label": "Product name / headline" },
+    { "type": "textarea", "id": "lede", "label": "Intro line" },
+    { "type": "text", "id": "price", "label": "Price" },
+    { "type": "text", "id": "compare_at", "label": "Compare-at price" },
+    { "type": "text", "id": "rating", "label": "Rating caption" },
+    { "type": "text", "id": "cta_text", "label": "Button text" },
+    { "type": "url", "id": "cta_url", "label": "Button link" },
+    { "type": "text", "id": "tag_title", "label": "Floating tag title" },
+    { "type": "textarea", "id": "tag_body", "label": "Floating tag text" },
+    { "type": "image_picker", "id": "media", "label": "Image (overrides the fallback)" },
+    { "type": "text", "id": "image_url", "label": "Image URL (used when no image is picked)" }
+  ],
+  "blocks": [
+    { "type": "chip", "name": "Trust chip", "settings": [ { "type": "text", "id": "label", "label": "Label" } ] }
+  ],
+  "presets": [ { "name": "Landing hero", "blocks": [ { "type": "chip" }, { "type": "chip" }, { "type": "chip" }, { "type": "chip" } ] } ]
+}
+{% endschema %}

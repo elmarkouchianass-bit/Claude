@@ -1,0 +1,5320 @@
+/* ══════════════════════════════════
+   BOILERPLATE CSS — auto-prepended by assembler
+   Hero slideshow, product card swatches, secondary image,
+   dropdown keyboard state, announcement carousel
+
+   STYLE TOKENS — set these in :root via theme.liquid to vary per theme:
+   --hero-height: 100vh | 85vh | 70vh
+   --hero-text-align: flex-start | center | flex-end  (horizontal)
+   --hero-text-valign: flex-end | center              (vertical)
+   --hero-content-max-width: 560px | 680px | 100%
+   --hero-heading-size: clamp(2.5rem, 5vw, 4rem)
+   --hero-heading-weight: 400 | 600 | 700
+   --hero-heading-transform: none | uppercase
+   --hero-heading-spacing: 0.02em | 0.08em | 0.15em
+   --btn-radius: 100px | 4px | 0px
+   --btn-transform: none | uppercase
+   --btn-letter-spacing: 0 | 0.1em | 0.15em
+   --nav-layout: single-row | stacked
+   --logo-size: 1.4rem
+   --logo-weight: 400 | 500 | 700
+   --logo-spacing: 0.25em | 0.15em | 0.05em
+   --logo-transform: uppercase | none
+   ══════════════════════════════════ */
+
+/* ── HORIZONTAL OVERFLOW CATCH — generation-wide ──
+   AI sections occasionally include fixed-width grids, wide tables (e.g. a
+   plant-nursery care chart with 4 columns × content), or oversized SVGs
+   that exceed the viewport on narrow screens. Without this rule, the
+   whole page scrolls horizontally — the bug looks like the page is
+   "broken" even though only one section overflows. `overflow-x: clip` on
+   body prevents the page-wide scroll without breaking sticky positioning
+   the way `overflow-x: hidden` would. */
+html, body { overflow-x: clip; }
+
+/* ── ANTI-OVERLAP CATCH — generation-wide ──
+   AI's sticky/fixed headers can clip the top of the first content section
+   on initial render or near scroll-y = 0 (iframe contexts especially).
+   Defensive measures:
+   1. scroll-padding-top on <html> so anchor jumps don't land under the header
+   2. scroll-margin-top on every section so #section-anchor jumps land below header
+   3. min-padding-top on first content section's grid-row-1 cells (AI sections
+      that use grid layouts where row 1 sits flush with header). Uses :where()
+      so AI's intentional padding wins on specificity. */
+:root { --header-h: 80px; }
+html { scroll-padding-top: var(--header-h, 80px); }
+body > .shopify-section { scroll-margin-top: var(--header-h, 80px); }
+body > :where(.shopify-section:not(.section-header):not(.section-announcement-bar)):first-of-type
+  > section,
+body > :where(.shopify-section:not(.section-header):not(.section-announcement-bar)):first-of-type
+  > div {
+  /* AI sections inherit a safe minimum top padding when they don't define one.
+     :where() means specificity is 0 — any AI rule with a real selector wins. */
+  padding-top: 1.5rem;
+}
+
+/* ── TAP-TARGET FLOOR — generation-wide ──
+   A link that is a flex or grid item gets BLOCKIFIED to display: block, so a
+   footer legal link counts as a standalone control while still being only as
+   tall as its 11px text line — 18px, under the 24px a thumb needs. Same for
+   the header wordmark (15px) and for a form field the AI left unstyled, which
+   falls back to the browser's ~19px default.
+
+   The class names on these elements are AI-authored and differ every
+   generation (.f-bottom .right, .foot__bot nav, .head-inner), so this keys on
+   structure and never on a class. Scoped to site chrome so editorial links in
+   body copy are untouched — and min-width/min-height are ignored outright on a
+   link that is still inline, so body copy is doubly safe.
+
+   WHY min-height AND NOT the padding + equal-negative-margin trick used by
+   .breadcrumbs__link: that pair is only layout-neutral when both halves land.
+   Breadcrumb markup is ours, so nothing can separate them. Here the markup is
+   the AI's, and it separates them two ways — a more specific AI rule can
+   override the padding alone, and (measured on halcyon's mobile nav) an item
+   whose cross size is set by its flex container absorbs the padding into its
+   border box entirely. Either way the negative margin is left uncompensated
+   and STACKS down a column: halcyon's mobile nav links each drifted up 6px
+   more than the last, 72px by the bottom of the panel. min-height cannot come
+   apart, and it grows a box only to the floor and never past it.
+
+   Mobile only, at the 768px breakpoint this file already uses most: the floor
+   is a touch concern, and it keeps the 1280px desktop render byte-identical.
+
+   Verified against the 390px TINY-TAP check in
+   research/handauth-runs/2026-08-27-ab-opus5/shoot-mobile.mjs. */
+@media (max-width: 768px) {
+  :is(header, footer, nav, address) a {
+    min-height: 24px;
+    min-width: 24px;
+    /* min-height alone grows the box DOWNWARD from the text, which drops the
+       link out of alignment with whatever it sits beside — measured on
+       foldfathom, the header wordmark rose 4.4px off the icon row next to it.
+       align-content re-centres the line box in the space the floor added. It
+       does nothing at all when the floor is inert, it does not change the
+       element's display type (so an anchor holding an icon plus a label is
+       never re-flowed into flex items), and a browser too old to support it on
+       a block container simply ignores it and lands back on the 4.4px offset
+       rather than breaking. */
+    align-content: center;
+  }
+  form :is(input, select, textarea):not([type="checkbox"]):not([type="radio"]):not([type="hidden"]) {
+    min-height: 24px;
+  }
+}
+
+/* ── ACCESSIBILITY UTILITIES ── */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── HERO SLIDESHOW ── */
+.hero--slideshow {
+  position: relative;
+  min-height: var(--hero-height, 100vh);
+  overflow: hidden;
+}
+
+.hero__slides {
+  position: relative;
+  width: 100%;
+  height: var(--hero-height, 100vh);
+}
+
+.hero__slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.8s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)), visibility 0s 0.8s;
+  display: flex;
+  align-items: var(--hero-text-valign, flex-end);
+  justify-content: var(--hero-text-align, flex-start);
+  pointer-events: none;
+}
+
+.hero__slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.8s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)), visibility 0s 0s;
+  pointer-events: auto;
+  z-index: 1;
+}
+
+/* Content fades out faster than background to prevent text overlap during crossfade */
+.hero__slide .hero__slide-content {
+  transition: opacity 0.3s ease;
+}
+.hero__slide:not(.is-active) .hero__slide-content {
+  opacity: 0;
+}
+
+.hero__slide-media {
+  position: absolute;
+  inset: 0;
+}
+
+.hero__slide-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Video hero — hides static image when video is present */
+.hero__slide-video {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.hero__slide-video + .hero__slide-image--fallback {
+  /* Fallback image hidden when video loads, shown if video fails */
+}
+@media (max-width: 768px) {
+  /* Optionally serve image-only on mobile to save bandwidth */
+  /* .hero__slide-video { display: none; } */
+}
+
+.hero__slide-placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--color-surface-alt, #f0f0f0);
+}
+
+.hero__slide-content {
+  position: relative;
+  z-index: 1;
+  max-width: var(--hero-content-max-width, 560px);
+  padding: 3rem 3rem 4.5rem;
+  /* Use flexbox for reliable alignment of all children (heading, subheading, buttons).
+     text-align alone fails because block children with max-width don't honor it. */
+  display: flex;
+  flex-direction: column;
+  align-items: var(--hero-text-align, flex-start);
+  text-align: var(--hero-text-css-align, left);
+}
+
+.hero__overlay {
+  position: absolute;
+  inset: 0;
+  /* Overlay ensures text readability over any hero image.
+     Top strip always dark for nav. Base dim for text legibility. */
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 20%),
+    linear-gradient(to top, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 45%),
+    rgba(0,0,0,0.15);
+}
+/* Stacked headers have their own opaque cream background covering ~130px
+   at the top. The overlay's top-dark band + base 15% dim create a visible
+   edge where the opaque nav ends. For stacked layouts: drop top gradient
+   AND base dim entirely — text readability is carried by the bottom
+   gradient + the text-shadow on .hero__heading/subheading/eyebrow. */
+body:has(.site-header[data-layout="stacked"]) .hero__overlay {
+  background: linear-gradient(to top, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 45%);
+}
+
+/* Hero text readability + typography override */
+.hero--slideshow .hero__heading,
+.hero--slideshow .hero__subheading,
+.hero--slideshow .hero__eyebrow {
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+}
+
+.hero__heading {
+  font-family: var(--font-heading, serif) !important;
+  font-style: normal !important;
+  font-weight: var(--hero-heading-weight, 400) !important;
+  /* --hero-heading-size is already a full clamp() value from the preset,
+     e.g. clamp(2.5rem, 5vw, 4rem) — use it directly, don't nest in another clamp */
+  font-size: var(--hero-heading-size, clamp(2rem, 4vw, 3.2rem)) !important;
+  letter-spacing: var(--hero-heading-spacing, 0.02em);
+  text-transform: var(--hero-heading-transform, none);
+  line-height: 1.1;
+  margin: 0 0 0.4rem;
+}
+
+.hero__subheading {
+  font-size: clamp(0.75rem, 1vw, 0.9rem);
+  opacity: 0.8;
+  max-width: 38ch;
+  line-height: 1.5;
+  margin: 0 0 1rem;
+}
+
+.hero__eyebrow {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin: 0 0 0.5rem;
+}
+
+/* Hero buttons — compact, understated */
+.hero__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: var(--hero-text-align, flex-start);
+}
+.hero__actions .btn {
+  padding: 0.55rem 1.4rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+}
+
+/* Hero slideshow text — always white on overlay */
+.hero--slideshow .hero__slide-content {
+  color: #fff;
+}
+
+.hero--slideshow .hero__eyebrow {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.hero--slideshow .hero__slide .btn--primary {
+  background: var(--color-background, #fff);
+  color: var(--color-text, #2d2d2d);
+  border-radius: var(--btn-radius, 100px);
+  text-transform: var(--btn-transform, none);
+  letter-spacing: var(--btn-letter-spacing, 0);
+}
+
+.hero--slideshow .hero__slide .btn--primary:hover {
+  background: var(--color-primary);
+  color: var(--color-background, #fff);
+}
+
+.hero--slideshow .hero__slide .btn--outline {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+  border-radius: var(--btn-radius, 100px);
+  text-transform: var(--btn-transform, none);
+  letter-spacing: var(--btn-letter-spacing, 0);
+}
+
+.hero--slideshow .hero__slide .btn--outline:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #fff;
+}
+
+.hero--slideshow .hero__slide:not(:has(.hero__slide-image)) .hero__slide-content {
+  color: var(--color-text, #2d2d2d);
+}
+
+.hero--slideshow .hero__slide:not(:has(.hero__slide-image)) .hero__overlay {
+  display: none;
+}
+
+/* ── DEPTH PARALLAX LAYERS ── */
+.hero__parallax-bg,
+.hero__parallax-mid,
+.hero__parallax-fg {
+  position: absolute;
+  inset: -20px; /* extra bleed so shifted layers don't reveal edges */
+  z-index: 0;
+  will-change: transform;
+  pointer-events: none;
+}
+.hero__parallax-bg img,
+.hero__parallax-mid img,
+.hero__parallax-fg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hero__parallax-bg { z-index: 0; }
+.hero__parallax-mid { z-index: 1; }
+.hero__parallax-fg { z-index: 2; }
+/* When parallax is active, hide the default hero image */
+.hero__slide--parallax .hero__slide-image {
+  display: none;
+}
+/* Overlay and content sit above parallax layers */
+.hero__slide--parallax .hero__overlay { z-index: 3; }
+.hero__slide--parallax .hero__slide-content { z-index: 4; }
+@media (prefers-reduced-motion: reduce) {
+  .hero__parallax-bg,
+  .hero__parallax-mid,
+  .hero__parallax-fg {
+    inset: 0;
+    transform: none !important;
+  }
+}
+
+/* Hero nav (arrows + dots) */
+.hero__nav {
+  position: absolute !important;
+  bottom: 2rem !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  z-index: 2;
+  width: auto !important;
+}
+
+.hero__arrow {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: #fff;
+  transition: background 0.2s ease;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+.hero__arrow:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.hero__dots {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.hero__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-background, #fff) 40%, transparent);
+  border: none;
+  cursor: pointer;
+  /* Reserve space for the active-state outline ring so layout doesn't jump */
+  outline: 1px solid transparent;
+  outline-offset: 2px;
+  transition: background 0.3s ease, transform 0.3s ease, outline-color 0.3s ease;
+}
+
+/* Active state uses THREE non-color cues (size, weight, outline ring) so
+   a colorblind user can identify the active slide at a glance. */
+.hero__dot.is-active {
+  background: var(--color-background, #fff);
+  transform: scale(1.35);
+  outline-color: currentColor;
+}
+
+/* ── HERO NAV VARIANTS — driven by --hero-nav-style token ── */
+
+/* MINIMAL — dots only, no arrows, subtle */
+.hero--slideshow[data-nav-style="minimal"] .hero__arrow { display: none; }
+.hero--slideshow[data-nav-style="minimal"] .hero__dot {
+  width: 6px; height: 6px;
+  background: rgba(255,255,255,0.3);
+  transition: background 0.3s ease, width 0.3s ease;
+  border-radius: 50%;
+}
+.hero--slideshow[data-nav-style="minimal"] .hero__dot.is-active {
+  background: #fff;
+  /* Non-color active cue: scale up so colorblind users see current slide. */
+  transform: scale(1.4);
+  width: 6px;
+  outline-color: #fff;
+}
+
+/* DASH — horizontal dashes, no arrows */
+.hero--slideshow[data-nav-style="dash"] .hero__arrow { display: none; }
+.hero--slideshow[data-nav-style="dash"] .hero__dots { gap: 0.4rem; }
+.hero--slideshow[data-nav-style="dash"] .hero__dot {
+  width: 20px; height: 2px;
+  border-radius: 1px;
+  background: rgba(255,255,255,0.3);
+  transition: background 0.3s ease, width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: none;
+}
+.hero--slideshow[data-nav-style="dash"] .hero__dot.is-active {
+  background: #fff;
+  width: 36px;
+  transform: none;
+}
+
+/* PILL — pill-shaped active, thin chevron arrows */
+.hero--slideshow[data-nav-style="pill"] .hero__arrow {
+  background: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
+  width: 20px; height: 20px;
+  opacity: 0.6;
+}
+.hero--slideshow[data-nav-style="pill"] .hero__arrow:hover { opacity: 1; background: none; }
+.hero--slideshow[data-nav-style="pill"] .hero__dots { gap: 0.35rem; }
+.hero--slideshow[data-nav-style="pill"] .hero__dot {
+  width: 8px; height: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.25);
+  transition: background 0.3s ease, width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: none;
+}
+.hero--slideshow[data-nav-style="pill"] .hero__dot.is-active {
+  background: #fff;
+  width: 24px;
+  transform: none;
+}
+
+/* Counter element — hidden by default, shown only for "number" nav style */
+.hero__counter { display: none; }
+
+/* NUMBER — shows "1 / 3" counter, hides dots (requires JS support) */
+.hero--slideshow[data-nav-style="number"] .hero__dots { display: none; }
+.hero--slideshow[data-nav-style="number"] .hero__counter { display: block; }
+.hero--slideshow[data-nav-style="number"] .hero__counter {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.7);
+}
+.hero--slideshow[data-nav-style="number"] .hero__arrow {
+  width: 24px; height: 24px;
+  background: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+.hero--slideshow[data-nav-style="number"] .hero__arrow:hover {
+  border-color: rgba(255,255,255,0.6);
+  background: none;
+}
+
+@media (max-width: 768px) {
+  .hero--slideshow,
+  .hero__slides {
+    min-height: 60vh;
+  }
+  .hero__heading {
+    /* Safety cap for mobile — preset clamp handles most cases,
+       but very large presets (adventure: 7vw → 5rem) need a ceiling */
+    font-size: clamp(1.6rem, 6vw, 2.8rem) !important;
+  }
+  .hero__slide-content {
+    padding: 2.5rem 1.5rem 3.5rem;
+  }
+  .hero__nav {
+    bottom: 1rem;
+  }
+}
+
+/* ── HERO VARIANTS: single-image / video / animation ──
+   Share .hero__heading, .hero__subheading, .hero__overlay etc with the
+   slideshow, but use a single fixed media layer (no slides). Content is
+   sourced from `section.settings` instead of block settings. */
+.hero--single-image,
+.hero--video,
+.hero--animation {
+  position: relative;
+  min-height: var(--hero-height, 100vh);
+  overflow: hidden;
+  display: flex;
+  align-items: var(--hero-text-valign, flex-end);
+  justify-content: var(--hero-text-align, flex-start);
+  color: #fff;
+}
+
+.hero--single-image .hero__media,
+.hero--video .hero__media,
+.hero--animation .hero__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero--single-image .hero__slide-image,
+.hero--video .hero__video,
+.hero--video .hero__video-svg,
+.hero--animation .hero__animation-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero--video .hero__video-svg ellipse animate { display: none; }
+}
+
+.hero--single-image .hero__slide-content,
+.hero--video .hero__slide-content,
+.hero--animation .hero__slide-content {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+}
+
+/* Text shadow for readability on photo/video backgrounds */
+.hero--single-image .hero__heading,
+.hero--single-image .hero__subheading,
+.hero--single-image .hero__eyebrow,
+.hero--video .hero__heading,
+.hero--video .hero__subheading,
+.hero--video .hero__eyebrow,
+.hero--animation .hero__heading,
+.hero--animation .hero__subheading,
+.hero--animation .hero__eyebrow {
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+}
+
+.hero--single-image .hero__eyebrow,
+.hero--video .hero__eyebrow,
+.hero--animation .hero__eyebrow {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* CTAs match slideshow styling: white primary, ghost outline */
+.hero--single-image .btn--primary,
+.hero--video .btn--primary,
+.hero--animation .btn--primary {
+  background: var(--color-background, #fff);
+  color: var(--color-text, #2d2d2d);
+  border-radius: var(--btn-radius, 100px);
+  text-transform: var(--btn-transform, none);
+  letter-spacing: var(--btn-letter-spacing, 0);
+}
+.hero--single-image .btn--primary:hover,
+.hero--video .btn--primary:hover,
+.hero--animation .btn--primary:hover {
+  background: var(--color-primary);
+  color: var(--color-background, #fff);
+}
+.hero--single-image .btn--outline,
+.hero--video .btn--outline,
+.hero--animation .btn--outline {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+  border-radius: var(--btn-radius, 100px);
+  text-transform: var(--btn-transform, none);
+  letter-spacing: var(--btn-letter-spacing, 0);
+}
+.hero--single-image .btn--outline:hover,
+.hero--video .btn--outline:hover,
+.hero--animation .btn--outline:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #fff;
+}
+
+/* Animation hero — drifting orbs over a brand-colored gradient.
+   Uses --color-primary / --color-secondary so the look adapts to palette. */
+.hero--animation .hero__animation-bg {
+  background:
+    radial-gradient(ellipse at 30% 30%, color-mix(in srgb, var(--color-primary, #2563eb) 60%, transparent) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 70%, color-mix(in srgb, var(--color-secondary, #1e293b) 70%, transparent) 0%, transparent 60%),
+    linear-gradient(135deg, var(--color-secondary, #1e293b) 0%, var(--color-primary, #2563eb) 100%);
+  overflow: hidden;
+}
+
+.hero--animation .hero__orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.55;
+  animation: hero-orb-drift 18s ease-in-out infinite;
+}
+.hero--animation .hero__orb--a {
+  width: 38vw;
+  height: 38vw;
+  top: -8vw;
+  left: -6vw;
+  background: var(--color-primary, #2563eb);
+}
+.hero--animation .hero__orb--b {
+  width: 32vw;
+  height: 32vw;
+  bottom: -10vw;
+  right: -6vw;
+  background: var(--color-accent, #f59e0b);
+  animation-delay: -6s;
+  animation-duration: 22s;
+}
+.hero--animation .hero__orb--c {
+  width: 26vw;
+  height: 26vw;
+  top: 35%;
+  left: 50%;
+  background: var(--color-secondary, #1e293b);
+  animation-delay: -12s;
+  animation-duration: 26s;
+}
+
+@keyframes hero-orb-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(8vw, -4vw) scale(1.08); }
+  66% { transform: translate(-6vw, 5vw) scale(0.95); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero--animation .hero__orb { animation: none; }
+}
+
+/* ── INSTAGRAM FEED ── */
+.instagram-feed {
+  padding: 4rem 0;
+}
+.instagram-feed__header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.instagram-feed__handle {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-primary, #2563eb);
+  text-decoration: none;
+}
+.instagram-feed__handle:hover { text-decoration: underline; }
+.instagram-feed__grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
+}
+@media (max-width: 768px) {
+  .instagram-feed__grid { grid-template-columns: repeat(3, 1fr); }
+}
+.instagram-feed__tile {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 4px;
+}
+.instagram-feed__placeholder {
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--color-primary, #2563eb) 20%, transparent) 0%,
+      color-mix(in srgb, var(--color-secondary, #1e293b) 20%, transparent) 100%);
+}
+.instagram-feed__note {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #999);
+  font-style: italic;
+}
+
+/* ── PRODUCT CARD: SECONDARY IMAGE HOVER ── */
+.product-card__image--primary,
+.product-card__image--secondary {
+  transition: opacity 0.4s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.product-card__image--secondary {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+}
+
+.product-card:hover .product-card__image--secondary {
+  opacity: 1;
+}
+
+.product-card:hover .product-card__image--primary {
+  opacity: 0;
+}
+
+/* ── PRODUCT CARD: COLOR SWATCHES ── */
+.product-card__swatches {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 0.3rem;
+}
+
+.product-card__swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-border, rgba(0,0,0,0.1));
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.product-card__swatch:hover {
+  border-color: var(--color-primary, #7a9e7e);
+  transform: scale(1.2);
+}
+
+/* ── PRODUCT CARD: VARIANT SWATCHES (Color + Size + other options) ──
+   Availability must NOT be communicated by color alone — Adam is colorblind.
+   Sold-out state uses: (1) reduced opacity, (2) diagonal strikethrough line,
+   (3) an aria-label suffix " - Sold out". */
+.swatch-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+
+.swatch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border: 1.5px solid var(--color-border, rgba(0,0,0,0.15));
+  border-radius: 4px;
+  font-size: 0.7rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.swatch--color {
+  width: 22px;
+  min-width: 22px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.swatch--text {
+  background: transparent;
+  color: var(--color-text, #1a1a1a);
+  font-weight: 500;
+}
+
+.swatch:hover {
+  border-color: var(--color-primary, currentColor);
+  transform: scale(1.08);
+}
+
+/* Sold-out: opacity + diagonal strikethrough line (shape, not color).
+   0.55 rather than 0.4 — at 0.4 the value inside a text swatch was faint
+   enough that you could see a size was gone but not read which one. */
+.swatch--unavailable {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.swatch--unavailable::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -2px;
+  right: -2px;
+  height: 1.5px;
+  background: currentColor;
+  transform: rotate(-45deg);
+  transform-origin: center;
+  pointer-events: none;
+}
+
+.swatch--color.swatch--unavailable::after {
+  background: #000;
+  height: 2px;
+}
+
+.swatch--unavailable:hover {
+  transform: none;
+}
+
+/* ── PRODUCT PAGE: the same swatch, doing a different job ──
+   On a collection tile a swatch reports what exists, so 22px is right. On a
+   product page it IS the buy control, and 22px is under half a thumb. These
+   only raise the floor — an AI theme's own rule still wins, because this file
+   is prepended to theme.css and anything written later at the same specificity
+   overrides it. */
+.product-option__swatch {
+  min-width: 44px;
+  height: auto;
+  min-height: 44px;
+  padding: 0 12px;
+  font-size: 0.8125rem;
+}
+
+.product-option__swatch.swatch--color {
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0;
+}
+
+/* ── HEADER — transparent overlay, always visible ── */
+.section-header {
+  position: sticky;
+  top: var(--announcement-h, 41px);
+  z-index: 100;
+  background: transparent;
+  width: 100%;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+  isolation: isolate;
+}
+
+/* Pull hero up behind both announcement bar + header — ONLY for image-
+   backed boilerplate heroes that intentionally use the transparent-header
+   overlay pattern. For AI-authored editorial heroes (typography-driven,
+   no full-bleed image), pulling the section up clips the heading behind
+   the sticky header. We scope by hero type instead.
+   Use ~ (general sibling) not + (adjacent) because Shopify CLI injects
+   <style> tags between sections, breaking the adjacent combinator. */
+.section-header ~ main > :where(
+  .shopify-section.section-hero-slideshow,
+  .shopify-section.section-hero-single-image,
+  .shopify-section.section-hero-video,
+  .shopify-section.section-hero-animation,
+  .shopify-section[data-hero-overlay]
+):first-child {
+  margin-top: calc(-1 * (var(--header-h, 50px) + var(--announcement-h, 41px)));
+}
+
+/* Solid header when scrolled past hero (toggled by JS) */
+.section-header.header--scrolled {
+  background: var(--color-background, #fff);
+  border-bottom: 1px solid var(--color-border, rgba(0,0,0,0.08));
+}
+.section-header.header--scrolled .header__logo-text,
+.section-header.header--scrolled .header__icon,
+.section-header.header--scrolled .nav-link,
+.section-header.header--scrolled .nav-toggle {
+  color: var(--color-text, #1a1a1a);
+  text-shadow: none;
+  filter: none;
+  filter: none;
+}
+
+/* ── HEADER LAYOUT — driven by --nav-layout token ── */
+.site-header {
+  width: 100%;
+  border-bottom: var(--header-border, none);
+}
+
+/* DEFAULT: Single-row — nav-left | logo-center | nav+icons-right */
+/* Note: .site-header prefix prevents .container padding from overriding vertical padding */
+.site-header .header__row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  padding: 0.8rem 1.5rem;
+  align-items: center;
+}
+
+.header__nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.header__nav--left {
+  justify-self: start;
+}
+
+.header__nav--right {
+  justify-self: end;
+  gap: 1.5rem;
+}
+
+.header__icons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
+
+.header__logo {
+  justify-self: center;
+  text-decoration: none;
+}
+
+/* VARIANT: Stacked — logo centered top, nav centered below, solid background */
+.site-header[data-layout="stacked"] {
+  background: var(--color-background);
+  color: var(--color-text);
+  /* Stacked layouts have a separate nav row immediately below the logo row.
+     A header-border from presets (like warm-artisan) creates a visible
+     horizontal line splitting the two rows. Force it off for stacked. */
+  --header-border: none;
+}
+.site-header[data-layout="stacked"] .header__row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 0.6rem 0 0;
+}
+.site-header[data-layout="stacked"] .header__logo-text,
+.site-header[data-layout="stacked"] .header__icon,
+.site-header[data-layout="stacked"] .nav-link,
+.site-header[data-layout="stacked"] .nav-toggle {
+  color: var(--color-text);
+  text-shadow: none;
+  filter: none;
+}
+.site-header[data-layout="stacked"] .header__nav--left {
+  display: none;
+}
+.site-header[data-layout="stacked"] .header__nav--right .nav-item,
+.site-header[data-layout="stacked"] .header__nav--right > a.nav-link {
+  display: none;
+}
+.site-header[data-layout="stacked"] .header__logo {
+  order: -1;
+}
+.site-header[data-layout="stacked"] .header__icons {
+  position: absolute;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 0;
+}
+/* Stacked nav row: hidden by default, shown only for stacked layout */
+.header__nav-stacked {
+  display: none;
+}
+.site-header[data-layout="stacked"] ~ .header__nav-stacked {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  padding: 0.5rem 0;
+  width: 100%;
+  background: var(--color-background);
+}
+/* Shopify wraps header + stacked-nav in .shopify-section.section-header.
+   Force it to be a block column so the nav row spans full width. */
+.shopify-section.section-header {
+  display: block !important;
+}
+/* Match logo color — both use the same text color on solid background */
+.site-header[data-layout="stacked"] .header__logo-text {
+  color: var(--color-text);
+}
+.header__nav-stacked .nav-link {
+  font-family: var(--nav-font, var(--font-body));
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: var(--nav-spacing, 0.04em);
+  text-transform: var(--nav-transform, uppercase);
+  color: var(--color-text);
+  text-shadow: none;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+.header__nav-stacked .nav-link:hover {
+  opacity: 0.6;
+}
+
+/* VARIANT: Inline-left — logo left, nav right */
+.site-header[data-layout="inline-left"] .header__row {
+  grid-template-columns: auto 1fr auto;
+}
+.site-header[data-layout="inline-left"] .header__logo {
+  justify-self: start;
+}
+.site-header[data-layout="inline-left"] .header__nav--left {
+  display: none;
+}
+.site-header[data-layout="inline-left"] .header__nav--right {
+  justify-self: end;
+}
+
+.header__logo-text {
+  font-family: var(--font-heading, serif);
+  font-size: var(--logo-size, 1.4rem);
+  font-weight: var(--logo-weight, 400);
+  letter-spacing: var(--logo-spacing, 0.25em);
+  text-transform: var(--logo-transform, uppercase);
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  white-space: nowrap;
+}
+
+.header__logo img {
+  max-width: 160px;
+  height: auto;
+}
+
+/* Wizard-uploaded merchant logos (settings.logo_bundled_filename) often
+   have a white or off-white background baked into the raster. Wrap the
+   image in a subtle rounded chip so the white surface looks intentional
+   on any header background — transparent over hero, solid color, dark.
+   Mix-blend-mode was tried earlier (`multiply`) but the header section's
+   `isolation: isolate` + variable backgrounds made it fragile; a simple
+   chip with consistent visual mass is reliable. Logos uploaded through
+   Shopify's image_picker (settings.logo) skip these rules — those
+   merchants are presumably uploading clean transparent PNGs. */
+.header__logo img.header__logo-img--bundled {
+  background: #fff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.header__icon {
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  transition: opacity 0.2s ease, color 0.3s ease;
+  text-decoration: none;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+}
+
+.header__icon:hover {
+  opacity: 0.6;
+}
+
+.header__cart {
+  position: relative;
+}
+
+.cart-count {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 17px;
+  height: 17px;
+  background: var(--color-primary, #B5713A);
+  color: var(--color-background, #fff);
+  font-size: 0.6rem;
+  font-weight: 600;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.nav-item {
+  position: relative;
+}
+
+/* Mobile nav + overlay — HIDDEN on all viewports until JS toggles .is-open */
+.mobile-nav,
+.mobile-nav-overlay {
+  display: none !important;
+}
+.mobile-nav.is-open {
+  display: block !important;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 175;
+  background: var(--color-background, #fff);
+  border-radius: 20px 20px 0 0;
+  max-height: 70vh;
+  overflow-y: auto;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+  animation: slideUp 0.35s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.mobile-nav-overlay.is-visible {
+  display: block !important;
+  position: fixed;
+  inset: 0;
+  z-index: 170;
+  background: rgba(0,0,0,0.4);
+}
+.mobile-nav__inner {
+  padding: 2rem 1.5rem 3rem;
+}
+.mobile-nav__link {
+  display: block;
+  padding: 0.8rem 0;
+  font-size: 1.1rem;
+  color: var(--color-text, #1a1a1a);
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-border, rgba(0,0,0,0.08));
+}
+
+.nav-link {
+  font-family: var(--nav-font, var(--font-body, sans-serif));
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: var(--nav-transform, uppercase);
+  letter-spacing: var(--nav-spacing, 0.1em);
+  color: #fff;
+  text-decoration: none;
+  transition: opacity 0.2s ease, color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 0 12px rgba(0,0,0,0.2);
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  opacity: 0.6;
+}
+
+.nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+}
+
+@media (max-width: 768px) {
+  /* Hide desktop nav links */
+  .header__nav--left,
+  .header__nav--right .nav-item,
+  .header__nav--right > a.nav-link {
+    display: none;
+  }
+  /* Mobile header: hamburger | logo | icons — single row */
+  .header__row {
+    display: grid;
+    /* auto, not a hard 40px: .nav-toggle measures exactly 24px on all 20 presets,
+       so a 40px track reserved 16px of dead space and took it from the wordmark
+       column. inline-left already resolves this column to auto (via its own
+       grid-template-columns rule), which is precisely why its presets had ~3x
+       the wordmark headroom that stacked ones did. This makes stacked match. */
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: 1fr;
+    align-items: center;
+    padding: 0.8rem 0;
+    gap: 0;
+  }
+  .nav-toggle {
+    display: flex;
+    order: -1;
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+  }
+  .header__nav--left {
+    grid-row: 1;
+  }
+  .header__logo {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: center;
+    /* STRUCTURAL GUARANTEE that the wordmark can never print over the icon row.
+       .header__logo-text sets white-space: nowrap, which makes the wordmark's
+       min-content equal its ENTIRE width; combined with justify-self (center
+       here, start for inline-left) the item is fit-content sized, so it takes
+       its max-content width and simply overflows the grid track. Capping to the
+       track and truncating is strictly better than overlapping text.
+       min-width MUST be stated: it beats max-width in the cascade, so leaving it
+       at the grid default of auto (= min-content = the full wordmark) would
+       cancel the max-width below. 24px also keeps the tap-target floor. */
+    min-width: 24px;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  .header__logo-text {
+    /* Wide letter-spacing is a desktop luxury. --logo-spacing defaults to 0.25em
+       and presets push it to 0.5em, which on a 16-character store name at 390px
+       cost up to 115px of width — measured as the dominant cause of the wordmark
+       running under the icons on 11 of 20 presets (the two presets that set no
+       tracking were the only clean ones). min() caps the wide ones and leaves a
+       preset that already tracks tighter exactly as its designer set it. */
+    letter-spacing: min(var(--logo-spacing, 0.25em), 0.05em);
+    /* Floor lowered from 0.9rem and the vw term from 3.5: at 390px the 0.9rem
+       floor was what bound (14.4px > 3.5vw), so only lowering the floor would
+       have changed nothing. Glyph width varies ~1.4x across presets at one size
+       because --font-heading differs, so this is sized for the widest of them.
+       3vw rather than 3.2vw: at 3.2 the tightest preset (beauty-editorial, whose
+       stacked layout reserves a 40px hamburger column and so has the least room)
+       cleared the icons by only 3px, and 3px is inside the margin by which font
+       metrics move between rendering contexts - it rendered fully in the mobile
+       harness and truncated in a desktop-context iframe of the same page. 3vw
+       takes that preset to ~13px of clearance. */
+    font-size: clamp(0.72rem, 3vw, var(--logo-size, 1.4rem));
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .header__nav--right {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+    gap: 0;
+  }
+  .header__icons {
+    margin-left: 0;
+    gap: 0.3rem;
+  }
+  /* Stacked variant — same mobile layout */
+  .site-header[data-layout="stacked"] .header__row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    flex-direction: unset;
+    /* 1.5rem, not 0, to match the default mobile header. This rule's own
+       comment says "same mobile layout", but the default keeps 0.8rem 1.5rem
+       from the unmediated .site-header .header__row, and 0 here outranks it
+       (0,3,1 beats 0,2,1), so the stacked header alone lost its side gutter and
+       .header__icons sat flush against the viewport edge. The cart badge is
+       absolutely positioned at right: -6px, so with no gutter 6 of its 17px
+       were clipped off-screen. Measured: exactly the 7 stacked presets, none of
+       the 13 inline-left ones. */
+    padding: 0.8rem 1.5rem;
+  }
+  .site-header[data-layout="stacked"] .header__icons {
+    position: static;
+    transform: none;
+  }
+  .header__nav-stacked {
+    display: none !important;
+  }
+}
+
+/* ── HERO SPLIT — text + image side by side, no overlay ── */
+.hero--split {
+  position: relative;
+  background: var(--color-background);
+}
+.hero-split__layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 85vh;
+}
+.hero--split[data-height="full"] .hero-split__layout { min-height: 100vh; }
+.hero--split[data-height="medium"] .hero-split__layout { min-height: 70vh; }
+
+.hero-split__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem 3rem 4rem 4rem;
+  max-width: 600px;
+  margin-left: auto;
+}
+.hero-split__content .hero__eyebrow { color: var(--color-primary); }
+.hero-split__content .hero__heading {
+  font-family: var(--font-heading);
+  font-size: var(--hero-heading-size, clamp(2.2rem, 5vw, 3.5rem));
+  font-weight: var(--hero-heading-weight, 400);
+  letter-spacing: var(--hero-heading-spacing, -0.01em);
+  text-transform: var(--hero-heading-transform, none);
+  line-height: 1.1;
+  margin: 0 0 1rem;
+  color: var(--color-text);
+}
+.hero-split__subheading {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  max-width: 42ch;
+  margin: 0 0 1.5rem;
+}
+.hero-split__content .hero__actions { justify-content: flex-start; }
+.hero-split__content .btn--primary {
+  background: var(--color-primary);
+  color: var(--color-background);
+}
+
+.hero-split__media {
+  position: relative;
+  overflow: hidden;
+}
+.hero-split__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hero-split__placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-alt);
+}
+
+/* Reversed layout: image left, text right */
+.section-hero-split[data-layout="text-right"] .hero-split__layout {
+  direction: rtl;
+}
+.section-hero-split[data-layout="text-right"] .hero-split__layout > * {
+  direction: ltr;
+}
+.section-hero-split[data-layout="text-right"] .hero-split__content {
+  margin-left: 0;
+  margin-right: auto;
+  padding: 4rem 4rem 4rem 3rem;
+}
+
+/* Pull hero up behind header (same as slideshow) */
+.section-header ~ main > .shopify-section:first-child .hero--split {
+  margin-top: calc(-1 * (var(--header-h, 50px) + var(--announcement-h, 41px)));
+  padding-top: calc(var(--header-h, 50px) + var(--announcement-h, 41px));
+}
+
+@media (max-width: 768px) {
+  .hero-split__layout {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .hero-split__media { min-height: 50vh; order: -1; }
+  .hero-split__content {
+    padding: 2.5rem 1.5rem;
+    max-width: 100%;
+    margin: 0;
+  }
+}
+
+/* ── DROPDOWN KEYBOARD STATE ── */
+.dropdown.is-active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── ANNOUNCEMENT BAR — sticky, style variants via data-bar-style ── */
+.section-announcement-bar {
+  position: sticky;
+  top: 0;
+  z-index: 101;
+}
+
+/* Default / solid — dark bar */
+.announcement-bar[data-bar-style="solid"],
+.announcement-bar:not([data-bar-style]) {
+  background: #111 !important;
+  color: #fff !important;
+}
+.announcement-bar[data-bar-style="solid"] .announcement-bar__close,
+.announcement-bar[data-bar-style="solid"] .announcement-bar__arrow,
+.announcement-bar:not([data-bar-style]) .announcement-bar__close,
+.announcement-bar:not([data-bar-style]) .announcement-bar__arrow {
+  color: #fff !important;
+}
+
+/* Brand — uses theme's primary color */
+.announcement-bar[data-bar-style="brand"] {
+  background: var(--color-primary) !important;
+  color: #fff !important;
+}
+.announcement-bar[data-bar-style="brand"] .announcement-bar__close,
+.announcement-bar[data-bar-style="brand"] .announcement-bar__arrow {
+  color: #fff !important;
+}
+
+/* Minimal — transparent bg, dark text, no hard divider */
+.announcement-bar[data-bar-style="minimal"] {
+  background: var(--color-background) !important;
+  color: var(--color-text) !important;
+}
+.announcement-bar[data-bar-style="minimal"] .announcement-bar__close,
+.announcement-bar[data-bar-style="minimal"] .announcement-bar__arrow {
+  color: var(--color-text) !important;
+}
+
+/* Accent — thin bar, card bg + text color. No left stripe (was creating
+   a visual "gap" on full-width bars — doesn't read as an accent). */
+.announcement-bar[data-bar-style="accent"] {
+  background: var(--color-background-card, #fff) !important;
+  color: var(--color-text) !important;
+}
+/* Accent needs explicit close/arrow color — base default is --color-background
+   which matches card bg → invisible close button. */
+.announcement-bar[data-bar-style="accent"] .announcement-bar__close,
+.announcement-bar[data-bar-style="accent"] .announcement-bar__arrow {
+  color: var(--color-text) !important;
+}
+
+/* ── ANNOUNCEMENT BAR CAROUSEL ── */
+.announcement-bar__carousel {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  justify-content: center;
+}
+
+.announcement-bar__slides {
+  position: relative;
+  text-align: center;
+  min-height: 1.4em;
+}
+
+.announcement-bar__slide {
+  display: none;
+  text-align: center;
+}
+
+.announcement-bar__slide.is-active {
+  display: block;
+}
+
+.announcement-bar__slide a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.announcement-bar__arrow {
+  color: inherit;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+  padding: 0.2rem;
+  flex-shrink: 0;
+}
+
+.announcement-bar__arrow:hover {
+  opacity: 1;
+}
+
+/* ── SCROLL REVEAL ── */
+/* Every [data-reveal] element animates individually as it enters the viewport.
+   NOTE: pre-reveal state uses a TINY opacity delta (0.999 → 1) instead of 0 → 1.
+   Older approach pushed opacity to 0, which caused axe-core color-contrast to
+   compute rendered text color as blended-with-background (near-invisible),
+   producing ~450 false-positive AA violations on below-the-fold content. The
+   transform-only fade is still visibly an animation while keeping text at full
+   contrast for assistive tech and automated auditors. */
+.js-reveal-armed [data-reveal] {
+  transition: transform 3.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.js-reveal-armed [data-reveal]:not(.is-revealed) {
+  transform: translateY(18px);
+}
+
+[data-reveal].is-revealed {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ── BACK TO TOP ── */
+.back-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 50;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.back-to-top.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.back-to-top:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* ── MEGA MENU ── */
+.nav-item--mega {
+  position: static;
+}
+
+.mega-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  background: var(--color-background, #fff);
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+
+.nav-item--mega.is-mega-open .mega-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.mega-menu__inner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 2rem;
+  padding: 2rem 0;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.mega-menu__column-title {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-text);
+  text-decoration: none;
+  margin-bottom: 0.75rem;
+  transition: color 0.2s ease;
+}
+
+.mega-menu__column-title:hover {
+  color: var(--color-primary);
+}
+
+.mega-menu__links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mega-menu__links li {
+  margin-bottom: 0.4rem;
+}
+
+.mega-menu__link {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+  line-height: 1.5;
+}
+
+.mega-menu__link:hover {
+  color: var(--color-primary);
+}
+
+/* Mega menu always uses solid background even when header is transparent */
+.section-header:not(.header--scrolled) .mega-menu {
+  background: var(--color-background, #fff);
+}
+.section-header:not(.header--scrolled) .mega-menu__column-title {
+  color: var(--color-text);
+}
+.section-header:not(.header--scrolled) .mega-menu__link {
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 768px) {
+  .mega-menu {
+    display: none !important;
+  }
+}
+
+/* ══════════════════════════════════
+   HOMEPAGE SECTIONS — boilerplate owned
+   Generic styles for all 10 homepage section types.
+   These use CSS variables so they adapt to any palette/font.
+   ══════════════════════════════════ */
+
+/* ── RESET & BASE ── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--color-text);
+  background: var(--color-background);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+h2 em, h1 em {
+  font-style: italic;
+  font-weight: 600;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* ── LAYOUT ── */
+
+.container {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  background: var(--color-primary);
+  color: var(--color-background);
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  z-index: 9999;
+  font-size: 0.85rem;
+}
+
+.skip-link:focus {
+  top: 0.5rem;
+}
+
+/* ── BUTTONS ── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 2rem;
+  border-radius: var(--btn-radius, 4px);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: var(--btn-letter-spacing, 0.02em);
+  text-transform: var(--btn-transform, none);
+  transition: all 0.3s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+  white-space: nowrap;
+}
+
+.btn--primary {
+  /* Darken the accent 20% toward secondary to guarantee 4.5:1 contrast against
+     forced-white text. Accent stays visually "orange" (or whatever primary is)
+     but loses the light-orange-on-white AA failure across themes with bright
+     accents. */
+  background: color-mix(in srgb, var(--color-primary), var(--color-secondary) 20%);
+  color: #fff;
+}
+
+.btn--primary:hover {
+  background: var(--color-secondary);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.btn--primary:active {
+  transform: scale(0.98);
+}
+
+.btn--outline {
+  background: transparent;
+  color: var(--color-text);
+  border: 1.5px solid var(--color-border-strong, color-mix(in srgb, var(--color-text) 25%, transparent));
+}
+
+.btn--outline:hover {
+  background: var(--color-primary);
+  color: var(--color-background);
+  border-color: var(--color-primary);
+}
+
+.btn--small {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.78rem;
+}
+
+.btn--pill {
+  border-radius: 999px;
+}
+
+/* ── SHARED SECTION ELEMENTS ── */
+
+.section-eyebrow {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  /* --color-eyebrow-text blends primary 80% + text 20% so it keeps brand tint
+     while guaranteeing AA contrast against --color-background. Fall back to
+     --color-text (which mirrors body contrast) if the blend is unavailable. */
+  color: var(--color-eyebrow-text, var(--color-text));
+  margin-bottom: 0.75rem;
+}
+
+.section-eyebrow--center {
+  display: block;
+  text-align: center;
+}
+
+.section-heading {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 1.25rem;
+}
+
+.section-heading--center {
+  text-align: center;
+}
+
+.section-header-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.section-link {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-primary);
+  transition: opacity 0.2s ease;
+}
+
+.section-link:hover {
+  opacity: 0.7;
+}
+
+/* ── PULL QUOTE ── */
+
+.pull-quote {
+  padding: 5rem 0;
+  text-align: center;
+  background: var(--color-background-card, var(--color-card, #fff));
+}
+
+.pull-quote__label {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 1.5rem;
+}
+
+.pull-quote__text {
+  font-family: var(--font-heading);
+  font-size: clamp(1.3rem, 3vw, 2.2rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--color-text);
+  max-width: 48ch;
+  margin: 0 auto;
+}
+
+.pull-quote__text p {
+  margin: 0;
+}
+
+/* ── TRUST BAR ── */
+
+.trust-bar {
+  padding: 4rem 0;
+  background: var(--color-background);
+}
+
+.trust-bar__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  text-align: center;
+}
+
+.trust-bar__icon {
+  color: var(--color-primary);
+  margin-bottom: 0.75rem;
+  display: flex;
+  justify-content: center;
+}
+
+.trust-bar__label {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.trust-bar__desc {
+  font-size: 0.78rem;
+  color: var(--color-text-muted, var(--color-muted));
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .trust-bar__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── FEATURED COLLECTION / PRODUCT CARDS ── */
+
+.featured-collection {
+  padding: 7rem 0;
+}
+
+.collection-grid {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.collection-grid--4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Handle odd-count last items so they don't sit alone with empty space */
+.collection-grid > *:last-child:nth-child(4n + 1) {
+  grid-column: 1 / -1;
+  max-width: 25%;
+  justify-self: center;
+}
+
+.testimonials__grid > *:last-child:nth-child(3n + 1) {
+  grid-column: 1 / -1;
+  max-width: 33.33%;
+  justify-self: center;
+}
+
+.product-card {
+  background: var(--color-background-card, var(--color-card, #fff));
+  color: var(--color-text);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--color-border, color-mix(in srgb, var(--color-text) 10%, transparent));
+  transition: transform 0.35s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)), box-shadow 0.35s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+}
+
+.product-card__link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.product-card__media {
+  position: relative;
+  aspect-ratio: 4/5;
+  overflow: hidden;
+  background: var(--color-background);
+}
+
+.product-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.product-card:hover .product-card__image {
+  transform: scale(1.04);
+}
+
+.product-card__placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-background);
+}
+
+/* Top-LEFT, not right — the wishlist heart sits at top:right with z-index 3,
+   so a right-aligned sale badge gets hidden behind it. Top-left is also the
+   standard ecom convention (Net-a-Porter, Mr Porter, Aritzia, etc.). */
+.product-card__badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  background: var(--color-primary);
+  color: var(--color-background);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  z-index: 2;
+}
+
+.product-card__info {
+  padding: 1rem;
+}
+
+.product-card__title {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: 0.35rem;
+}
+
+.product-card__price {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.product-card__compare {
+  text-decoration: line-through;
+  color: var(--color-text-muted, var(--color-muted));
+  font-weight: 400;
+}
+
+.product-card__atc {
+  margin: 0 1rem 1rem;
+  width: calc(100% - 2rem);
+}
+
+@media (max-width: 1024px) {
+  .collection-grid--4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .collection-grid--4 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  .product-card__info {
+    padding: 0.75rem;
+  }
+}
+
+/* ── BRAND STORY ── */
+
+.brand-story {
+  padding: 7rem 0;
+  background: var(--color-background-card, var(--color-card, #fff));
+}
+
+.brand-story__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.brand-story__content .section-eyebrow {
+  margin-bottom: 0.75rem;
+}
+
+.brand-story__text {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--color-text-muted, var(--color-muted));
+  margin-bottom: 2rem;
+}
+
+.brand-story__text p {
+  margin-bottom: 1em;
+}
+
+.brand-story__text p:last-child {
+  margin-bottom: 0;
+}
+
+.brand-story__media {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.brand-story__image {
+  width: 100%;
+  border-radius: 12px;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.8s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.brand-story.is-revealed .brand-story__image {
+  clip-path: inset(0 0 0 0);
+}
+
+.brand-story__placeholder {
+  width: 100%;
+  aspect-ratio: 6/5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-background);
+  border-radius: 12px;
+}
+
+@media (max-width: 768px) {
+  .brand-story__grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+/* ── PROCESS / HOW IT WORKS ── */
+
+.process {
+  padding: 7rem 0;
+  background: var(--color-background);
+}
+
+.process .section-eyebrow {
+  display: block;
+  text-align: center;
+}
+
+.process__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.5rem;
+  margin-top: 3rem;
+  text-align: center;
+}
+
+.process__step {
+  position: relative;
+}
+
+.process__number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary);
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: 1.25rem;
+}
+
+.process__connector {
+  position: absolute;
+  top: 26px;
+  left: calc(50% + 32px);
+  width: calc(100% - 16px);
+  height: 2px;
+  background: var(--color-border, color-mix(in srgb, var(--color-text) 10%, transparent));
+}
+
+.process__title {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.process__desc {
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--color-text-muted, var(--color-muted));
+  max-width: 28ch;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .process__grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .process__connector {
+    display: none;
+  }
+}
+
+/* ── PRESS / AS SEEN IN ── */
+
+.press {
+  padding: 5rem 0;
+  background: var(--color-background-card, var(--color-card, #fff));
+}
+
+.press__logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3.5rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.press__logo {
+  opacity: 0.35;
+  transition: opacity 0.3s ease;
+}
+
+.press__logo:hover {
+  opacity: 0.7;
+}
+
+.press__name {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.press__heading {
+  font-family: var(--font-heading);
+  text-align: center;
+  font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+  margin: 0.5rem 0 0.25rem;
+  line-height: 1.1;
+}
+
+.press__image {
+  max-width: 140px;
+  max-height: 50px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: grayscale(100%);
+}
+
+/* Typographic wordmarks — used when merchant hasn't uploaded a logo image */
+.press__wordmark {
+  color: var(--color-text);
+  white-space: nowrap;
+  line-height: 1;
+}
+.press__wordmark[data-style="serif-caps"] {
+  font-family: var(--font-heading, 'Playfair Display', serif);
+  font-weight: 500;
+  font-size: 1.25rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.press__wordmark[data-style="serif-italic"] {
+  font-family: var(--font-heading, 'Playfair Display', serif);
+  font-weight: 400;
+  font-style: italic;
+  font-size: 1.6rem;
+}
+.press__wordmark[data-style="sans-caps"] {
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.press__wordmark[data-style="sans-light"] {
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-weight: 300;
+  font-size: 1.35rem;
+  letter-spacing: 0.02em;
+}
+.press__wordmark[data-style="display"] {
+  font-family: var(--font-heading, 'Playfair Display', serif);
+  font-weight: 700;
+  font-size: 1.75rem;
+  letter-spacing: -0.02em;
+}
+
+/* Inline variant: single row with dot dividers between items */
+.press--inline .press__logos {
+  gap: 2rem;
+}
+.press--inline .press__logo {
+  position: relative;
+  padding-right: 2rem;
+}
+.press--inline .press__logo:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.3;
+}
+.press--inline .press__logo:last-child { padding-right: 0; }
+
+/* Quotes variant: stacked grid with pull quote under each wordmark */
+.press--quotes .press__logos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2.5rem;
+  align-items: start;
+}
+.press--quotes .press__logo {
+  opacity: 1;
+  text-align: center;
+  padding: 0 1rem;
+}
+.press--quotes .press__quote {
+  margin: 0.75rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .press__logos {
+    gap: 2rem;
+  }
+  .press__name,
+  .press__wordmark[data-style="serif-italic"],
+  .press__wordmark[data-style="display"] {
+    font-size: 1.1rem;
+  }
+  .press--inline .press__logo { padding-right: 1.25rem; }
+  .press--inline .press__logo:not(:last-child)::after { right: -0.2rem; }
+}
+
+/* ── TESTIMONIALS ── */
+
+.testimonials {
+  padding: 7rem 0;
+  background: var(--color-background);
+}
+
+.testimonials .section-eyebrow {
+  display: block;
+  text-align: center;
+}
+
+.testimonials__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.testimonial-card {
+  background: var(--color-background-card, var(--color-card, #fff));
+  border-radius: 12px;
+  padding: 2rem;
+  border: 1px solid var(--color-border, color-mix(in srgb, var(--color-text) 10%, transparent));
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.testimonial-card__stars {
+  display: flex;
+  gap: 2px;
+}
+
+.testimonial-card__quote {
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--color-text);
+  flex: 1;
+}
+
+.testimonial-card__author {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.testimonial-card__name {
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.testimonial-card__detail {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, var(--color-muted));
+}
+
+@media (max-width: 768px) {
+  .testimonials__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── IMAGE WITH TEXT ── */
+
+.image-with-text {
+  padding: 7rem 0;
+  background: var(--color-background-card, var(--color-card, #fff));
+}
+
+.image-with-text__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.image-with-text__media {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.image-with-text__image {
+  width: 100%;
+  border-radius: 12px;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.8s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.image-with-text.is-revealed .image-with-text__image {
+  clip-path: inset(0 0 0 0);
+}
+
+.image-with-text__placeholder {
+  width: 100%;
+  aspect-ratio: 6/5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-background);
+  border-radius: 12px;
+}
+
+.image-with-text__content .section-eyebrow {
+  margin-bottom: 0.75rem;
+}
+
+.image-with-text__text {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--color-text-muted, var(--color-muted));
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .image-with-text__grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+/* ── NEWSLETTER ── */
+
+.newsletter {
+  padding: 5rem 0;
+  background: var(--color-primary);
+  color: var(--color-background);
+}
+
+.newsletter--banner {
+  padding: 6rem 0;
+}
+
+.newsletter .section-eyebrow {
+  color: var(--color-background);
+  opacity: 0.7;
+  display: block;
+  text-align: center;
+}
+
+.newsletter .section-heading {
+  color: var(--color-background);
+}
+
+.newsletter__inner--stacked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.newsletter__subheading {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.newsletter__subheading--center {
+  text-align: center;
+}
+
+.newsletter__form-wrap {
+  width: 100%;
+}
+
+.newsletter__form-wrap--center {
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.newsletter__field {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.newsletter__input {
+  flex: 1;
+  padding: 0.85rem 1.25rem;
+  border: 1.5px solid rgba(255,255,255,0.3);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.1);
+  color: var(--color-background);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.newsletter__input::placeholder {
+  color: rgba(255,255,255,0.5);
+}
+
+.newsletter__input:focus {
+  border-color: rgba(255,255,255,0.6);
+}
+
+.newsletter__btn {
+  background: var(--color-background);
+  color: var(--color-primary);
+  border: none;
+  flex-shrink: 0;
+}
+
+.newsletter__btn:hover {
+  background: var(--color-background-card, var(--color-card, #fff));
+  transform: translateY(-1px);
+}
+
+.newsletter__success {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+@media (max-width: 480px) {
+  .newsletter__field {
+    flex-direction: column;
+  }
+}
+
+/* ── FOOTER ── */
+
+.site-footer {
+  padding: 5rem 0 2rem;
+  background: var(--color-text);
+  color: var(--color-background);
+}
+
+.footer__grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+
+.footer__logo-text {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.footer__desc {
+  font-size: 0.82rem;
+  line-height: 1.65;
+  opacity: 0.6;
+  max-width: 30ch;
+  margin-bottom: 1.5rem;
+}
+
+.footer__social {
+  display: flex;
+  /* WHY wrap: the row renders up to 9 social links, each 30px wide with a 1rem
+     gap, so its min-content width is ~398px. Without wrapping that is an
+     unshrinkable floor on whatever column holds it, and at 390px it pushed the
+     whole footer 32px past the viewport edge on every free-landing preset
+     (20 of 20, always exactly 32px). Wrapping is the fix rather than hiding or
+     shrinking icons at mobile, because every link stays reachable, and it
+     engages only when the row genuinely cannot fit, so the 1280px desktop
+     render is unchanged. */
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* .footer__brand had no rule at all, so it kept the grid-item default
+   min-width: auto and could not shrink below its widest child. The wrap above
+   removes today's 398px child, but merchant content is arbitrary: one long
+   unbreakable store name or URL would reintroduce the same overflow.
+   min-width: 0 is the standard release valve for a grid or flex child that
+   refuses to shrink. */
+.footer__brand {
+  min-width: 0;
+}
+
+.footer__social-link {
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.footer__social-link:hover {
+  opacity: 1;
+}
+
+.footer__heading {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.4;
+  margin-bottom: 1.25rem;
+}
+
+.footer__link {
+  display: block;
+  font-size: 0.85rem;
+  opacity: 0.6;
+  margin-bottom: 0.65rem;
+  transition: opacity 0.2s ease;
+}
+
+.footer__link:hover {
+  opacity: 1;
+}
+
+.footer__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer__payment {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.footer__copyright {
+  font-size: 0.75rem;
+  opacity: 0.4;
+}
+
+.themr-watermark {
+  text-align: center;
+  padding: 0.25rem 0 0.6rem;
+  font-size: 0.7rem;
+  opacity: 0.55;
+  letter-spacing: 0.04em;
+}
+.themr-watermark__link {
+  color: inherit;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.themr-watermark__link:hover { opacity: 1; }
+.themr-watermark__brand { font-weight: 600; }
+
+/* ── HEADER LOCALE SWITCHER (ISO-code dropdown) ── */
+.locale-switcher {
+  position: relative;
+  display: inline-block;
+  margin-right: 0.25rem;
+}
+.locale-switcher > summary {
+  list-style: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  transition: border-color 0.15s, background 0.15s;
+}
+.section-header.header--scrolled .locale-switcher > summary,
+.site-header[data-layout="stacked"] .locale-switcher > summary {
+  color: var(--color-text, #1a1a1a);
+  text-shadow: none;
+}
+.locale-switcher > summary::-webkit-details-marker { display: none; }
+.locale-switcher > summary:hover,
+.locale-switcher[open] > summary {
+  border-color: currentColor;
+}
+.locale-switcher__code { line-height: 1; }
+.locale-switcher__chevron {
+  transition: transform 0.2s;
+  opacity: 0.6;
+}
+.locale-switcher[open] .locale-switcher__chevron { transform: rotate(180deg); }
+
+.locale-switcher__menu {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  right: 0;
+  min-width: 220px;
+  max-height: 340px;
+  overflow-y: auto;
+  background: var(--color-background, #fff);
+  color: var(--color-text, #1a1a1a);
+  border: 1px solid var(--color-border, rgba(0,0,0,0.08));
+  border-radius: 8px;
+  box-shadow: 0 12px 32px -8px rgba(0,0,0,0.18);
+  padding: 0.35rem;
+  z-index: 100;
+}
+.locale-switcher__form {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+}
+.locale-switcher__option {
+  display: grid;
+  grid-template-columns: 2.25rem 1fr auto;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 0.65rem;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: inherit;
+  text-align: left;
+  border-radius: 5px;
+  font-family: inherit;
+}
+.locale-switcher__option:hover {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+}
+.locale-switcher__option.is-active {
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  font-weight: 600;
+}
+.locale-switcher__iso {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+.locale-switcher__name { white-space: nowrap; }
+.locale-switcher__currency {
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  opacity: 0.55;
+  font-weight: 500;
+}
+
+/* ── REVIEW STARS ── */
+.review-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  line-height: 1;
+  color: var(--color-primary, #d97706);
+}
+.review-stars__row { display: inline-flex; gap: 1px; }
+.review-stars__star--empty { color: var(--color-text, #222); opacity: 0.25; }
+.review-stars__text {
+  font-size: 0.8rem;
+  color: var(--color-text, #222);
+  opacity: 0.8;
+}
+.review-stars__count { opacity: 0.6; font-weight: normal; }
+.review-stars--expanded { gap: 0.5rem; }
+.review-stars-widget { display: inline-block; }
+.review-stars-widget--expanded { display: block; }
+.review-stars-widget .jdgm-widget:not(:empty) + .review-stars--fallback { display: none; }
+
+/* ── BRAND VIDEO ── */
+.brand-video {
+  padding: 5rem 1.5rem;
+  background: var(--color-background, #fff);
+  color: var(--color-text, #1a1a1a);
+}
+.brand-video__container { text-align: center; max-width: 1080px; }
+.brand-video__heading {
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin: 0.25rem 0 0.5rem;
+  line-height: 1.1;
+}
+.brand-video__subheading {
+  font-size: 1.05rem;
+  opacity: 0.65;
+  max-width: 560px;
+  margin: 0 auto 2.5rem;
+}
+.brand-video__media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--color-background-card, #000);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px -16px rgba(0,0,0,0.35);
+}
+.brand-video__video,
+.brand-video__embed-wrap,
+.brand-video__embed {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.brand-video__video { object-fit: cover; display: block; }
+.brand-video__placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-background-card, #111);
+}
+.brand-video__poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.5;
+}
+.brand-video__empty {
+  position: relative;
+  color: var(--color-background, #fff);
+  text-align: center;
+  padding: 1.5rem;
+  max-width: 320px;
+}
+.brand-video__empty p { font-size: 0.85rem; opacity: 0.75; margin-top: 0.75rem; }
+.brand-video__caption {
+  margin: 1.25rem auto 0;
+  font-size: 0.85rem;
+  opacity: 0.6;
+  max-width: 640px;
+  font-style: italic;
+}
+@media (max-width: 768px) {
+  .brand-video { padding: 3.5rem 1rem; }
+}
+
+/* ── SIZE GUIDE ── */
+.size-guide-section {
+  padding: 4rem 1.5rem;
+  background: var(--color-background, #fff);
+  color: var(--color-text, #1a1a1a);
+}
+.size-guide {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.size-guide__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border, rgba(0,0,0,0.08));
+}
+.size-guide__title {
+  font-family: var(--font-heading, inherit);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.1;
+}
+.size-guide__subtitle {
+  margin: 0.25rem 0 0;
+  opacity: 0.65;
+  font-size: 0.95rem;
+}
+.size-guide__unit-toggle {
+  display: inline-flex;
+  border: 1px solid var(--color-border, rgba(0,0,0,0.12));
+  border-radius: 999px;
+  padding: 2px;
+}
+.size-guide__unit-btn {
+  background: transparent;
+  border: 0;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: inherit;
+  opacity: 0.6;
+  transition: all 0.15s;
+}
+.size-guide__unit-btn.is-active {
+  background: var(--color-text, #1a1a1a);
+  color: var(--color-background, #fff);
+  opacity: 1;
+}
+.size-guide__table-wrap {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+}
+.size-guide__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+.size-guide__table th,
+.size-guide__table td {
+  padding: 0.9rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border, rgba(0,0,0,0.06));
+}
+.size-guide__table thead th {
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+.size-guide__table tbody th {
+  font-weight: 600;
+  font-family: var(--font-heading, inherit);
+}
+.size-guide__notes {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  list-style: none;
+  background: var(--color-surface-alt, rgba(0,0,0,0.03));
+  border-radius: 8px;
+}
+.size-guide__notes li {
+  font-size: 0.85rem;
+  opacity: 0.75;
+  padding: 0.2rem 0;
+  position: relative;
+  padding-left: 1.25rem;
+}
+.size-guide__notes li::before {
+  content: '';
+  position: absolute;
+  left: 0.25rem;
+  top: 0.85rem;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+  .footer__grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .size-guide-section { padding: 3rem 1rem; }
+  .size-guide__table th,
+  .size-guide__table td { padding: 0.65rem 0.75rem; font-size: 0.85rem; }
+}
+
+/* ─────────────────────────────────────
+   FOOTER VARIANTS — 7 layouts
+   (standard / editorial / 4col-sparse / brutalist /
+    anchored / dictionary / minimal)
+   Palette-agnostic: uses var(--color-*) tokens.
+   Brutalist overrides to hardcoded dark surface by design.
+   ───────────────────────────────────── */
+
+/* Shared dark-footer tokens (resolve from theme's text/background pair) */
+.site-footer {
+  --footer-bg: var(--color-text);
+  --footer-fg: var(--color-background);
+  /* Mix footer foreground into footer background instead of fading to transparent —
+     guarantees 4.5:1 contrast against the dark surface. Was 55% fg on transparent,
+     which composited to ~2.5:1 on dark themes and failed AA. */
+  --footer-muted: color-mix(in srgb, var(--color-background) 75%, var(--color-text));
+  --footer-border: color-mix(in srgb, var(--color-background) 10%, transparent);
+}
+
+/* Shared building blocks for A/B/C/F/G/H (dark surface) */
+.site-footer .footer__main { display: block; }
+.site-footer .footer__wordmark {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 1.6rem;
+  letter-spacing: 0.01em;
+  color: var(--color-background);
+  margin: 0;
+}
+.site-footer .footer__social-link {
+  width: 30px; height: 30px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--footer-border);
+  border-radius: 50%;
+  color: var(--footer-muted);
+  transition: color .2s, border-color .2s, opacity .2s;
+  text-decoration: none;
+  opacity: 1;
+}
+.site-footer .footer__social-link:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  opacity: 1;
+}
+.site-footer .footer__social-link svg { width: 16px; height: 16px; }
+
+.site-footer .footer__locale {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--footer-border);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  color: var(--footer-muted);
+}
+
+/* A — Standard 3-column */
+.site-footer[data-footer-style="standard"] .footer__main {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  gap: 3rem;
+  align-items: start;
+  margin-bottom: 2rem;
+}
+.site-footer[data-footer-style="standard"] .footer__desc { max-width: 420px; }
+.site-footer[data-footer-style="standard"] .footer__bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--footer-border);
+}
+@media (max-width: 720px) {
+  .site-footer[data-footer-style="standard"] .footer__main { grid-template-columns: 1fr; gap: 2rem; }
+}
+
+/* B — Editorial centered masthead */
+.site-footer[data-footer-style="editorial"] .footer__main { text-align: center; }
+.site-footer[data-footer-style="editorial"] .footer__wordmark,
+.site-footer[data-footer-style="editorial"] .footer__logo {
+  font-size: 2.5rem;
+  letter-spacing: 0.02em;
+  display: inline-block;
+  margin: 0 auto;
+}
+.site-footer[data-footer-style="editorial"] .footer__desc {
+  margin: 1rem auto 1.5rem;
+  max-width: 500px;
+  text-align: center;
+}
+.site-footer[data-footer-style="editorial"] .footer__social {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 1rem auto 2rem;
+}
+.site-footer[data-footer-style="editorial"] .footer__menu-inline {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--footer-border);
+}
+.site-footer[data-footer-style="editorial"] .footer__menu-inline .footer__link {
+  padding: 0.3rem 0;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  display: inline-block;
+}
+.site-footer[data-footer-style="editorial"] .footer__bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--footer-border);
+  color: var(--footer-muted);
+  font-size: 0.75rem;
+}
+
+/* C — 4-column sparse */
+.site-footer[data-footer-style="4col-sparse"] .footer__main {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 2.5rem;
+  align-items: start;
+  margin-bottom: 2rem;
+}
+.site-footer[data-footer-style="4col-sparse"] .footer__logo-text,
+.site-footer[data-footer-style="4col-sparse"] .footer__wordmark { font-size: 1.35rem; }
+.site-footer[data-footer-style="4col-sparse"] .footer__desc { font-size: 0.82rem; max-width: none; }
+.site-footer[data-footer-style="4col-sparse"] .footer__bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--footer-border);
+}
+@media (max-width: 720px) {
+  .site-footer[data-footer-style="4col-sparse"] .footer__main { grid-template-columns: 1fr 1fr; gap: 2rem; }
+}
+@media (max-width: 480px) {
+  .site-footer[data-footer-style="4col-sparse"] .footer__main { grid-template-columns: 1fr; }
+}
+
+/* D — Brutalist (inverted — always dark hardcoded surface by design) */
+.site-footer[data-footer-style="brutalist"] {
+  background: #0f1214;
+  color: #F5F2ED;
+  padding: 2.5rem 0 1.25rem;
+  border-top: 3px solid #F5F2ED;
+}
+.site-footer[data-footer-style="brutalist"] .container {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.site-footer[data-footer-style="brutalist"] .footer__top {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #F5F2ED;
+}
+.site-footer[data-footer-style="brutalist"] .footer__top h2 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  margin: 0;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #F5F2ED;
+  line-height: 0.95;
+}
+.site-footer[data-footer-style="brutalist"] .footer__top p {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0;
+  color: var(--color-primary);
+}
+.site-footer[data-footer-style="brutalist"] .footer__cols {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  padding: 1.75rem 0;
+  border-bottom: 2px solid #F5F2ED;
+}
+.site-footer[data-footer-style="brutalist"] .footer__cols h4 {
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-primary);
+  margin: 0 0 0.85rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(245,242,237,0.25);
+}
+.site-footer[data-footer-style="brutalist"] .footer__cols a {
+  display: block;
+  padding: 0.22rem 0;
+  color: #F5F2ED;
+  text-decoration: none;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+}
+.site-footer[data-footer-style="brutalist"] .footer__cols a:hover { color: var(--color-primary); }
+.site-footer[data-footer-style="brutalist"] .footer__social-row {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 1.25rem 0;
+  border-bottom: 2px solid #F5F2ED;
+  /* footer.liquid emits the links and their separator spans back to back with
+     the tag whitespace stripped, so as inline content the whole row is one
+     unbreakable word and runs ~400px past a 390px phone. Flex gives every link
+     and separator its own break opportunity. */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.site-footer[data-footer-style="brutalist"] .footer__social-row a {
+  color: #F5F2ED; text-decoration: none; padding: 0 0.15rem;
+}
+.site-footer[data-footer-style="brutalist"] .footer__social-row a:hover { color: var(--color-primary); }
+.site-footer[data-footer-style="brutalist"] .footer__social-row .sep {
+  color: var(--color-primary); padding: 0 0.6rem;
+}
+.site-footer[data-footer-style="brutalist"] .footer__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-top: 1.25rem;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(245,242,237,0.6);
+}
+@media (max-width: 720px) {
+  .site-footer[data-footer-style="brutalist"] .footer__cols { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .site-footer[data-footer-style="brutalist"] .footer__top { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .site-footer[data-footer-style="brutalist"] .footer__cols { grid-template-columns: 1fr; }
+}
+
+/* F — Anchored wordmark */
+.site-footer[data-footer-style="anchored"] {
+  min-height: 460px;
+  display: flex;
+  flex-direction: column;
+}
+.site-footer[data-footer-style="anchored"] > .container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+}
+.site-footer[data-footer-style="anchored"] .footer__monument {
+  font-family: var(--font-heading);
+  font-weight: 200;
+  font-size: clamp(3.25rem, 9vw, 7.5rem);
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  margin: 0;
+  padding-right: 0.2em;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--footer-muted);
+  max-width: 100%;
+  overflow: visible;
+  word-break: break-word;
+}
+.site-footer[data-footer-style="anchored"] .footer__monument em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--color-primary);
+  -webkit-text-stroke: 0;
+}
+.site-footer[data-footer-style="anchored"] .footer__under {
+  color: var(--footer-muted);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  margin: 1rem 0 0;
+  max-width: 440px;
+  line-height: 1.55;
+}
+.site-footer[data-footer-style="anchored"] .footer__bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--footer-border);
+  margin-top: 2rem;
+}
+.site-footer[data-footer-style="anchored"] .footer__bar-nav {
+  display: flex; flex-wrap: wrap; gap: 0 1.5rem;
+}
+.site-footer[data-footer-style="anchored"] .footer__bar-nav a {
+  font-size: 0.8rem;
+  color: var(--color-background);
+  text-decoration: none;
+  opacity: 0.85;
+  padding: 0.25rem 0;
+}
+.site-footer[data-footer-style="anchored"] .footer__bar-nav a:hover { opacity: 1; color: var(--color-primary); }
+.site-footer[data-footer-style="anchored"] .footer__bar-meta {
+  font-size: 0.72rem;
+  color: var(--footer-muted);
+  /* Payment icons + locale pill + copyright are 344px of min-content against
+     the 342px a 390px viewport leaves inside .container, so without wrap this
+     row is 2px wider than the phone and clips. */
+  display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+}
+@media (max-width: 720px) {
+  .site-footer[data-footer-style="anchored"] .footer__bar { grid-template-columns: 1fr; gap: 1rem; }
+}
+
+/* G — Dictionary (4-column dense, small-caps) */
+.site-footer[data-footer-style="dictionary"] .footer__intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--footer-border);
+}
+.site-footer[data-footer-style="dictionary"] .footer__intro h2 {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 1.5rem;
+  margin: 0;
+  color: var(--color-background);
+}
+.site-footer[data-footer-style="dictionary"] .footer__intro p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--footer-muted);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.site-footer[data-footer-style="dictionary"] .footer__grid-dict {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem 2rem;
+}
+.site-footer[data-footer-style="dictionary"] .footer__grid-dict h4 {
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-variant: small-caps;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--color-primary);
+  margin: 0 0 0.65rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--footer-border);
+}
+.site-footer[data-footer-style="dictionary"] .footer__grid-dict a {
+  display: block;
+  font-size: 11px;
+  line-height: 1.9;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-background);
+  opacity: 0.75;
+  text-decoration: none;
+}
+.site-footer[data-footer-style="dictionary"] .footer__grid-dict a:hover {
+  opacity: 1; color: var(--color-primary);
+}
+.site-footer[data-footer-style="dictionary"] .footer__tail {
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--footer-border);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.72rem;
+  color: var(--footer-muted);
+  letter-spacing: 0.04em;
+}
+@media (max-width: 720px) {
+  .site-footer[data-footer-style="dictionary"] .footer__grid-dict { grid-template-columns: repeat(2, 1fr); gap: 1.5rem 1.25rem; }
+}
+@media (max-width: 480px) {
+  .site-footer[data-footer-style="dictionary"] .footer__grid-dict { grid-template-columns: repeat(2, 1fr); gap: 1.5rem 1rem; }
+  .site-footer[data-footer-style="dictionary"] .footer__grid-dict a { font-size: 10.5px; }
+}
+
+/* H — Minimal wordmark row */
+.site-footer[data-footer-style="minimal"] { padding: 0; }
+.site-footer[data-footer-style="minimal"] .footer__hr {
+  height: 1px;
+  background: var(--footer-border);
+  margin: 0;
+}
+.site-footer[data-footer-style="minimal"] .footer__row {
+  /* Flex + absolute-center for the link row so it's page-centered and
+     aligns with the .themr-watermark sitting below. Logo floats left,
+     meta floats right via margin-auto. Abs-centering is independent of
+     side cell widths, so links stay dead-center regardless. */
+  display: flex;
+  align-items: center;
+  padding: 1.25rem 0;
+  position: relative;
+  min-height: 44px;
+}
+.site-footer[data-footer-style="minimal"] .footer__row-logo,
+.site-footer[data-footer-style="minimal"] .footer__row-logo-img { margin-right: auto; }
+.site-footer[data-footer-style="minimal"] .footer__row-meta { margin-left: auto; }
+.site-footer[data-footer-style="minimal"] .footer__row-links {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.site-footer[data-footer-style="minimal"] .footer__row-logo,
+.site-footer[data-footer-style="minimal"] .footer__row-logo-img {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-background);
+  max-height: 32px;
+  width: auto;
+}
+.site-footer[data-footer-style="minimal"] .footer__row-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0;
+  font-size: 0.8rem;
+}
+.site-footer[data-footer-style="minimal"] .footer__row-links a {
+  text-decoration: none;
+  color: var(--color-background);
+  opacity: 0.78;
+  padding: 0.25rem 0;
+}
+.site-footer[data-footer-style="minimal"] .footer__row-links a:hover { opacity: 1; color: var(--color-primary); }
+.site-footer[data-footer-style="minimal"] .footer__row-links .dot {
+  opacity: 0.35;
+  padding: 0 0.85rem;
+  color: var(--footer-muted);
+}
+.site-footer[data-footer-style="minimal"] .footer__row-meta {
+  display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+  font-size: 0.72rem;
+  color: var(--footer-muted);
+}
+@media (max-width: 720px) {
+  .site-footer[data-footer-style="minimal"] .footer__row {
+    /* The base rule above is flex, not grid, so grid-template-columns was inert
+       here and the row stayed a single un-wrapping line: logo + meta together
+       ran 35px past a 390px phone. Stack the cells explicitly instead. */
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+    padding: 1.25rem 0;
+  }
+  /* Absolute-centering the links only makes sense on the one-line desktop row;
+     stacked, they need to be back in flow. Same for the auto margins that push
+     logo and meta to opposite ends. */
+  .site-footer[data-footer-style="minimal"] .footer__row-links {
+    position: static;
+    transform: none;
+    justify-content: center;
+  }
+  .site-footer[data-footer-style="minimal"] .footer__row-logo,
+  .site-footer[data-footer-style="minimal"] .footer__row-logo-img,
+  .site-footer[data-footer-style="minimal"] .footer__row-meta { margin: 0; }
+  .site-footer[data-footer-style="minimal"] .footer__row-meta { justify-content: center; }
+}
+
+/* ── ANNOUNCEMENT BAR (section styles) ── */
+
+.announcement-bar {
+  background: var(--color-secondary, var(--color-primary));
+  color: var(--color-background);
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+}
+
+.announcement-bar .container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.55rem 1.5rem;
+  position: relative;
+}
+
+.announcement-bar__carousel {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  justify-content: center;
+}
+
+.announcement-bar__slides {
+  position: relative;
+  text-align: center;
+  min-height: 1.4em;
+}
+
+.announcement-bar__slide {
+  display: none;
+  text-align: center;
+}
+
+.announcement-bar__slide.is-active {
+  display: block;
+}
+
+.announcement-bar__slide a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.announcement-bar__arrow {
+  color: var(--color-background);
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+  padding: 0.2rem;
+  flex-shrink: 0;
+}
+
+.announcement-bar__arrow:hover {
+  opacity: 1;
+}
+
+.announcement-bar__close {
+  position: absolute;
+  right: 1rem;
+  color: var(--color-background);
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+  padding: 0.2rem;
+  /* 24px tap-target floor. The 16px icon plus 0.2rem padding measured 22px
+     wide, under the minimum on width (height already cleared it at 25px).
+     Sized rather than re-padded so a later padding override cannot shrink it
+     back, and centred so the icon does not sit off-axis in the larger box.
+     The button is absolutely positioned, so growing it moves nothing else. */
+  min-width: 24px;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.announcement-bar__close:hover {
+  opacity: 1;
+}
+
+/* ── HEADER SHARED (cart count, dropdowns) ── */
+
+.cart-count {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  background: var(--color-primary);
+  color: var(--color-background);
+  font-size: 0.6rem;
+  font-weight: 600;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: var(--color-background-card, var(--color-card, #fff));
+  border: 1px solid var(--color-border, color-mix(in srgb, var(--color-text) 10%, transparent));
+  border-radius: 12px;
+  padding: 0.75rem 0;
+  min-width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s ease;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  z-index: 50;
+}
+
+.dropdown__link {
+  display: block;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.82rem;
+  color: var(--color-text);
+  transition: all 0.15s ease;
+}
+
+.dropdown__link:hover {
+  background: var(--color-background);
+  color: var(--color-primary);
+}
+
+/* ── REVEAL ANIMATIONS ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-story__image,
+  .image-with-text__image {
+    clip-path: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════
+   SECTION VARIANTS V1 — BEGIN
+   testimonials / trust-bar / featured-collection / brand-story
+   ═══════════════════════════════════════ */
+
+/* ═══════════════════════════════════════
+   TESTIMONIALS VARIANTS V1 — BEGIN
+   Palette-agnostic. Uses theme tokens only:
+   --color-primary, --color-text, --color-background,
+   --color-background-card (fallback --color-card),
+   --color-text-muted (fallback --color-muted),
+   --color-border, --font-heading, --font-body.
+   ═══════════════════════════════════════ */
+
+/* ── Shared ── */
+.testimonials { padding: 7rem 0; background: var(--color-background); }
+
+/* ── VARIANT: carousel ──
+   Horizontal scroll-snap track + dot pagination. CSS-only MVP
+   (no JS). Dots indicate active position via SIZE + OPACITY +
+   FILL change — not color alone (colorblind-safe). */
+.testimonials--carousel .section-eyebrow { display: block; text-align: center; }
+
+.testimonials__carousel { margin-top: 3rem; position: relative; }
+
+.testimonials__track {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.5rem 0.25rem 2rem;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-text) 20%, transparent) transparent;
+}
+.testimonials__track::-webkit-scrollbar { height: 6px; }
+.testimonials__track::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-text) 20%, transparent);
+  border-radius: 3px;
+}
+
+.testimonial-slide {
+  flex: 0 0 min(420px, 80%);
+  scroll-snap-align: start;
+  background: var(--color-background-card, var(--color-card, #fff));
+  border-radius: 12px;
+  padding: 2rem;
+  border: 1px solid var(--color-border, color-mix(in srgb, var(--color-text) 10%, transparent));
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.testimonial-slide__stars { display: flex; gap: 2px; }
+.testimonial-slide__quote {
+  font-size: 0.95rem; line-height: 1.65; color: var(--color-text);
+  flex: 1; margin: 0;
+}
+.testimonial-slide__author { display: flex; flex-direction: column; gap: 0.15rem; }
+.testimonial-slide__name { font-weight: 600; font-size: 0.85rem; }
+.testimonial-slide__detail { font-size: 0.78rem; color: var(--color-text-muted, var(--color-muted)); }
+
+.testimonials__dots {
+  display: flex; justify-content: center; gap: 0.5rem; margin-top: 1rem;
+}
+.testimonials__dot {
+  appearance: none;
+  border: 1.5px solid color-mix(in srgb, var(--color-text) 40%, transparent);
+  background: transparent;
+  width: 10px; height: 10px; border-radius: 50%;
+  cursor: pointer; padding: 0; opacity: 0.45;
+  transition: all 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.testimonials__dot.is-active,
+.testimonials__dot[aria-selected="true"] {
+  /* Colorblind-safe: size + opacity + fill change, not hue alone */
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  opacity: 1;
+  transform: scale(1.35);
+}
+
+/* ── VARIANT: fullbleed-quote ── */
+.testimonials--fullbleed-quote { padding: 9rem 0; }
+.testimonials--fullbleed-quote .section-eyebrow--center {
+  display: block; text-align: center; margin-bottom: 2rem;
+}
+.testimonials__fullbleed {
+  max-width: 58rem; margin: 0 auto; text-align: center; padding: 0 1rem;
+}
+.testimonials__fullbleed-mark { display: block; margin: 0 auto 2rem; opacity: 0.9; }
+.testimonials__fullbleed-quote {
+  font-family: var(--font-heading);
+  font-size: clamp(2.2rem, 5vw, 4.25rem);
+  line-height: 1.08; letter-spacing: -0.02em;
+  font-style: italic; color: var(--color-text);
+  margin: 0 0 2.5rem; text-wrap: balance;
+}
+.testimonials__fullbleed-author {
+  display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: center;
+  gap: 0.75rem; font-family: var(--font-body);
+  font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--color-text-muted, var(--color-muted));
+}
+.testimonials__fullbleed-name { font-weight: 600; color: var(--color-text); }
+.testimonials__fullbleed-divider { opacity: 0.5; }
+
+/* ── VARIANT: marquee ──
+   Continuous scroll ticker. Pauses on hover.
+   prefers-reduced-motion → animation disabled, stacks statically. */
+.testimonials--marquee { padding: 5rem 0; overflow: hidden; }
+.testimonials--marquee .section-heading { margin-bottom: 2rem; }
+
+.testimonials__marquee {
+  position: relative; overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.testimonials__marquee-track {
+  display: flex; gap: 3rem; width: max-content;
+  animation: testimonials-marquee 45s linear infinite;
+  will-change: transform;
+}
+.testimonials__marquee:hover .testimonials__marquee-track { animation-play-state: paused; }
+
+.testimonials__marquee-item {
+  display: inline-flex; align-items: center; gap: 0.9rem;
+  flex: 0 0 auto; font-size: 1rem; color: var(--color-text); white-space: nowrap;
+}
+.testimonials__marquee-mark {
+  font-family: var(--font-heading); font-size: 2rem; line-height: 1;
+  color: var(--color-primary); transform: translateY(0.25rem);
+}
+.testimonials__marquee-quote {
+  font-family: var(--font-body); font-style: italic;
+  max-width: 32rem; overflow: hidden; text-overflow: ellipsis;
+}
+.testimonials__marquee-author {
+  font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--color-text-muted, var(--color-muted)); font-weight: 500;
+}
+.testimonials__marquee-sep { color: var(--color-primary); opacity: 0.55; margin-left: 0.5rem; }
+
+@keyframes testimonials-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .testimonials__marquee { -webkit-mask-image: none; mask-image: none; }
+  .testimonials__marquee-track {
+    animation: none; flex-wrap: wrap; width: 100%;
+    gap: 1.5rem 2.5rem; justify-content: center;
+  }
+  .testimonials__marquee-item:nth-child(n+6) { display: none; }
+}
+
+/* ── VARIANT: stacked-wide ──
+   Full-width rows. Avatar alternates sides (odd=left, even=right). */
+.testimonials--stacked-wide .section-eyebrow { display: block; text-align: center; }
+
+.testimonials__stacked {
+  display: flex; flex-direction: column; gap: 3rem;
+  margin: 3.5rem auto 0; max-width: 64rem;
+}
+
+.testimonial-row {
+  display: grid; grid-template-columns: auto 1fr;
+  gap: 2rem; align-items: center; padding: 2rem 0;
+  border-top: 1px solid var(--color-border, color-mix(in srgb, var(--color-text) 12%, transparent));
+}
+.testimonial-row--right { grid-template-columns: 1fr auto; }
+.testimonial-row--right .testimonial-row__avatar { order: 2; }
+.testimonial-row--right .testimonial-row__body { order: 1; text-align: right; }
+
+.testimonial-row__avatar {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; overflow: hidden;
+  border: 1px solid var(--color-border, color-mix(in srgb, var(--color-text) 10%, transparent));
+}
+.testimonial-row__avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.testimonial-row__avatar-initial {
+  font-family: var(--font-heading); font-size: 2rem;
+  font-weight: 600; color: var(--color-primary); line-height: 1;
+}
+
+.testimonial-row__body { display: flex; flex-direction: column; gap: 0.9rem; }
+.testimonial-row__quote {
+  font-family: var(--font-heading);
+  font-size: clamp(1.2rem, 2vw, 1.6rem); line-height: 1.35;
+  font-style: italic; color: var(--color-text);
+  margin: 0; letter-spacing: -0.01em;
+}
+.testimonial-row__author { display: flex; flex-direction: column; gap: 0.1rem; }
+.testimonial-row__name {
+  font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; font-size: 0.78rem;
+}
+.testimonial-row__detail { color: var(--color-text-muted, var(--color-muted)); font-size: 0.78rem; }
+
+/* ── VARIANT: numbered-list ──
+   01 / 02 / 03 editorial numbering, sequential rule-separated rows. */
+.testimonials--numbered-list .section-eyebrow { display: block; text-align: center; }
+
+.testimonials__numbered {
+  list-style: none; margin: 3.5rem auto 0; padding: 0;
+  max-width: 62rem; display: flex; flex-direction: column;
+}
+
+.testimonial-numbered {
+  display: grid; grid-template-columns: 6rem 1fr;
+  gap: 2rem; align-items: start; padding: 2.25rem 0;
+  border-top: 1px solid var(--color-border, color-mix(in srgb, var(--color-text) 12%, transparent));
+}
+.testimonial-numbered:last-child {
+  border-bottom: 1px solid var(--color-border, color-mix(in srgb, var(--color-text) 12%, transparent));
+}
+.testimonial-numbered__num {
+  font-family: var(--font-heading);
+  font-size: clamp(3rem, 5.5vw, 4.75rem); line-height: 0.9;
+  letter-spacing: -0.04em; color: var(--color-primary);
+  font-weight: 500; font-variant-numeric: tabular-nums;
+}
+.testimonial-numbered__body { display: flex; flex-direction: column; gap: 0.9rem; }
+.testimonial-numbered__quote {
+  font-family: var(--font-heading);
+  font-size: clamp(1.05rem, 1.6vw, 1.35rem); line-height: 1.45;
+  color: var(--color-text); font-style: italic;
+  margin: 0; text-wrap: pretty;
+}
+.testimonial-numbered__author {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: var(--font-body); font-size: 0.78rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--color-text-muted, var(--color-muted));
+}
+.testimonial-numbered__name { font-weight: 600; color: var(--color-text); }
+.testimonial-numbered__sep { opacity: 0.4; }
+
+/* ── Responsive ── */
+@media (max-width: 720px) {
+  .testimonials { padding: 5rem 0; }
+  .testimonials--fullbleed-quote { padding: 6rem 0; }
+  .testimonial-slide { flex-basis: 82%; padding: 1.5rem; }
+
+  .testimonial-row,
+  .testimonial-row--right {
+    grid-template-columns: 1fr; text-align: left; gap: 1rem; padding: 1.5rem 0;
+  }
+  .testimonial-row--right .testimonial-row__avatar,
+  .testimonial-row--right .testimonial-row__body { order: unset; text-align: left; }
+  .testimonial-row__avatar { width: 56px; height: 56px; }
+  .testimonial-row__avatar-initial { font-size: 1.4rem; }
+
+  .testimonial-numbered { grid-template-columns: 1fr; gap: 0.75rem; padding: 1.75rem 0; }
+  .testimonial-numbered__num { font-size: 2.5rem; }
+
+  .testimonials__marquee-quote { max-width: 22rem; }
+}
+
+@media (max-width: 480px) {
+  .testimonials__fullbleed-quote { font-size: 1.75rem; line-height: 1.18; }
+  .testimonials__fullbleed-mark { width: 48px; height: auto; margin-bottom: 1.25rem; }
+  .testimonial-row__quote { font-size: 1.05rem; }
+  .testimonial-numbered__quote { font-size: 0.98rem; }
+  .testimonial-slide { padding: 1.25rem; }
+  .testimonials__marquee-item { gap: 0.6rem; font-size: 0.9rem; }
+}
+
+/* TESTIMONIALS VARIANTS V1 — END */
+
+/* ═══════════════════════════════════════
+   TRUST-BAR VARIANTS V1 — BEGIN
+   ═══════════════════════════════════════
+
+   All selectors are scoped with .trust-bar--<variant> so the
+   legacy .trust-bar / .trust-bar__grid rules in theme.css.base
+   remain the source of truth for the default `icon-row` layout.
+
+   Palette-agnostic: only custom properties are used
+   (--color-primary, --color-text, --color-muted, --color-background,
+    --color-card, --font-heading, --font-body, --color-text-muted).
+   No hardcoded hex colors.
+   ═══════════════════════════════════════ */
+
+/* ── Shared header (eyebrow + heading) ── */
+.trust-bar__header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+.trust-bar__eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  opacity: 0.85;
+}
+.trust-bar__heading {
+  font-family: var(--font-heading);
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  margin: 0;
+  color: var(--color-text);
+}
+
+/* ═══════════════════════════════════════
+   VARIANT: stat-counters
+   Colorblind-safe: numbers are plain text, heading-weight,
+   with descriptive captions below. Never rely on color alone.
+   ═══════════════════════════════════════ */
+.trust-bar--stat-counters {
+  padding: 5rem 0;
+  background: var(--color-background);
+}
+.trust-bar--stat-counters .trust-bar__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 2rem 3rem;
+  text-align: center;
+  align-items: start;
+}
+.trust-bar--stat-counters .trust-bar__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.5rem 0.25rem;
+  position: relative;
+}
+.trust-bar--stat-counters .trust-bar__stat-value {
+  font-family: var(--font-heading);
+  font-size: clamp(3rem, 7vw, 6rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: var(--color-text);
+  font-weight: 500;
+  font-variant-numeric: lining-nums tabular-nums;
+  /* Stretch: subtle fade-in. No digit substitution — accessible text. */
+  animation: trust-bar-stat-in 0.8s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+.trust-bar--stat-counters .trust-bar__stat-label {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-text-muted, var(--color-muted));
+}
+
+@keyframes trust-bar-stat-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* a11y: KILL ALL counter animation under reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .trust-bar--stat-counters .trust-bar__stat-value,
+  .trust-bar--stat-counters .trust-bar__stat-label {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* ═══════════════════════════════════════
+   VARIANT: minimal-text-badges
+   Typographic-only. NO icons rendered even if block has one
+   (the liquid template simply doesn't render icons in this variant).
+   Hushed luxury mood.
+   ═══════════════════════════════════════ */
+.trust-bar--minimal-text-badges {
+  padding: 4rem 0;
+  background: var(--color-background);
+}
+.trust-bar--minimal-text-badges .trust-bar__badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 1rem;
+}
+.trust-bar--minimal-text-badges .trust-bar__badge {
+  display: inline-block;
+  padding: 0.75rem 1.4rem;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-text);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--color-text);
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════
+   VARIANT: vertical-stack
+   Stacked rows: icon + label left, description right.
+   ═══════════════════════════════════════ */
+.trust-bar--vertical-stack {
+  padding: 5rem 0;
+  background: var(--color-background);
+}
+.trust-bar--vertical-stack .trust-bar__stack {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  max-width: 780px;
+  display: flex;
+  flex-direction: column;
+}
+.trust-bar--vertical-stack .trust-bar__stack-row {
+  display: grid;
+  grid-template-columns: auto minmax(160px, 1fr) 2fr;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.25rem 0.25rem;
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+}
+.trust-bar--vertical-stack .trust-bar__stack-row:last-child {
+  box-shadow: none;
+}
+.trust-bar--vertical-stack .trust-bar__stack-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+.trust-bar--vertical-stack .trust-bar__stack-label {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  line-height: 1.2;
+  color: var(--color-text);
+  letter-spacing: -0.005em;
+}
+.trust-bar--vertical-stack .trust-bar__stack-desc {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--color-text-muted, var(--color-muted));
+  text-align: right;
+}
+
+/* ═══════════════════════════════════════
+   VARIANT: checkmark-row
+   Inline flexible row with check icons + labels.
+   ═══════════════════════════════════════ */
+.trust-bar--checkmark-row {
+  padding: 2rem 0;
+  background: var(--color-background);
+  box-shadow:
+    inset 0 1px 0 rgba(0, 0, 0, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06);
+}
+.trust-bar--checkmark-row .trust-bar__checkrow {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem 1.75rem;
+}
+.trust-bar--checkmark-row .trust-bar__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--color-text);
+  letter-spacing: 0.01em;
+}
+.trust-bar--checkmark-row .trust-bar__check-icon {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════
+   VARIANT: hero-card
+   Asymmetric: 1 featured item large, 2-3 smaller beside/below.
+   ═══════════════════════════════════════ */
+.trust-bar--hero-card {
+  padding: 5rem 0;
+  background: var(--color-background);
+}
+.trust-bar--hero-card .trust-bar__hero-wrap {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 2rem;
+  align-items: stretch;
+}
+.trust-bar--hero-card .trust-bar__hero {
+  padding: 2.5rem 2rem;
+  background: var(--color-card, var(--color-background));
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  justify-content: center;
+}
+.trust-bar--hero-card .trust-bar__hero-icon {
+  color: var(--color-primary);
+  line-height: 0;
+}
+.trust-bar--hero-card .trust-bar__hero-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.4rem, 2.8vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--color-text);
+}
+.trust-bar--hero-card .trust-bar__hero-desc {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--color-text-muted, var(--color-muted));
+  margin: 0;
+  max-width: 36ch;
+}
+.trust-bar--hero-card .trust-bar__hero-side {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.trust-bar--hero-card .trust-bar__hero-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1rem 1.1rem;
+  background: var(--color-card, var(--color-background));
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+  flex: 1;
+}
+.trust-bar--hero-card .trust-bar__hero-item-icon {
+  color: var(--color-primary);
+  line-height: 0;
+  flex-shrink: 0;
+}
+.trust-bar--hero-card .trust-bar__hero-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.trust-bar--hero-card .trust-bar__hero-item-label {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: 0.01em;
+}
+.trust-bar--hero-card .trust-bar__hero-item-desc {
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: var(--color-text-muted, var(--color-muted));
+}
+
+/* ── Responsive — mobile ≤720px ── */
+@media (max-width: 720px) {
+  .trust-bar__header { margin-bottom: 1.75rem; }
+  .trust-bar--stat-counters .trust-bar__stats { grid-template-columns: repeat(2, 1fr); gap: 1.5rem 1rem; }
+  .trust-bar--stat-counters .trust-bar__stat-value { font-size: clamp(2.25rem, 10vw, 3.25rem); }
+  .trust-bar--minimal-text-badges .trust-bar__badges { gap: 0.5rem 0.6rem; }
+  .trust-bar--minimal-text-badges .trust-bar__badge { padding: 0.6rem 1rem; font-size: 0.65rem; letter-spacing: 0.18em; }
+  .trust-bar--vertical-stack .trust-bar__stack-row { grid-template-columns: auto 1fr; gap: 0.75rem 1rem; }
+  .trust-bar--vertical-stack .trust-bar__stack-desc { grid-column: 2 / -1; text-align: left; font-size: 0.82rem; }
+  .trust-bar--checkmark-row .trust-bar__checkrow { gap: 0.4rem 1rem; }
+  .trust-bar--checkmark-row .trust-bar__check { font-size: 0.82rem; }
+  .trust-bar--hero-card .trust-bar__hero-wrap { grid-template-columns: 1fr; }
+  .trust-bar--hero-card .trust-bar__hero { padding: 1.75rem 1.4rem; }
+}
+
+/* TRUST-BAR VARIANTS V1 — END */
+
+/* ═══════════════════════════════════════
+   FEATURED-COLLECTION VARIANTS V1 — BEGIN
+   ═══════════════════════════════════════ */
+
+/* Shared wrapper — palette-agnostic; uses theme custom props */
+.featured-collection {
+  padding: clamp(48px, 8vw, 120px) 0;
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+.featured-collection .section-header-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.featured-collection .section-heading {
+  margin: 0;
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.featured-collection .section-eyebrow {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-primary, var(--color-text));
+  opacity: 0.75;
+}
+
+.featured-collection .section-link {
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-text);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+  transition: opacity 0.2s ease-out;
+}
+
+.featured-collection .section-link:hover { opacity: 0.65; }
+
+/* ─── grid-4col (default) ─────────────── */
+.featured-collection--grid-4col .collection-grid--4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(0.75rem, 1.5vw, 1.5rem);
+}
+
+@media (max-width: 1024px) {
+  .featured-collection--grid-4col .collection-grid--4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .featured-collection--grid-4col .collection-grid--4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── hero-plus-grid ──────────────────── */
+/* 3-col grid: featured card on left spans all rows, 4 supporting cards
+   fill the 2x2 area on the right. `grid-row: 1 / -1` makes the hero
+   automatically span however many rows exist — avoids orphan space
+   when more or fewer supporting items render. */
+.featured-collection--hero-plus-grid .featured-collection__hero-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
+  gap: clamp(0.75rem, 1.5vw, 1.5rem);
+}
+
+.featured-collection--hero-plus-grid .featured-collection__hero-grid > .product-card--featured {
+  grid-column: 1 / 2;
+  grid-row: 1 / -1;
+}
+
+.featured-collection--hero-plus-grid .featured-collection__hero-grid > .product-card--featured .product-card__media {
+  height: 100%;
+  min-height: clamp(380px, 48vw, 620px);
+  aspect-ratio: auto;
+}
+
+.featured-collection--hero-plus-grid .featured-collection__hero-grid > .product-card--featured .product-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.featured-collection--hero-plus-grid .featured-collection__hero-grid > .product-card--featured .product-card__title {
+  font-size: 1.15rem;
+}
+
+@media (max-width: 720px) {
+  .featured-collection--hero-plus-grid .featured-collection__hero-grid {
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+  }
+  .featured-collection--hero-plus-grid .featured-collection__hero-grid > .product-card--featured {
+    grid-column: auto;
+    grid-row: auto;
+  }
+  .featured-collection--hero-plus-grid .featured-collection__hero-grid > .product-card--featured .product-card__media {
+    min-height: 0;
+  }
+}
+
+/* ─── horizontal-scroll ───────────────── */
+.featured-collection--horizontal-scroll .featured-collection__scroll {
+  display: flex;
+  gap: clamp(0.75rem, 1.5vw, 1.25rem);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.5rem 0 1.5rem;
+  scroll-padding-inline: 1rem;
+  cursor: grab;
+  scrollbar-width: none;
+}
+
+.featured-collection--horizontal-scroll .featured-collection__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.featured-collection--horizontal-scroll .featured-collection__scroll:active {
+  cursor: grabbing;
+}
+
+.featured-collection--horizontal-scroll .featured-collection__scroll > .product-card {
+  flex: 0 0 auto;
+  width: clamp(240px, 28vw, 320px);
+  scroll-snap-align: start;
+}
+
+.featured-collection--horizontal-scroll .featured-collection__scroll > .product-card .product-card__media {
+  aspect-ratio: 3 / 4;
+}
+
+@media (max-width: 720px) {
+  .featured-collection--horizontal-scroll .featured-collection__scroll > .product-card {
+    width: 75vw;
+  }
+}
+
+/* ─── editorial-split ─────────────────── */
+.featured-collection--editorial-split .featured-collection__split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1rem, 2.5vw, 2.5rem);
+  align-items: stretch;
+}
+
+.featured-collection--editorial-split .featured-collection__hero-product {
+  display: flex;
+  flex-direction: column;
+}
+
+.featured-collection--editorial-split .featured-collection__hero-product .product-card__media {
+  aspect-ratio: auto;
+  min-height: clamp(420px, 55vw, 680px);
+  flex: 1;
+}
+
+.featured-collection--editorial-split .featured-collection__hero-product .product-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.featured-collection--editorial-split .featured-collection__hero-product .product-card__title {
+  font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+  letter-spacing: -0.01em;
+}
+
+.featured-collection--editorial-split .featured-collection__mini-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.75rem, 1.5vw, 1.25rem);
+  align-content: start;
+}
+
+.featured-collection--editorial-split .featured-collection__mini-grid > .product-card .product-card__media {
+  aspect-ratio: 3 / 4;
+}
+
+@media (max-width: 900px) {
+  .featured-collection--editorial-split .featured-collection__mini-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .featured-collection--editorial-split .featured-collection__split {
+    grid-template-columns: 1fr;
+  }
+  .featured-collection--editorial-split .featured-collection__hero-product .product-card__media {
+    min-height: 0;
+    aspect-ratio: 4 / 5;
+  }
+  .featured-collection--editorial-split .featured-collection__mini-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* FEATURED-COLLECTION VARIANTS V1 — END */
+
+/* ═══════════════════════════════════════
+   BRAND-STORY VARIANTS V1 — BEGIN
+   ═══════════════════════════════════════ */
+
+/* Shared placeholder visual for blank images (palette-agnostic). */
+.brand-story__placeholder {
+  width: 100%;
+  aspect-ratio: 6 / 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text, #222);
+  background:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--color-primary, #777) 14%, transparent) 0%,
+      color-mix(in srgb, var(--color-background, #fff) 80%, transparent) 55%,
+      color-mix(in srgb, var(--color-text, #222) 8%, transparent) 100%);
+  border-radius: inherit;
+}
+
+.brand-story__placeholder svg {
+  width: min(72%, 420px);
+  height: auto;
+}
+
+/* ── VARIANT: text-image-split (default) ─────────────────── */
+
+.brand-story--text-image-split .brand-story__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+}
+
+.brand-story--text-image-split .brand-story__media {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.brand-story--text-image-split .brand-story__image {
+  width: 100%;
+  display: block;
+  border-radius: 14px;
+}
+
+@media (max-width: 768px) {
+  .brand-story--text-image-split .brand-story__grid {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+  .brand-story--text-image-split .brand-story__media { order: -1; }
+}
+
+/* ── VARIANT: fullbleed-overlay ──────────────────────────── */
+
+.brand-story--fullbleed-overlay {
+  padding: 0;
+}
+
+.brand-story--fullbleed-overlay > .container {
+  max-width: none;
+  padding: 0;
+}
+
+.brand-story--fullbleed-overlay .brand-story__stage {
+  position: relative;
+  width: 100%;
+  min-height: clamp(440px, 60vh, 640px);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.brand-story--fullbleed-overlay .brand-story__media--bleed {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.brand-story--fullbleed-overlay .brand-story__image,
+.brand-story--fullbleed-overlay .brand-story__placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 0;
+  aspect-ratio: auto;
+}
+
+/* Scrim: gradient darkens the lower half so text remains readable
+   regardless of palette. Not color-alone — provides solid contrast mass. */
+.brand-story--fullbleed-overlay .brand-story__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.15) 40%,
+    rgba(0, 0, 0, 0.55) 80%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  pointer-events: none;
+}
+
+.brand-story--fullbleed-overlay .brand-story__overlay {
+  position: relative;
+  z-index: 2;
+  max-width: 620px;
+  padding: clamp(2rem, 6vw, 4rem);
+  color: #fff;
+}
+
+.brand-story--fullbleed-overlay .brand-story__overlay .section-eyebrow,
+.brand-story--fullbleed-overlay .brand-story__overlay .section-heading,
+.brand-story--fullbleed-overlay .brand-story__overlay .brand-story__text {
+  color: #fff;
+}
+
+.brand-story--fullbleed-overlay .brand-story__overlay .brand-story__text {
+  opacity: 0.88;
+  margin-bottom: 1.5rem;
+}
+
+.brand-story--fullbleed-overlay .brand-story__cta {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .brand-story--fullbleed-overlay .brand-story__stage {
+    min-height: clamp(380px, 75vh, 520px);
+  }
+}
+
+/* ── VARIANT: magazine-split ─────────────────────────────── */
+
+.brand-story--magazine-split .brand-story__mag {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: start;
+}
+
+.brand-story--magazine-split .brand-story__mag-media {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.brand-story--magazine-split .brand-story__mag-media .brand-story__image,
+.brand-story--magazine-split .brand-story__mag-media .brand-story__placeholder {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  display: block;
+  border-radius: 10px;
+}
+
+.brand-story--magazine-split .brand-story__mag-head {
+  grid-column: 2;
+  grid-row: 1;
+  padding-top: clamp(0.5rem, 2vw, 2rem);
+}
+
+.brand-story--magazine-split .brand-story__mag-head .section-heading {
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  line-height: 1.05;
+  margin: 0.75rem 0 0;
+}
+
+.brand-story--magazine-split .brand-story__mag-body {
+  grid-column: 2;
+  grid-row: 2;
+  font-size: 1rem;
+  line-height: 1.7;
+  column-count: 1;
+}
+
+.brand-story--magazine-split .brand-story__mag-body p:first-of-type::first-letter {
+  font-family: var(--font-heading, serif);
+  font-size: 4em;
+  line-height: 0.85;
+  float: left;
+  padding: 0.15em 0.12em 0 0;
+  margin-right: 0.04em;
+  color: var(--color-primary, var(--color-text));
+  font-weight: 600;
+}
+
+.brand-story--magazine-split .brand-story__mag-cta {
+  grid-column: 2;
+  grid-row: 3;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .brand-story--magazine-split .brand-story__mag {
+    grid-template-columns: 1fr;
+  }
+  .brand-story--magazine-split .brand-story__mag-media,
+  .brand-story--magazine-split .brand-story__mag-head,
+  .brand-story--magazine-split .brand-story__mag-body,
+  .brand-story--magazine-split .brand-story__mag-cta {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .brand-story--magazine-split .brand-story__mag-media .brand-story__image,
+  .brand-story--magazine-split .brand-story__mag-media .brand-story__placeholder {
+    aspect-ratio: 5 / 4;
+  }
+}
+
+/* ── VARIANT: stacked-chapters ───────────────────────────── */
+
+.brand-story--stacked-chapters .brand-story__article {
+  max-width: 700px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 4vw, 3rem);
+  text-align: left;
+}
+
+.brand-story--stacked-chapters .brand-story__article-head .section-eyebrow {
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.brand-story--stacked-chapters .brand-story__article-head .section-heading {
+  font-size: clamp(1.9rem, 4vw, 2.75rem);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.brand-story--stacked-chapters .brand-story__article-media {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.brand-story--stacked-chapters .brand-story__article-media .brand-story__image,
+.brand-story--stacked-chapters .brand-story__article-media .brand-story__placeholder {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  display: block;
+  border-radius: 10px;
+}
+
+.brand-story--stacked-chapters .brand-story__article-body {
+  max-width: 65ch;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+.brand-story--stacked-chapters .brand-story__article-body p + p {
+  margin-top: 1.25em;
+}
+
+.brand-story--stacked-chapters .brand-story__article-cta {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .brand-story--stacked-chapters .brand-story__article {
+    gap: 1.75rem;
+  }
+  .brand-story--stacked-chapters .brand-story__article-body {
+    font-size: 1rem;
+  }
+}
+
+/* BRAND-STORY VARIANTS V1 — END */
+
+/* SECTION VARIANTS V1 — END */
+
+/* ─────────────────────────────────────
+   WISHLIST V1 — Pro-tier feature
+   Active state uses SHAPE (filled vs outline
+   heart) + aria-pressed — never color alone.
+   Colorblind-safe by design.
+   ───────────────────────────────────── */
+.product-card {
+  position: relative;
+}
+
+.wishlist-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-backdrop-heavy, var(--color-background-card));
+  color: var(--color-text);
+  cursor: pointer;
+  z-index: 3;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.wishlist-btn:hover {
+  transform: scale(1.08);
+  border-color: var(--color-border-strong);
+  background: var(--color-background-card);
+}
+
+.wishlist-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.wishlist-btn__heart {
+  display: block;
+  pointer-events: none;
+}
+
+.wishlist-btn .wishlist-btn__heart--filled { display: none; }
+.wishlist-btn.is-wishlisted .wishlist-btn__heart--outline { display: none; }
+.wishlist-btn.is-wishlisted .wishlist-btn__heart--filled { display: block; }
+
+.wishlist-btn.is-wishlisted {
+  color: var(--color-primary);
+  transform: scale(1.1);
+  border-color: var(--color-primary);
+}
+
+.wishlist-btn.is-wishlisted:hover {
+  transform: scale(1.15);
+}
+
+/* Header counter badge */
+.wishlist-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 0.35rem;
+  margin-left: 0.25rem;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: var(--color-background-card);
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.wishlist-count.is-hidden { display: none; }
+
+/* Wishlist page */
+.wishlist-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 5rem;
+}
+
+.wishlist-page__header {
+  margin-bottom: 2rem;
+}
+
+.wishlist-page__title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 0.5rem;
+  line-height: 1.15;
+}
+
+.wishlist-page__subtitle {
+  font-family: var(--font-body);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.wishlist-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .wishlist-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  .wishlist-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.wishlist-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--color-background-card);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 0.75rem;
+}
+
+.wishlist-item__link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.wishlist-item__image {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.wishlist-item__placeholder {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: var(--color-surface-alt);
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+}
+
+.wishlist-item__title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 0.25rem;
+  color: var(--color-text);
+}
+
+.wishlist-item__price {
+  font-family: var(--font-body);
+  color: var(--color-text-muted);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.wishlist-item__remove {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+
+.wishlist-item__remove:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+.wishlist-empty {
+  display: none;
+  text-align: center;
+  padding: 4rem 1.5rem;
+  border: 1px dashed var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface-alt);
+}
+
+.wishlist-empty__title {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  color: var(--color-text);
+  margin: 0 0 0.5rem;
+}
+
+.wishlist-empty__text {
+  color: var(--color-text-muted);
+  margin: 0 0 1.5rem;
+}
+
+/* WISHLIST V1 — END */
+
+/* ─────────────────────────────────────
+   BUNDLE BUILDER V1 — Pro-tier section
+   Savings badge uses a ▼ glyph + label +
+   border + fill — never color-only.
+   Colorblind-safe by design.
+   ───────────────────────────────────── */
+.bundle-builder {
+  padding: clamp(3rem, 8vw, 6rem) 0;
+}
+
+.bundle-builder .section-eyebrow,
+.bundle-builder .section-heading {
+  text-align: center;
+}
+
+.bundle-builder__subheading {
+  max-width: 620px;
+  margin: 0.75rem auto 2.5rem;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.bundle-builder__empty {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  border: 1px dashed var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface-alt);
+}
+
+.bundle-builder__empty-title {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
+  color: var(--color-text);
+}
+
+.bundle-builder__empty-text {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+}
+
+/* ── Shared card structure ── */
+.bundle-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-background-card);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.bundle-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-border-strong);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+}
+
+.bundle-card__media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--color-surface-alt);
+}
+
+.bundle-card__media--placeholder {
+  background:
+    linear-gradient(135deg, var(--color-surface-alt) 0%, var(--color-background) 100%);
+}
+
+.bundle-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.bundle-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 1.5rem;
+}
+
+.bundle-card__title {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+  color: var(--color-text);
+}
+
+.bundle-card__title--hero {
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  letter-spacing: -0.01em;
+}
+
+.bundle-card__description {
+  font-family: var(--font-body);
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.bundle-card__price-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.bundle-card__compare-price {
+  font-family: var(--font-body);
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+}
+
+.bundle-card__compare-price s {
+  text-decoration: line-through;
+}
+
+.bundle-card__price {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+/* Savings badge — shape + glyph + label (colorblind-safe)
+   - border = shape signal
+   - ▼ glyph = "discount going down" independent of color
+   - text label "Save $X" = redundant textual signal */
+.bundle-card__savings {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.6rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 40%, transparent);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.bundle-card__savings-glyph {
+  font-size: 0.7em;
+  line-height: 1;
+}
+
+.bundle-card__cta {
+  align-self: flex-start;
+  margin-top: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: var(--btn-letter-spacing, 0.04em);
+  text-transform: var(--btn-transform, uppercase);
+  padding: 0.75rem 1.4rem;
+  border: none;
+  border-radius: var(--btn-radius, 6px);
+  background: var(--color-primary);
+  color: var(--color-background);
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.bundle-card__cta:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.bundle-card__cta:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.bundle-card__cta:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.bundle-card__cta.btn--secondary {
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+}
+
+.bundle-card__cta.btn--secondary:hover:not(:disabled) {
+  background: var(--color-surface-alt);
+  opacity: 1;
+}
+
+/* ── Variant: cards ── */
+.bundle-builder--cards .bundle-builder__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* ── Variant: split-hero ── */
+.bundle-builder--split-hero .bundle-builder__split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.bundle-builder--split-hero .bundle-card--hero {
+  height: 100%;
+}
+
+.bundle-builder--split-hero .bundle-card--hero .bundle-card__media {
+  aspect-ratio: 5 / 4;
+}
+
+.bundle-builder--split-hero .bundle-builder__split-rest {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.bundle-builder--split-hero .bundle-card--mini {
+  flex-direction: row;
+  align-items: stretch;
+}
+
+.bundle-builder--split-hero .bundle-card--mini .bundle-card__media {
+  flex: 0 0 40%;
+  aspect-ratio: auto;
+}
+
+.bundle-builder--split-hero .bundle-card--mini .bundle-card__body {
+  flex: 1 1 auto;
+  padding: 1.25rem;
+}
+
+.bundle-builder--split-hero .bundle-card--mini .bundle-card__description {
+  display: none;
+}
+
+/* ── Variant: list ── */
+.bundle-builder--list .bundle-builder__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.bundle-builder--list .bundle-card--row {
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0;
+}
+
+.bundle-builder--list .bundle-card--row .bundle-card__media {
+  flex: 0 0 240px;
+  aspect-ratio: auto;
+}
+
+.bundle-builder--list .bundle-card--row .bundle-card__body {
+  flex: 1 1 auto;
+  padding: 1.5rem;
+  justify-content: center;
+}
+
+.bundle-builder--list .bundle-card__row-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.bundle-builder--list .bundle-card__row-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 1.5rem;
+  border-left: 1px solid var(--color-border);
+  min-width: 200px;
+}
+
+.bundle-builder--list .bundle-card__row-cta .bundle-card__cta {
+  margin-top: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 720px) {
+  .bundle-builder--cards .bundle-builder__grid {
+    grid-template-columns: 1fr;
+  }
+  .bundle-builder--split-hero .bundle-builder__split {
+    grid-template-columns: 1fr;
+  }
+  .bundle-builder--split-hero .bundle-card--mini {
+    flex-direction: column;
+  }
+  .bundle-builder--split-hero .bundle-card--mini .bundle-card__media {
+    flex: 0 0 auto;
+    aspect-ratio: 4 / 3;
+  }
+  .bundle-builder--list .bundle-card--row {
+    flex-direction: column;
+  }
+  .bundle-builder--list .bundle-card--row .bundle-card__media {
+    flex: 0 0 auto;
+    aspect-ratio: 4 / 3;
+  }
+  .bundle-builder--list .bundle-card__row-cta {
+    border-left: none;
+    border-top: 1px solid var(--color-border);
+    align-items: flex-start;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+/* BUNDLE BUILDER V1 — END */
+
+/* ═════════ APP BLOCKS ═════════ */
+/* Slots where merchant-installed Shopify apps (reviews, upsells, size charts,
+   subscriptions) render. Declared as { "type": "@app" } in the schema of
+   main-product / main-collection / main-cart / main-article and apps.liquid.
+   Nothing renders until a merchant adds an app block in the theme editor, so
+   these rules must never reserve space on their own. */
+.theme-app-block {
+  margin: 1.5rem 0;
+}
+
+/* An app that renders nothing (misconfigured, or gated behind a plan) must not
+   leave a gap in the layout. */
+.theme-app-block:empty {
+  display: none;
+  margin: 0;
+}
+
+/* App markup is authored by a third party and routinely assumes full width. */
+.theme-app-block img,
+.theme-app-block iframe,
+.theme-app-block table {
+  max-width: 100%;
+}
+
+.theme-app-block iframe {
+  border: 0;
+}
+
+/* apps.liquid — a top-level app block added as its own section. */
+.apps-section {
+  padding: 2rem 0;
+}
+
+.apps-section:empty {
+  display: none;
+  padding: 0;
+}
+
+/* Mirrors .container above (1320px / 1.5rem) so an app section lines up with
+   every other section on the page. */
+.apps-section--padded {
+  max-width: 1320px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+/* APP BLOCKS — END */
+
+/* THEMR-BOILERPLATE END — AI-generated CSS follows below this line */
+
+
+
+/* Hero hardening — only for photo-overlay heroes (skips pure-type heroes). */
+.shopify-section.section-hero:has(img) > section,
+.shopify-section.section-hero:has(img) > div,
+.shopify-section.section-hero:has(img) [class*="hero__canvas"],
+.shopify-section.section-hero:has(img) [class*="hero__inner"],
+.shopify-section.section-hero:has(img) [class*="hero-canvas"],
+.shopify-section.section-hero:has(img) [class*="hero-inner"] {
+  min-height: 80vh;
+}
+.shopify-section.section-hero img {
+  object-fit: cover;
+  object-position: center;
+}
+
+
+
+/* Media-fill hardening — images cover their fixed-shape containers (no gray gap). */
+[class*="media"] img,
+[class*="photo"] img,
+[class*="plate"] img,
+[class*="frame"] img,
+[class*="visual"] img,
+[class*="thumb"] img,
+[class*="gallery"] img,
+[class*="portrait"] img,
+[class*="figure"] img,
+[class*="__image"] img,
+[class*="-image"] img,
+[class*="feed"] img,
+[class*="tile"] img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block;
+}

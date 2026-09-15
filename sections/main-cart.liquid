@@ -1,0 +1,591 @@
+<style>
+  .cart-page {
+    padding: 2rem 1rem 4rem;
+  }
+
+  .cart-page__title {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    color: var(--color-text);
+    margin: 0 0 2rem;
+    text-align: center;
+  }
+
+  /* --- Empty State --- */
+  .cart-empty {
+    text-align: center;
+    padding: 4rem 1rem;
+  }
+
+  .cart-empty__icon svg {
+    width: 64px;
+    height: 64px;
+    color: var(--color-text);
+    opacity: 0.2;
+    margin-bottom: 1.5rem;
+  }
+
+  .cart-empty__heading {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    color: var(--color-text);
+    margin: 0 0 0.75rem;
+  }
+
+  .cart-empty__text {
+    color: var(--color-text);
+    opacity: 0.6;
+    margin: 0 0 1.5rem;
+  }
+
+  .cart-empty__link {
+    display: inline-block;
+    padding: 0.75rem 1.75rem;
+    background: var(--color-primary);
+    color: #fff;
+    text-decoration: none;
+    border-radius: var(--btn-radius, 6px);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    text-transform: var(--btn-transform, none);
+    letter-spacing: var(--btn-letter-spacing, 0);
+    transition: opacity 0.2s ease;
+  }
+
+  .cart-empty__link:hover {
+    opacity: 0.85;
+  }
+
+  /* --- Cart Items --- */
+  .cart-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cart-item {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 1rem;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--color-border);
+    align-items: start;
+  }
+
+  @media (min-width: 768px) {
+    .cart-item {
+      grid-template-columns: 100px 1fr auto auto auto;
+      align-items: center;
+      gap: 1.5rem;
+    }
+  }
+
+  .cart-item__image-link {
+    display: block;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--color-background-card);
+  }
+
+  .cart-item__image {
+    width: 100%;
+    height: auto;
+    display: block;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+
+  .cart-item__details {
+    min-width: 0;
+  }
+
+  .cart-item__title {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    color: var(--color-text);
+    margin: 0 0 0.2rem;
+    text-decoration: none;
+  }
+
+  .cart-item__title:hover {
+    color: var(--color-primary);
+  }
+
+  .cart-item__variant {
+    font-size: 0.8rem;
+    color: var(--color-text);
+    opacity: 0.6;
+    margin: 0 0 0.35rem;
+  }
+
+  .cart-item__price {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--color-text);
+    opacity: 0.7;
+  }
+
+  @media (min-width: 768px) {
+    .cart-item__price {
+      text-align: right;
+      opacity: 1;
+    }
+  }
+
+  /* --- Quantity Controls --- */
+  .cart-item__quantity {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--btn-radius, 6px);
+    overflow: hidden;
+    margin-top: 0.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .cart-item__quantity {
+      margin-top: 0;
+    }
+  }
+
+  .cart-item__qty-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: none;
+    background: transparent;
+    color: var(--color-text);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.15s ease;
+  }
+
+  .cart-item__qty-btn:hover {
+    background: var(--color-background-card);
+  }
+
+  .cart-item__qty-input {
+    width: 40px;
+    height: 34px;
+    text-align: center;
+    border: none;
+    border-left: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--color-text);
+    -moz-appearance: textfield;
+  }
+
+  .cart-item__qty-input::-webkit-inner-spin-button,
+  .cart-item__qty-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* --- Line Total + Remove --- */
+  .cart-item__line-total {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-text);
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .cart-item__line-total {
+      display: block;
+      text-align: right;
+    }
+  }
+
+  .cart-item__remove {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--color-text);
+    opacity: 0.5;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: opacity 0.15s ease;
+    margin-top: 0.35rem;
+  }
+
+  .cart-item__remove:hover {
+    opacity: 1;
+  }
+
+  /* --- Mobile line total --- */
+  .cart-item__mobile-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+  }
+
+  .cart-item__mobile-total {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-text);
+  }
+
+  @media (min-width: 768px) {
+    .cart-item__mobile-footer {
+      display: none;
+    }
+
+    .cart-item__remove-mobile {
+      display: none;
+    }
+
+    .cart-item__remove-desktop {
+      display: inline-flex;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .cart-item__remove-desktop {
+      display: none;
+    }
+  }
+
+  /* --- Cart Footer --- */
+  .cart-footer {
+    margin-top: 2rem;
+    border-top: 2px solid var(--color-border);
+    padding-top: 1.5rem;
+  }
+
+  .cart-footer__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
+  }
+
+  .cart-footer__subtotal-label {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    color: var(--color-text);
+  }
+
+  .cart-footer__subtotal-value {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    color: var(--color-text);
+  }
+
+  .cart-footer__notice {
+    font-size: 0.8rem;
+    color: var(--color-text);
+    opacity: 0.55;
+    margin: 0.5rem 0 1.5rem;
+    text-align: right;
+  }
+
+  /* The accelerated buttons render in shadow DOM and are not ours to style.
+     This one declaration makes their corner follow the theme's own button
+     radius, so they vary per theme instead of looking identical everywhere.
+     No height or background: the block is empty in preview and an empty box
+     would show. */
+  .cart-footer__accelerated {
+    --shopify-accelerated-checkout-button-border-radius: var(--btn-radius, 6px);
+    display: grid;
+    gap: 0.5rem;
+  }
+  .cart-footer__accelerated:empty {
+    display: none;
+  }
+
+  /* ── CART VARIANTS ───────────────────────────────────────────────────
+     Defaults per preset, all beatable by any AI rule. The mechanism — the
+     accelerated buttons, the form, the totals — is identical underneath. */
+  [data-cart-style="editorial"] .cart-footer__checkout { border-radius: 0; letter-spacing: 0.1em; }
+  [data-cart-style="editorial"] .cart-footer { border-top-width: 2px; padding-top: 1.6rem; }
+
+  [data-cart-style="catalog"] .cart-footer__checkout { border-radius: 2px; padding-top: 0.7rem; padding-bottom: 0.7rem; font-size: 0.85rem; }
+  [data-cart-style="catalog"] .cart-footer__accelerated { gap: 0.35rem; }
+
+  [data-cart-style="minimal"] .cart-footer__checkout { border-radius: 999px; }
+  [data-cart-style="minimal"] .cart-footer__notice { opacity: 0.7; }
+
+  [data-cart-style="bold"] .cart-footer__checkout { font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding-top: 1.05rem; padding-bottom: 1.05rem; }
+  [data-cart-style="bold"] .cart-footer__subtotal-value { font-weight: 700; }
+
+  .cart-footer__checkout {
+    display: block;
+    width: 100%;
+    padding: 0.9rem 2rem;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--btn-radius, 6px);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: var(--btn-transform, none);
+    letter-spacing: var(--btn-letter-spacing, 0);
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .cart-footer__checkout:hover {
+    opacity: 0.85;
+  }
+
+  @media (min-width: 768px) {
+    .cart-footer {
+      max-width: 420px;
+      margin-left: auto;
+      margin-top: 2rem;
+    }
+  }
+
+  /* --- Cart Note --- */
+  .cart-note {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .cart-note__label {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 0.5rem;
+  }
+
+  .cart-note__textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--btn-radius, 6px);
+    background: var(--color-background);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    resize: vertical;
+  }
+
+  .cart-note__textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+</style>
+
+{%- comment -%}
+  data-cart-style, matching data-product-style and data-collection-style. The
+  cart is now a third page carrying a mechanic every theme shares, and a shared
+  mechanic with a single look is how /collections/all ended up identical across
+  every brand (Bug #13, 744f80c). The hook costs nothing and keeps the
+  appearance separable from the mechanism.
+{%- endcomment -%}
+<div class="cart-page container" data-cart-style="{{ settings.preset_cart_style | default: settings.preset_collection_style | default: 'minimal' }}">
+  <h1 class="cart-page__title" data-reveal>{{ 'cart.title' | t | default: 'Your Cart' }}</h1>
+
+  {%- if cart.item_count == 0 -%}
+
+    {%- comment -%} Empty Cart {%- endcomment -%}
+    <div class="cart-empty" data-reveal>
+      <div class="cart-empty__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+      </div>
+      <h2 class="cart-empty__heading">Your cart is empty</h2>
+      <p class="cart-empty__text">Looks like you haven't added anything yet.</p>
+      <a href="/collections/all" class="cart-empty__link">Continue Shopping</a>
+    </div>
+
+  {%- else -%}
+
+    <form action="/cart" method="post" id="cart-form">
+
+      {%- comment -%} Cart Items {%- endcomment -%}
+      <ul class="cart-items" data-reveal>
+        {%- for item in cart.items -%}
+          <li class="cart-item">
+            <a href="{{ item.url }}" class="cart-item__image-link">
+              {%- if item.image -%}
+                <img
+                  src="{{ item.image | image_url: width: 200 }}"
+                  alt="{{ item.image.alt | default: item.product.title | escape }}"
+                  loading="lazy"
+                  class="cart-item__image"
+                  width="100"
+                  height="100"
+                >
+              {%- endif -%}
+            </a>
+
+            <div class="cart-item__details">
+              <a href="{{ item.url }}" class="cart-item__title">{{ item.product.title }}</a>
+              {%- if item.variant.title != 'Default Title' -%}
+                <p class="cart-item__variant">{{ item.variant.title }}</p>
+              {%- endif -%}
+              <p class="cart-item__price">{{ item.original_price | money }}</p>
+
+              <div class="cart-item__quantity">
+                <button
+                  type="button"
+                  class="cart-item__qty-btn"
+                  data-qty-minus
+                  data-line="{{ forloop.index }}"
+                  aria-label="Decrease quantity"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14"/></svg>
+                </button>
+                <input
+                  type="number"
+                  class="cart-item__qty-input"
+                  name="updates[]"
+                  value="{{ item.quantity }}"
+                  min="0"
+                  data-line="{{ forloop.index }}"
+                  aria-label="Quantity for {{ item.product.title | escape }}"
+                >
+                <button
+                  type="button"
+                  class="cart-item__qty-btn"
+                  data-qty-plus
+                  data-line="{{ forloop.index }}"
+                  aria-label="Increase quantity"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                </button>
+              </div>
+
+              {%- comment -%} Mobile line total + remove {%- endcomment -%}
+              <div class="cart-item__mobile-footer">
+                <span class="cart-item__mobile-total">{{ item.final_line_price | money }}</span>
+                <a href="/cart/change?line={{ forloop.index }}&quantity=0" class="cart-item__remove cart-item__remove-mobile">Remove</a>
+              </div>
+            </div>
+
+            {%- comment -%} Desktop-only columns {%- endcomment -%}
+            <span class="cart-item__line-total">{{ item.final_line_price | money }}</span>
+            <a href="/cart/change?line={{ forloop.index }}&quantity=0" class="cart-item__remove cart-item__remove-desktop">Remove</a>
+          </li>
+        {%- endfor -%}
+      </ul>
+
+      {%- comment -%} Cart Note {%- endcomment -%}
+      {%- if section.settings.show_cart_note -%}
+        <div class="cart-note" data-reveal>
+          <label class="cart-note__label" for="cart-note">Order notes</label>
+          <textarea
+            class="cart-note__textarea"
+            id="cart-note"
+            name="note"
+            placeholder="Add a note to your order..."
+          >{{ cart.note }}</textarea>
+        </div>
+      {%- endif -%}
+
+      {%- comment -%}
+        App blocks — cart upsells, shipping calculators, gift-wrap widgets.
+        Placed above the subtotal so an upsell is seen before checkout.
+      {%- endcomment -%}
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when '@app' -%}
+            <div class="theme-app-block" {{ block.shopify_attributes }}>{% render block %}</div>
+        {%- endcase -%}
+      {%- endfor -%}
+
+      {%- comment -%} Cart Footer {%- endcomment -%}
+      <div class="cart-footer" data-reveal>
+        <div class="cart-footer__row">
+          <span class="cart-footer__subtotal-label">Subtotal</span>
+          <span class="cart-footer__subtotal-value">{{ cart.total_price | money }}</span>
+        </div>
+        <p class="cart-footer__notice">Shipping and taxes calculated at checkout</p>
+        <button type="submit" name="checkout" class="cart-footer__checkout">Checkout</button>
+
+        {%- comment -%}
+          Shop Pay / Apple Pay / Google Pay on the cart, the counterpart to the
+          payment_button now on the product page. Neither existed anywhere in
+          the boilerplate, so every theme Themr has generated has asked people
+          to type an address they had already given Shopify once.
+
+          This one needs no form tag — it is a global content block — which is
+          why it works inside the hand-written cart form.
+
+          Renders empty in the local preview, which has no Shopify checkout
+          context. The wrapper therefore carries no height, border or
+          background: an empty box in every preview screenshot would be a
+          worse bug than the one being fixed.
+        {%- endcomment -%}
+        <div class="cart-footer__accelerated">
+          {{ content_for_additional_checkout_buttons }}
+        </div>
+      </div>
+
+    </form>
+
+  {%- endif -%}
+</div>
+
+<script>
+  (function() {
+    var form = document.getElementById('cart-form');
+    if (!form) return;
+
+    form.addEventListener('click', function(e) {
+      var minus = e.target.closest('[data-qty-minus]');
+      var plus = e.target.closest('[data-qty-plus]');
+      var target = minus || plus;
+      if (!target) return;
+
+      var line = target.getAttribute('data-line');
+      var input = form.querySelector('input[data-line="' + line + '"]');
+      if (!input) return;
+
+      var current = parseInt(input.value, 10) || 0;
+
+      if (minus && current > 0) {
+        input.value = current - 1;
+      } else if (plus) {
+        input.value = current + 1;
+      }
+
+      /* Submit the form after a short delay to batch rapid clicks */
+      clearTimeout(form._qtyTimeout);
+      form._qtyTimeout = setTimeout(function() {
+        form.submit();
+      }, 600);
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Cart",
+  "tag": "section",
+  "class": "section-cart",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_cart_note",
+      "default": false,
+      "label": "Show order note field"
+    }
+  ],
+  "blocks": [
+    { "type": "@app" }
+  ]
+}
+{% endschema %}

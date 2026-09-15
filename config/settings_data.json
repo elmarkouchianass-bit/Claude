@@ -1,0 +1,59 @@
+{
+  "current": {
+    "color_primary": "#2563eb",
+    "color_secondary": "#1e293b",
+    "color_background": "#ffffff",
+    "color_background_card": "#FFFFFF",
+    "color_text": "#0f172a",
+    "color_text_muted": "#484c55",
+    "font_heading": "Playfair Display",
+    "font_body": "Source Sans 3",
+    "logo_max_width": 140,
+    "logo_bundled_filename": "",
+    "preset_collection_style": "editorial",
+    "popup_enabled": false,
+    "social_instagram": "https://instagram.com/",
+    "social_tiktok": "https://tiktok.com/",
+    "social_pinterest": "https://pinterest.com/",
+    "social_facebook": "https://facebook.com/",
+    "social_twitter": "https://x.com/",
+    "social_youtube": "https://youtube.com/",
+    "social_threads": "https://threads.net/",
+    "social_reddit": "https://reddit.com/",
+    "social_linkedin": "https://linkedin.com/",
+    "sections": {
+      "announcement-bar": {
+        "type": "announcement-bar",
+        "settings": {
+          "text": "Vorreni — complimentary shipping on qualifying orders",
+          "link": "",
+          "bar_style": "solid"
+        }
+      },
+      "header": {
+        "type": "header",
+        "settings": {
+          "layout": "inline-left",
+          "icon_set": "outline",
+          "show_locale_switcher": true,
+          "menu": "main-menu",
+          "wordmark": "Vorreni",
+          "store_name": "Vorreni",
+          "brand_name": "Vorreni",
+          "logo_text": "Vorreni",
+          "brand": "Vorreni"
+        },
+        "layout": "stacked"
+      },
+      "footer": {
+        "type": "footer",
+        "settings": {
+          "description": "Vorenni sells fashion apperael for men",
+          "footer_style": "standard",
+          "col2_heading": "Shop",
+          "col3_heading": "Help"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,186 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "vorreni",
+    "theme_version": "1.0.0",
+    "theme_author": "Themr",
+    "theme_documentation_url": "https://themr.ai",
+    "theme_support_url": "https://themr.ai/help"
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "color",
+        "id": "color_primary",
+        "label": "Primary accent",
+        "default": "#2563eb"
+      },
+      {
+        "type": "color",
+        "id": "color_secondary",
+        "label": "Secondary / hover",
+        "default": "#1e293b"
+      },
+      {
+        "type": "color",
+        "id": "color_background",
+        "label": "Background",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "color_background_card",
+        "label": "Card background",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "id": "color_text",
+        "label": "Text",
+        "default": "#0f172a"
+      },
+      {
+        "type": "color",
+        "id": "color_text_muted",
+        "label": "Muted text",
+        "default": "#484c55"
+      }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "text",
+        "id": "font_heading",
+        "label": "Heading font family",
+        "default": "Playfair Display"
+      },
+      {
+        "type": "text",
+        "id": "font_body",
+        "label": "Body font family",
+        "default": "Source Sans 3"
+      }
+    ]
+  },
+  {
+    "name": "Logo",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo image",
+        "info": "Upload your logo here to replace the store name in the header and footer. Overrides the logo shipped with your Themr theme."
+      },
+      {
+        "type": "range",
+        "id": "logo_max_width",
+        "label": "Logo max width (px)",
+        "min": 50,
+        "max": 300,
+        "step": 10,
+        "default": 140
+      },
+      {
+        "type": "text",
+        "id": "logo_bundled_filename",
+        "label": "Bundled logo asset",
+        "info": "Filename of the logo shipped inside this theme's assets/ folder (e.g. logo.png). Used as a fallback when no image is uploaded above. Clear this to remove the bundled logo."
+      }
+    ]
+  },
+  {
+    "name": "Social media",
+    "settings": [
+      {
+        "type": "text",
+        "id": "social_instagram",
+        "label": "Instagram URL"
+      },
+      {
+        "type": "text",
+        "id": "social_tiktok",
+        "label": "TikTok URL"
+      },
+      {
+        "type": "text",
+        "id": "social_facebook",
+        "label": "Facebook URL"
+      },
+      {
+        "type": "text",
+        "id": "social_pinterest",
+        "label": "Pinterest URL"
+      },
+      {
+        "type": "text",
+        "id": "social_twitter",
+        "label": "X / Twitter URL"
+      },
+      {
+        "type": "text",
+        "id": "social_youtube",
+        "label": "YouTube URL"
+      },
+      {
+        "type": "text",
+        "id": "social_threads",
+        "label": "Threads URL"
+      },
+      {
+        "type": "text",
+        "id": "social_reddit",
+        "label": "Reddit URL"
+      },
+      {
+        "type": "text",
+        "id": "social_linkedin",
+        "label": "LinkedIn URL"
+      }
+    ]
+  },
+  {
+    "name": "Reviews",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Judge.me integration"
+      },
+      {
+        "type": "paragraph",
+        "content": "Paste your Judge.me shop token to render live review widgets on product pages and cards. Leave blank to show static stars from product review metafields only."
+      },
+      {
+        "type": "text",
+        "id": "judgeme_shop_token",
+        "label": "Judge.me shop token",
+        "info": "Find this in your Judge.me dashboard under Settings → Shop."
+      }
+    ]
+  },
+  {
+    "name": "Popup",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "popup_enabled",
+        "label": "Enable promotional popup",
+        "default": false,
+        "info": "Shows a discount popup to first-time visitors"
+      }
+    ]
+  },
+  {
+    "name": "Favicon",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon",
+        "info": "32x32px recommended"
+      }
+    ]
+  }
+]

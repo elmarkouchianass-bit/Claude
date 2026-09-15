@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title }}{% unless page_title contains shop.name %} &mdash; {{ shop.name }}{% endunless %}</title>
+  {% if page_description %}
+    <meta name="description" content="{{ page_description | escape }}">
+  {% endif %}
+  <link rel="canonical" href="{{ canonical_url }}">
+  {% render 'meta-tags' %}
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  {% if settings.favicon %}
+    <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32 }}">
+  {% endif %}
+
+  {{ 'theme.css' | asset_url | stylesheet_tag }}
+  {{ content_for_header }}
+
+  {% render 'json-ld' %}
+
+  <style>
+    :root {
+      --color-primary: {{ settings.color_primary }};
+      --color-secondary: {{ settings.color_secondary }};
+      --color-background: {{ settings.color_background }};
+      --color-background-card: {{ settings.color_background_card }};
+      --color-text: {{ settings.color_text }};
+      --color-text-muted: {{ settings.color_text_muted }};
+      --font-heading: '{{ settings.font_heading }}', sans-serif;
+      --font-body: '{{ settings.font_body }}', sans-serif;
+
+      /* Derived colors */
+      --color-border: color-mix(in srgb, var(--color-text) 10%, transparent);
+      --color-border-strong: color-mix(in srgb, var(--color-text) 18%, transparent);
+      --color-surface-alt: color-mix(in srgb, var(--color-primary) 6%, var(--color-background));
+      --color-backdrop: color-mix(in srgb, var(--color-background) 90%, transparent);
+      --color-backdrop-heavy: color-mix(in srgb, var(--color-background) 97%, transparent);
+      --color-eyebrow-bg: color-mix(in srgb, var(--color-primary) 10%, transparent);
+      --color-eyebrow-text: color-mix(in srgb, var(--color-primary) 60%, var(--color-text));
+      --color-success: color-mix(in srgb, green 40%, var(--color-text));
+      --color-error: color-mix(in srgb, red 50%, var(--color-text));
+
+      /* Style tokens */
+      --header-padding: 1.4rem 0;
+      --header-border: 1px solid rgba(255,255,255,0.15);
+      --nav-font: var(--font-heading);
+      --nav-transform: none;
+      --nav-spacing: 0.02em;
+      --hero-text-align: center;
+      --hero-text-css-align: center;
+      --hero-content-max-width: 700px;
+      --hero-heading-size: clamp(2.8rem, 6vw, 4.5rem);
+      --hero-heading-spacing: -0.01em;
+      --btn-radius: 4px;
+      --btn-letter-spacing: 0.05em;
+      --logo-size: 1.6rem;
+      --logo-weight: 700;
+      --logo-spacing: 0.15em;
+
+      /* Animation easings */
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">{{ 'accessibility.skip_to_content' | t }}</a>
+
+  {% section 'announcement-bar' %}
+  {% section 'header' %}
+  {% render 'breadcrumbs' %}
+
+  <main id="main-content">
+    {{ content_for_layout }}
+  </main>
+
+  {% section 'footer' %}
+
+  {% render 'cart-drawer' %}
+  {% render 'quick-view' %}
+  {% render 'promo-popup' %}
+
+  <button class="back-to-top" aria-label="Back to top" type="button">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script src="{{ 'theme.js' | asset_url }}" defer></script>
+</body>
+</html>

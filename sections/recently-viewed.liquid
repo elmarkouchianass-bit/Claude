@@ -1,0 +1,228 @@
+<style>
+  .recently-viewed {
+    padding: 3rem 1rem 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .recently-viewed__heading {
+    font-family: var(--font-heading);
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 1.5rem;
+    text-align: center;
+  }
+
+  .recently-viewed__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .recently-viewed__grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+    }
+  }
+
+  .recently-viewed__card {
+    background: var(--color-background-card);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .recently-viewed__card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .recently-viewed__image-wrap {
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: var(--color-border);
+  }
+
+  .recently-viewed__image-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.35s ease;
+  }
+
+  .recently-viewed__card:hover .recently-viewed__image-wrap img {
+    transform: scale(1.04);
+  }
+
+  .recently-viewed__info {
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .recently-viewed__title {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .recently-viewed__price {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--color-text);
+    opacity: 0.7;
+  }
+
+  .recently-viewed__empty {
+    display: none;
+  }
+</style>
+
+<section class="recently-viewed" data-recently-viewed data-max-products="{{ section.settings.max_products }}" data-reveal>
+  <h2 class="recently-viewed__heading">{{ section.settings.heading }}</h2>
+  <div class="recently-viewed__grid" data-recently-viewed-grid></div>
+</section>
+
+<script>
+  (function() {
+    var STORAGE_KEY = 'recently_viewed_products';
+    var container = document.querySelector('[data-recently-viewed]');
+    if (!container) return;
+
+    var maxProducts = parseInt(container.getAttribute('data-max-products'), 10) || 6;
+    var grid = container.querySelector('[data-recently-viewed-grid]');
+
+    /* Save current product to localStorage (on product pages) */
+    var productMeta = document.querySelector('[data-product-gallery]');
+    if (productMeta) {
+      var currentHandle = window.location.pathname.split('/products/')[1];
+      if (currentHandle) {
+        currentHandle = currentHandle.split('?')[0].split('#')[0];
+        var stored = [];
+        try { stored = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) {}
+        stored = stored.filter(function(h) { return h !== currentHandle; });
+        stored.unshift(currentHandle);
+        if (stored.length > 10) stored = stored.slice(0, 10);
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(stored)); } catch(e) {}
+      }
+    }
+
+    /* Render recently viewed products */
+    var handles = [];
+    try { handles = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) {}
+
+    /* Exclude the current product if on a product page */
+    var currentPath = window.location.pathname;
+    if (currentPath.indexOf('/products/') !== -1) {
+      var current = currentPath.split('/products/')[1];
+      if (current) {
+        current = current.split('?')[0].split('#')[0];
+        handles = handles.filter(function(h) { return h !== current; });
+      }
+    }
+
+    handles = handles.slice(0, maxProducts);
+
+    if (handles.length === 0) {
+      container.style.display = 'none';
+      return;
+    }
+
+    var loaded = 0;
+    var total = handles.length;
+
+    handles.forEach(function(handle) {
+      fetch('/products/' + handle + '.json')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          var p = data.product;
+          if (!p) return;
+
+          var imgSrc = '';
+          if (p.images && p.images.length > 0) {
+            imgSrc = p.images[0].src;
+          }
+
+          var price = '';
+          if (p.variants && p.variants.length > 0) {
+            var cents = p.variants[0].price;
+            var amount = parseFloat(cents);
+            if (!isNaN(amount)) {
+              if (amount > 100) {
+                price = '$' + (amount / 100).toFixed(2);
+              } else {
+                price = '$' + amount.toFixed(2);
+              }
+            }
+          }
+
+          var card = document.createElement('a');
+          card.href = '/products/' + handle;
+          card.className = 'recently-viewed__card';
+          card.innerHTML =
+            '<div class="recently-viewed__image-wrap">' +
+              (imgSrc ? '<img src="' + imgSrc + '" alt="' + (p.title || '').replace(/"/g, '&quot;') + '" loading="lazy" width="300" height="300">' : '') +
+            '</div>' +
+            '<div class="recently-viewed__info">' +
+              '<p class="recently-viewed__title">' + (p.title || '') + '</p>' +
+              (price ? '<span class="recently-viewed__price">' + price + '</span>' : '') +
+            '</div>';
+
+          grid.appendChild(card);
+        })
+        .catch(function() {})
+        .finally(function() {
+          loaded++;
+          if (loaded === total && grid.children.length === 0) {
+            container.style.display = 'none';
+          }
+        });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Recently Viewed",
+  "class": "section-recently-viewed",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Recently Viewed"
+    },
+    {
+      "type": "range",
+      "id": "max_products",
+      "label": "Max products to show",
+      "min": 4,
+      "max": 10,
+      "step": 1,
+      "default": 6
+    }
+  ],
+  "presets": [
+    {
+      "name": "Recently Viewed",
+      "category": "Products"
+    }
+  ]
+}
+{% endschema %}

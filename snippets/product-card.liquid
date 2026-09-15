@@ -1,0 +1,148 @@
+{%- comment -%}
+  Product card snippet — Premium standard
+  Params: product (object), index (number), featured (boolean, optional)
+
+  Features:
+  - Primary + secondary image (hover swap)
+  - Color swatches from "Color" option
+  - Quick-add button (slides up on hover)
+  - Star ratings
+  - Badges (Sale, New, Best Seller)
+  - Price with compare-at strikethrough
+  - Hover lift + shadow escalation
+{%- endcomment -%}
+
+<div class="product-card{% if featured %} product-card--featured{% endif %}" data-reveal style="--index: {{ index }}">
+  {% render 'wishlist-button', product: product %}
+  <a href="{{ product.url }}" class="product-card__link">
+    <div class="product-card__media">
+      {%- if product.featured_image != blank -%}
+        <img
+          src="{{ product.featured_image | image_url: width: 600 }}"
+          srcset="
+            {{ product.featured_image | image_url: width: 300 }} 300w,
+            {{ product.featured_image | image_url: width: 450 }} 450w,
+            {{ product.featured_image | image_url: width: 600 }} 600w
+          "
+          sizes="(max-width: 768px) 50vw, 25vw"
+          alt="{{ product.featured_image.alt | default: product.title | escape }}"
+          width="{{ product.featured_image.width }}"
+          height="{{ product.featured_image.height }}"
+          loading="lazy"
+          class="product-card__image product-card__image--primary"
+        >
+        {%- if product.images.size > 1 -%}
+          <img
+            src="{{ product.images[1] | image_url: width: 600 }}"
+            srcset="
+              {{ product.images[1] | image_url: width: 300 }} 300w,
+              {{ product.images[1] | image_url: width: 450 }} 450w,
+              {{ product.images[1] | image_url: width: 600 }} 600w
+            "
+            sizes="(max-width: 768px) 50vw, 25vw"
+            alt="{{ product.images[1].alt | default: product.title | escape }}"
+            width="{{ product.images[1].width }}"
+            height="{{ product.images[1].height }}"
+            loading="lazy"
+            class="product-card__image product-card__image--secondary"
+          >
+        {%- endif -%}
+      {%- else -%}
+        <div class="product-card__placeholder">
+          <svg viewBox="0 0 300 380" fill="none" stroke="currentColor" stroke-width="1" opacity="0.12" aria-hidden="true">
+            <rect x="90" y="40" width="120" height="220" rx="60"/>
+            <circle cx="150" cy="160" r="35"/>
+          </svg>
+        </div>
+      {%- endif -%}
+
+      {%- if product.available -%}
+        <div class="product-card__quick-add">
+          {%- if product.has_only_default_variant -%}
+            <form action="/cart/add" method="post" class="product-card__add-form">
+              <input type="hidden" name="id" value="{{ product.first_available_variant.id }}">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="btn btn--small product-card__add-btn">Add to Cart</button>
+            </form>
+          {%- else -%}
+            <button class="btn btn--small" type="button" data-quick-view-trigger="{{ product.handle }}">Quick View</button>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if product.compare_at_price > product.price -%}
+        <span class="product-card__badge product-card__badge--sale">SALE</span>
+      {%- elsif product.tags contains 'bestseller' -%}
+        <span class="product-card__badge">BEST SELLER</span>
+      {%- elsif product.tags contains 'new' -%}
+        <span class="product-card__badge product-card__badge--new">NEW</span>
+      {%- endif -%}
+    </div>
+
+    <div class="product-card__info">
+      <h3 class="product-card__title">{{ product.title }}</h3>
+      <div class="product-card__stars" role="img" aria-label="5 out of 5 stars">
+        {%- for i in (1..5) -%}
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="var(--color-primary)" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        {%- endfor -%}
+        <span class="visually-hidden">5/5</span>
+      </div>
+
+      {%- comment -%}
+        Variant swatches — renders every option (Color, Size, etc.).
+        Sold-out swatches get both opacity and a diagonal strikethrough
+        (NOT color-only) and an aria-label announcing availability —
+        required for colorblind users.
+      {%- endcomment -%}
+      {%- if product.options_with_values.size > 0 -%}
+        <div class="swatch-row">
+          {%- for option in product.options_with_values -%}
+            {%- assign option_name_lower = option.name | downcase -%}
+            {%- assign is_color = false -%}
+            {%- if option_name_lower == 'color' or option_name_lower == 'colour' -%}
+              {%- assign is_color = true -%}
+            {%- endif -%}
+            {%- for value in option.values -%}
+              {%- assign value_available = false -%}
+              {%- for variant in product.variants -%}
+                {%- if variant.available -%}
+                  {%- if variant.option1 == value or variant.option2 == value or variant.option3 == value -%}
+                    {%- assign value_available = true -%}
+                  {%- endif -%}
+                {%- endif -%}
+              {%- endfor -%}
+              {%- if value_available -%}
+                {%- assign availability_label = '' -%}
+              {%- else -%}
+                {%- assign availability_label = ' - Sold out' -%}
+              {%- endif -%}
+              {%- if is_color -%}
+                {%- assign swatch_color = value | downcase | replace: ' ', '' -%}
+                <span
+                  class="swatch swatch--color{% unless value_available %} swatch--unavailable{% endunless %}"
+                  style="background-color: {{ swatch_color }};"
+                  title="{{ option.name }}: {{ value }}{{ availability_label }}"
+                  aria-label="{{ option.name }}: {{ value }}{{ availability_label }}"
+                ></span>
+              {%- else -%}
+                <span
+                  class="swatch swatch--text{% unless value_available %} swatch--unavailable{% endunless %}"
+                  title="{{ option.name }}: {{ value }}{{ availability_label }}"
+                  aria-label="{{ option.name }}: {{ value }}{{ availability_label }}"
+                >{{ value }}</span>
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      <div class="product-card__price">
+        {%- if product.compare_at_price > product.price -%}
+          <span class="product-card__price--compare">{{ product.compare_at_price | money }}</span>
+        {%- endif -%}
+        <span class="product-card__price--current">{{ product.price | money }}</span>
+      </div>
+      {% render 'review-stars', product: product %}
+    </div>
+  </a>
+</div>
