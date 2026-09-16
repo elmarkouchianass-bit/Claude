@@ -1,0 +1,99 @@
+{% doc %}
+  @prompt
+    Redesign my existing Horizon Premium Variant Picker into a native luxury fashion variant picker for VORRENI. Do not create a new component; improve the existing one while keeping all Horizon functionality and Shopify variant synchronization.
+    
+    ## Product Media Integration (highest priority)
+    
+    Make the color picker fully dynamic using Shopify product media.
+    
+    * Every color option must represent the real variant color.
+    * When a customer clicks a color circle, immediately switch the main product gallery to that variant's featured media.
+    * Update the active gallery thumbnail automatically.
+    * Keep the gallery swipe functionality on mobile.
+    * If a variant has multiple media items, start at that variant's featured media.
+    * No page refresh.
+    * Keep the URL variant parameter synchronized.
+    
+    ## Color Picker
+    
+    Replace the image swatches with premium color circles.
+    
+    * Use the actual variant color instead of thumbnail images.
+    * Large circular swatches (about 32–36px).
+    * Thin light gray border.
+    * Selected color gets:
+    
+      * black border,
+      * smooth scale animation,
+      * small checkmark,
+      * subtle shadow.
+    * Smooth 200ms transitions.
+    
+    ## Size Picker
+    
+    Keep the premium pill buttons.
+    
+    * Remove the selected size indicator shown above the size section.
+    * Only the pills should indicate the selected size.
+    * Show only available sizes for the selected color.
+    * Unavailable sizes should be disabled, light gray and have a subtle strikethrough.
+    
+    ## Remove Unnecessary Elements
+    
+    Remove completely:
+    
+    * the "Selected" summary section,
+    * the selected preview slider,
+    * the price inside the custom variant picker,
+    * the "In Stock" text.
+    
+    The original Horizon price outside the picker should remain unchanged.
+    
+    ## Layout
+    
+    * More premium spacing.
+    * Keep everything compact.
+    * Rounded corners (16px).
+    * Luxury styling inspired by Represent and Gymshark.
+    * Black (#111111), cream (#F8F6F2), light gray (#E5E5E5), and gold accents (#C8A96A).
+    
+    ## Animations
+    
+    Add subtle premium interactions.
+    
+    * Hover lift.
+    * Scale on selection.
+    * Smooth gallery transition.
+    * Animated border.
+    
+    Duration: 200ms.
+    
+    ## Accessibility
+    
+    Maintain full keyboard navigation, ARIA labels, focus states and screen reader support.
+    
+    ## Important
+    
+    Use only Shopify's dynamic data.
+    
+    * product.variants
+    * product.options_with_values
+    * variant.featured_media
+    * product.media
+    
+    Do not hardcode colors, images or sizes.
+    
+    The final result must feel like a native Horizon component where clicking a blue color circle instantly changes the product gallery to the blue variant, without showing extra selected labels, duplicate size indicators, custom price or stock text.
+    , geef het een bundle mogelijkheid waarin ik de korting kan tonen en aanpassen witte achtergrond
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{% assign color_option = blank %}{% assign color_position = 0 %}
+{% for option in product.options_with_values %}{% assign option_name = option.name | downcase %}{% if option_name contains 'color' or option_name contains 'colour' or option_name contains 'kleur' %}{% assign color_option = option %}{% assign color_position = option.position %}{% break %}{% endif %}{% endfor %}
+{% if color_option == blank and product.options_with_values.size > 0 %}{% assign color_option = product.options_with_values.first %}{% assign color_position = color_option.position %}{% endif %}
+{% style %}.ai-variant-picker-{{ ai_gen_id }}{display:block;width:{{ block.settings.desktop_width_percent }}%;max-width:100%;color:#111;background:#fff;border:1px solid #E5E5E5;border-radius:16px;padding:20px;font-family:{{ settings.type_body_font.family }},sans-serif}.ai-variant-picker-{{ ai_gen_id }}__group{margin:0 0 18px}.ai-variant-picker-{{ ai_gen_id }}__group:last-child{margin-bottom:0}.ai-variant-picker-{{ ai_gen_id }}__label{display:block;margin:0 0 10px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.ai-variant-picker-{{ ai_gen_id }}__swatches,.ai-variant-picker-{{ ai_gen_id }}__sizes,.ai-variant-picker-{{ ai_gen_id }}__bundles{display:flex;flex-wrap:wrap;gap:10px}.ai-variant-picker-{{ ai_gen_id }}__swatch{position:relative;width:36px;height:36px;padding:0;border:1px solid #D2D2D2;border-radius:50%;background:var(--swatch-color);cursor:pointer;transition:transform 200ms ease,border-color 200ms ease,box-shadow 200ms ease}.ai-variant-picker-{{ ai_gen_id }}__swatch:hover{transform:translateY(-2px)}.ai-variant-picker-{{ ai_gen_id }}__swatch[aria-pressed=true]{border:2px solid #111;box-shadow:0 3px 8px rgba(17,17,17,.18);transform:scale(1.08)}.ai-variant-picker-{{ ai_gen_id }}__swatch[aria-pressed=true]::after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:16px;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.55)}.ai-variant-picker-{{ ai_gen_id }}__size,.ai-variant-picker-{{ ai_gen_id }}__bundle{min-width:64px;padding:10px 15px;border:1px solid #111;border-radius:16px;background:#fff;color:#111;cursor:pointer;font:inherit;font-size:13px;transition:transform 200ms ease,background 200ms ease,color 200ms ease}.ai-variant-picker-{{ ai_gen_id }}__size:hover:not(:disabled),.ai-variant-picker-{{ ai_gen_id }}__bundle:hover{transform:translateY(-2px)}.ai-variant-picker-{{ ai_gen_id }}__size[aria-pressed=true],.ai-variant-picker-{{ ai_gen_id }}__bundle[aria-pressed=true]{background:#111;color:#fff;transform:scale(1.03)}.ai-variant-picker-{{ ai_gen_id }}__size:disabled{color:#999;background:#E5E5E5;border-color:#D5D5D5;text-decoration:line-through;cursor:not-allowed}.ai-variant-picker-{{ ai_gen_id }}__discount{display:block;margin-top:9px;color:#7c6334;font-size:12px;font-weight:600}.ai-variant-picker-{{ ai_gen_id }} button:focus-visible{outline:2px solid #C8A96A;outline-offset:3px}@media(max-width:749px){.ai-variant-picker-{{ ai_gen_id }}{width:100%;padding:16px}}{% endstyle %}
+<variant-picker-{{ ai_gen_id }} class="ai-variant-picker-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+{% if color_option != blank %}<div class="ai-variant-picker-{{ ai_gen_id }}__group"><span class="ai-variant-picker-{{ ai_gen_id }}__label" id="ai-color-{{ ai_gen_id }}">{{ color_option.name }}</span><div class="ai-variant-picker-{{ ai_gen_id }}__swatches" role="group" aria-labelledby="ai-color-{{ ai_gen_id }}">{% for value in color_option.values %}<button type="button" class="ai-variant-picker-{{ ai_gen_id }}__swatch" style="--swatch-color:{{ value | escape }}" data-color-value="{{ value | escape }}" aria-label="{{ color_option.name | escape }}: {{ value | escape }}" aria-pressed="false"></button>{% endfor %}</div></div>{% endif %}
+{% for option in product.options_with_values %}{% unless option.position == color_position %}<div class="ai-variant-picker-{{ ai_gen_id }}__group"><span class="ai-variant-picker-{{ ai_gen_id }}__label" id="ai-option-{{ ai_gen_id }}-{{ option.position }}">{{ option.name }}</span><div class="ai-variant-picker-{{ ai_gen_id }}__sizes" role="group" aria-labelledby="ai-option-{{ ai_gen_id }}-{{ option.position }}">{% for value in option.values %}<button type="button" class="ai-variant-picker-{{ ai_gen_id }}__size" data-option-position="{{ option.position }}" data-option-value="{{ value | escape }}" aria-label="{{ option.name | escape }}: {{ value | escape }}" aria-pressed="false">{{ value }}</button>{% endfor %}</div></div>{% endunless %}{% endfor %}
+{% if block.settings.bundle_enabled %}<div class="ai-variant-picker-{{ ai_gen_id }}__group"><span class="ai-variant-picker-{{ ai_gen_id }}__label">{{ block.settings.bundle_heading }}</span><div class="ai-variant-picker-{{ ai_gen_id }}__bundles" role="group" aria-label="{{ block.settings.bundle_heading | escape }}"><button type="button" class="ai-variant-picker-{{ ai_gen_id }}__bundle" data-bundle-quantity="1" data-bundle-discount="0" aria-pressed="true">{{ block.settings.bundle_single_label }}</button><button type="button" class="ai-variant-picker-{{ ai_gen_id }}__bundle" data-bundle-quantity="2" data-bundle-discount="{{ block.settings.bundle_two_discount }}" aria-pressed="false">{{ block.settings.bundle_two_label }}<span class="ai-variant-picker-{{ ai_gen_id }}__discount">-{{ block.settings.bundle_two_discount }}%</span></button><button type="button" class="ai-variant-picker-{{ ai_gen_id }}__bundle" data-bundle-quantity="3" data-bundle-discount="{{ block.settings.bundle_three_discount }}" aria-pressed="false">{{ block.settings.bundle_three_label }}<span class="ai-variant-picker-{{ ai_gen_id }}__discount">-{{ block.settings.bundle_three_discount }}%</span></button></div></div>{% endif %}<script type="application/json" data-variants>{{ product.variants | json }}</script></variant-picker-{{ ai_gen_id }}>
+<script>(function(){class VP{{ ai_gen_id }} extends HTMLElement{connectedCallback(){this.v=JSON.parse(this.querySelector('[data-variants]').textContent);this.s=[...this.querySelectorAll('[data-color-value]')];this.b=[...this.querySelectorAll('[data-option-value]')];this.k=[...this.querySelectorAll('[data-bundle-quantity]')];this.cp={{ color_position | default: 1 }};this.s.forEach(x=>x.onclick=()=>this.pick(this.cp,x.dataset.colorValue));this.b.forEach(x=>x.onclick=()=>{if(!x.disabled)this.pick(+x.dataset.optionPosition,x.dataset.optionValue)});this.k.forEach(x=>x.onclick=()=>this.bundle(x));this.sync()}pick(p,val){let c=this.cur(),o=c.options.slice();o[p-1]=val;let n=this.v.find(x=>x.options.every((z,i)=>z===o[i]));if(n)this.update(n)}cur(){let id=new URLSearchParams(location.search).get('variant');return this.v.find(x=>String(x.id)===id)||this.v.find(x=>x.available)||this.v[0]}update(v){this.s.forEach(x=>x.setAttribute('aria-pressed',x.dataset.colorValue===v.options[this.cp-1]));this.b.forEach(x=>{let p=+x.dataset.optionPosition;x.disabled=!this.v.some(y=>y.available&&y.options[this.cp-1]===v.options[this.cp-1]&&y.options[p-1]===x.dataset.optionValue);x.setAttribute('aria-pressed',x.dataset.optionValue===v.options[p-1])});let u=new URL(location.href);u.searchParams.set('variant',v.id);history.replaceState({},'',u);let i=document.querySelector('form[action*="/cart/add"] [name="id"]');if(i){i.value=v.id;i.dispatchEvent(new Event('change',{bubbles:true}))}if(v.featured_media){let m=document.querySelector('[data-media-id="'+v.featured_media.id+'"],[data-product-media-id="'+v.featured_media.id+'"]');if(m)m.click()}}bundle(x){this.k.forEach(y=>y.setAttribute('aria-pressed',y===x));let q=document.querySelector('form[action*="/cart/add"] [name="quantity"]');if(q){q.value=x.dataset.bundleQuantity;q.dispatchEvent(new Event('change',{bubbles:true}))}}sync(){let v=this.cur();if(v)this.update(v)}}customElements.define('variant-picker-{{ ai_gen_id }}',VP{{ ai_gen_id }})})();</script>
+{% schema %}{"name":"Luxury variant picker","settings":[{"type":"range","id":"desktop_width_percent","label":"Desktop width","min":50,"max":100,"step":5,"unit":"%","default":100},{"type":"checkbox","id":"bundle_enabled","label":"Show bundle offers","default":true},{"type":"text","id":"bundle_heading","label":"Bundle heading","default":"Choose your bundle"},{"type":"text","id":"bundle_single_label","label":"Single label","default":"1 item"},{"type":"text","id":"bundle_two_label","label":"Two item label","default":"2 items"},{"type":"range","id":"bundle_two_discount","label":"Two item discount","min":0,"max":80,"step":5,"unit":"%","default":10},{"type":"text","id":"bundle_three_label","label":"Three item label","default":"3 items"},{"type":"range","id":"bundle_three_discount","label":"Three item discount","min":0,"max":80,"step":5,"unit":"%","default":15}],"presets":[{"name":"Luxury variant picker"}],"tag":null,"class":"luxury-variant-picker"}{% endschema %}

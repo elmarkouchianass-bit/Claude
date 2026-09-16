@@ -1,0 +1,336 @@
+{% doc %}
+  @prompt
+    Als je dit aan Clyro, Cursor, Claude Code of een andere AI Shopify developer wilt geven, gebruik dan deze duidelijke prompt. Hij beschrijft precies hoe de countdown-banner moet worden aangepast zonder de bestaande functionaliteit te breken.
+    
+    # Prompt – Maak de Offer Countdown perfect (Shopify Horizon)
+    
+    Je bent een senior Shopify Liquid developer. Pas alleen de bestaande `Offer countdown` block aan. Breek geen bestaande functionaliteit of schema-instellingen.
+    
+    ## Gewenste wijzigingen
+    
+    ### Layout
+    
+    * Plaats de countdown direct onder de Add to Cart knop.
+    
+    * Maak hem kleiner dan nu.
+    
+    * Padding moet 0px zijn (zo compact mogelijk).
+    
+    * Alles moet horizontaal staan.
+    
+    * Geen tekst of timer onder elkaar.
+    
+    * Verplaats de banner iets omhoog zodat hij dichter tegen de koopknop zit.
+    
+    * Alleen de achtergrond mag iets hoger zijn zodat het comfortabel oogt.
+    
+    ### Design
+    
+    Gebruik exact deze kleuren:
+    
+    * Background: `#FEF2F2`
+    
+    * Border: `#B42318`
+    
+    * Label: `#B42318`
+    
+    * Timer: `#B42318`
+    
+    * Klok-icoon: `#B42318`
+    
+    Maak de border:
+    
+    * afgerond (pill style)
+    
+    * zachter
+    
+    * minder hoekig
+    
+    ### Typografie
+    
+    * Niet bold
+    
+    * Label klein
+    
+    * Timer iets groter maar nog steeds compact
+    
+    * Gebruik tabular numbers zodat de cijfers niet verspringen.
+    
+    ### Icon
+    
+    * Klok links.
+    
+    * Klein (ongeveer 12px).
+    
+    * Zelfde kleur als de timer.
+    
+    ### Timer gedrag (belangrijk)
+    
+    De huidige uren kloppen niet.
+    
+    Maak een countdown die altijd aftelt naar:
+    
+    de eerstvolgende lokale middernacht (00:00) in de gekozen tijdzone.
+    
+    Voorbeeld:
+    
+    * Tijd nu: 19:01:26
+    
+    * Toon:
+    
+    `OFFER ENDS: 04:58:34`
+    
+    Om 00:00:
+    
+    * reset automatisch
+    
+    * telt direct opnieuw af naar de volgende dag.
+    
+    Gebruik de gekozen tijdzone uit de bestaande setting (`Europe/Amsterdam`, `London`, `New York`, enz.).
+    
+    ### Functionaliteit
+    
+    Behoud:
+    
+    * tijdzone selector
+    
+    * live countdown
+    
+    * automatische reset elke dag
+    
+    * Shopify Theme Editor compatibiliteit
+    
+    * bestaande schema instellingen
+    
+    ### CSS eisen
+    
+    * `padding: 0`
+    
+    * `display: flex`
+    
+    * `align-items: center`
+    
+    * `justify-content: center`
+    
+    * `gap: 4px`
+    
+    * `border-radius: 999px`
+    
+    * compacte hoogte
+    
+    * `margin-top` iets negatief zodat hij dichter onder de knop komt
+    
+    ### Eindresultaat
+    
+    Het moet eruitzien als een premium Shopify Horizon component:
+    
+    🕒 OFFER ENDS: 04:58:34
+    
+    * lichtrode achtergrond
+    
+    * rode outline
+    
+    * rode tekst
+    
+    * pill-vorm
+    
+    * strak uitgelijnd
+    
+    * subtiele luxe uitstraling
+    
+    * volledig responsive op mobiel en desktop.
+    
+    ### Oplevering
+    
+    Geef het volledige aangepaste Liquid-bestand terug, inclusief:
+    
+    * HTML
+    
+    * CSS
+    
+    * JavaScript
+    
+    * Schema
+    
+    Zonder placeholders of ingekorte code.
+    
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-offer-countdown-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    margin-top: -6px;
+    padding: 0;
+  }
+
+  .ai-offer-countdown__inner-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    min-height: 24px;
+    padding: 0 9px;
+    background: #FEF2F2;
+    border: 1px solid #B42318;
+    border-radius: 999px;
+    color: #B42318;
+    font-family: {{ block.settings.font.family }}, sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .ai-offer-countdown__icon-{{ ai_gen_id }} {
+    display: inline-flex;
+    flex: 0 0 12px;
+    width: 12px;
+    height: 12px;
+    color: #B42318;
+  }
+
+  .ai-offer-countdown__icon-{{ ai_gen_id }} svg {
+    display: block;
+    width: 12px;
+    height: 12px;
+  }
+
+  .ai-offer-countdown__label-{{ ai_gen_id }} {
+    color: #B42318;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+  }
+
+  .ai-offer-countdown__time-{{ ai_gen_id }} {
+    color: #B42318;
+    font-size: 12px;
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-offer-countdown-{{ ai_gen_id }} {
+      width: 100%;
+    }
+  }
+{% endstyle %}
+
+<offer-countdown-{{ ai_gen_id }}
+  class="ai-offer-countdown-{{ ai_gen_id }}"
+  data-timezone="{{ block.settings.timezone | escape }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-offer-countdown__inner-{{ ai_gen_id }}" role="timer" aria-live="polite" aria-label="{{ block.settings.label | escape }}">
+    <span class="ai-offer-countdown__icon-{{ ai_gen_id }}" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="M12 7v5l3 2"></path>
+      </svg>
+    </span>
+    <span class="ai-offer-countdown__label-{{ ai_gen_id }}">{{ block.settings.label }}</span>
+    <span class="ai-offer-countdown__time-{{ ai_gen_id }}">00:00:00</span>
+  </div>
+</offer-countdown-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class OfferCountdown{{ ai_gen_id }} extends HTMLElement {
+      connectedCallback() {
+        this.timeElement = this.querySelector('.ai-offer-countdown__time-{{ ai_gen_id }}');
+        this.timezone = this.dataset.timezone || 'Europe/Amsterdam';
+        this.update();
+        this.interval = window.setInterval(() => this.update(), 1000);
+      }
+
+      disconnectedCallback() {
+        window.clearInterval(this.interval);
+      }
+
+      update() {
+        const now = new Date();
+        const parts = new Intl.DateTimeFormat('en-CA', {
+          timeZone: this.timezone,
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+        }).formatToParts(now).reduce((values, part) => {
+          values[part.type] = part.value;
+          return values;
+        }, {});
+        const currentSeconds = (Number(parts.hour) * 3600) + (Number(parts.minute) * 60) + Number(parts.second);
+        let remaining = 86400 - currentSeconds;
+        if (remaining <= 0 || remaining > 86400) remaining = 86400;
+        const hours = Math.floor(remaining / 3600);
+        const minutes = Math.floor((remaining % 3600) / 60);
+        const seconds = remaining % 60;
+        this.timeElement.textContent = [hours, minutes, seconds].map((value) => String(value).padStart(2, '0')).join(':');
+      }
+    }
+
+    if (!customElements.get('offer-countdown-{{ ai_gen_id }}')) {
+      customElements.define('offer-countdown-{{ ai_gen_id }}', OfferCountdown{{ ai_gen_id }});
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Offer countdown",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "default": "OFFER ENDS:"
+    },
+    {
+      "type": "select",
+      "id": "timezone",
+      "label": "Time zone",
+      "options": [
+        { "value": "Europe/Amsterdam", "label": "Amsterdam" },
+        { "value": "Europe/London", "label": "London" },
+        { "value": "America/New_York", "label": "New York" },
+        { "value": "America/Los_Angeles", "label": "Los Angeles" },
+        { "value": "Asia/Dubai", "label": "Dubai" },
+        { "value": "Asia/Tokyo", "label": "Tokyo" },
+        { "value": "Australia/Sydney", "label": "Sydney" }
+      ],
+      "default": "Europe/Amsterdam"
+    },
+    {
+      "type": "font_picker",
+      "id": "font",
+      "label": "Font",
+      "default": "sans-serif"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "Offer countdown"
+    }
+  ],
+  "tag": null,
+  "class": "offer-countdown-block"
+}
+{% endschema %}

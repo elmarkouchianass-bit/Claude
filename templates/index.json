@@ -1,197 +1,285 @@
-{
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */{
   "sections": {
-    "hero": {
+    "hero_jVaWmY": {
       "type": "hero",
+      "blocks": {
+        "text_YLPk4p": {
+          "type": "text",
+          "name": "t:names.heading",
+          "settings": {
+            "text": "<p>Browse our latest products</p>",
+            "text_color": "{{ settings.color_palette.background }}",
+            "width": "fit-content",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h2",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "button_H9gpTf": {
+          "type": "button",
+          "name": "t:names.button",
+          "settings": {
+            "label": "Shop all",
+            "link": "shopify://collections/all",
+            "open_in_new_tab": false,
+            "style_class": "button-custom",
+            "custom_button_background": "rgba(0,0,0,0)",
+            "custom_button_text": "{{ settings.color_palette.background }}",
+            "custom_button_border": "{{ settings.color_palette.background }}",
+            "width": "fit-content",
+            "custom_width": 100,
+            "width_mobile": "fit-content",
+            "custom_width_mobile": 100
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "text_YLPk4p",
+        "button_H9gpTf"
+      ],
+      "name": "t:names.hero",
       "settings": {
-        "height": "92vh",
-        "text_position": "center",
-        "overlay_opacity": 30,
-        "eyebrow": "Fall 2026",
-        "heading": "Essentials, made to last",
-        "subheading": "Heavyweight cottons, considered fits, and a range small enough that we get every piece right.",
-        "cta_text": "Shop new arrivals",
-        "cta_url": "shopify://collections/new-arrivals",
-        "cta2_text": "Shop all",
-        "cta2_url": "shopify://collections/all"
+        "media_type_1": "image",
+        "media_type_2": "image",
+        "stack_media_on_mobile": false,
+        "custom_mobile_media": false,
+        "media_type_1_mobile": "image",
+        "media_type_2_mobile": "image",
+        "open_in_new_tab": false,
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "space-between",
+        "vertical_alignment": "flex-end",
+        "align_baseline": true,
+        "horizontal_alignment_flex_direction_column": "center",
+        "vertical_alignment_flex_direction_column": "flex-end",
+        "gap": 24,
+        "section_width": "page-width",
+        "section_height": "medium",
+        "section_height_custom": 50,
+        "background_color": "rgba(0,0,0,0)",
+        "toggle_overlay": true,
+        "overlay_color": "#12121266",
+        "overlay_style": "solid",
+        "gradient_direction": "to bottom",
+        "blurred_reflection": false,
+        "reflection_opacity": 75,
+        "padding-block-start": 100,
+        "padding-block-end": 72
       }
     },
-    "usp": {
-      "type": "usp-bar",
-      "settings": {},
+    "product_list_fa6P9H": {
+      "type": "product-list",
       "blocks": {
-        "u1": {
-          "type": "item",
+        "static-header": {
+          "type": "_product-list-content",
+          "name": "t:names.header",
+          "static": true,
           "settings": {
-            "title": "Free shipping",
-            "text": "On U.S. orders over $75"
-          }
+            "content_direction": "row",
+            "vertical_on_mobile": false,
+            "horizontal_alignment": "space-between",
+            "vertical_alignment": "flex-end",
+            "align_baseline": true,
+            "horizontal_alignment_flex_direction_column": "flex-start",
+            "vertical_alignment_flex_direction_column": "center",
+            "gap": 12,
+            "width": "fill",
+            "custom_width": 100,
+            "width_mobile": "fill",
+            "custom_width_mobile": 100,
+            "height": "fit",
+            "custom_height": 100,
+            "background_media": "none",
+            "video_position": "cover",
+            "background_image_position": "cover",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "product_list_text_YFtzcL": {
+              "type": "_product-list-text",
+              "name": "t:names.collection_title",
+              "settings": {
+                "text": "<h3>{{ closest.collection.title }}</h3>",
+                "width": "fit-content",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "h4",
+                "font": "var(--font-body--family)",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "product_list_button_MWeP9V": {
+              "type": "_product-list-button",
+              "name": "t:names.product_list_button",
+              "settings": {
+                "label": "View all",
+                "open_in_new_tab": false,
+                "style_class": "link",
+                "width": "fit-content",
+                "custom_width": 100,
+                "width_mobile": "fit-content",
+                "custom_width_mobile": 100
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "product_list_text_YFtzcL",
+            "product_list_button_MWeP9V"
+          ]
         },
-        "u2": {
-          "type": "item",
+        "static-product-card": {
+          "type": "_product-card",
+          "name": "t:names.product_card",
+          "static": true,
           "settings": {
-            "title": "30-day returns",
-            "text": "Wear it, wash it, decide"
-          }
-        },
-        "u3": {
-          "type": "item",
-          "settings": {
-            "title": "Made to last",
-            "text": "200 GSM and up, never sheer"
-          }
-        },
-        "u4": {
-          "type": "item",
-          "settings": {
-            "title": "Fair pricing",
-            "text": "Sold direct, no middleman"
-          }
+            "product_card_gap": 4,
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "product_card_gallery_677WP3": {
+              "type": "_product-card-gallery",
+              "name": "t:names.product_card_media",
+              "settings": {
+                "image_ratio": "adapt",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "product_title_YXxMTj": {
+              "type": "product-title",
+              "name": "t:names.product_title",
+              "settings": {
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "rte",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 4,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "price_JQzVV4": {
+              "type": "price",
+              "name": "t:names.product_price",
+              "settings": {
+                "show_sale_price_first": true,
+                "show_installments": false,
+                "show_tax_info": false,
+                "type_preset": "h6",
+                "width": "100%",
+                "alignment": "left",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "product_card_gallery_677WP3",
+            "product_title_YXxMTj",
+            "price_JQzVV4"
+          ]
         }
       },
-      "block_order": ["u1", "u2", "u3", "u4"]
-    },
-    "new_arrivals": {
-      "type": "featured-collection",
+      "name": "t:names.product_list",
       "settings": {
-        "collection": "new-arrivals",
-        "eyebrow": "Just landed",
-        "heading": "New arrivals",
-        "products_to_show": 4,
-        "columns": "4",
-        "show_view_all": true,
-        "view_all_text": "View all"
-      }
-    },
-    "categories": {
-      "type": "category-tiles",
-      "settings": {
-        "eyebrow": "The range",
-        "heading": "Shop by category"
-      },
-      "blocks": {
-        "c1": {
-          "type": "tile",
-          "settings": {
-            "collection": "t-shirts",
-            "label": "T-Shirts"
-          }
-        },
-        "c2": {
-          "type": "tile",
-          "settings": {
-            "collection": "pants",
-            "label": "Pants"
-          }
-        },
-        "c3": {
-          "type": "tile",
-          "settings": {
-            "collection": "outerwear",
-            "label": "Outerwear"
-          }
-        }
-      },
-      "block_order": ["c1", "c2", "c3"]
-    },
-    "story": {
-      "type": "brand-story",
-      "settings": {
-        "media_position": "left",
-        "eyebrow": "Our approach",
-        "heading": "Fewer things, made properly",
-        "text": "<p>We build a short range and keep it. Every piece is cut from fabric chosen for how it wears after fifty washes — not how it photographs on day one.</p><p>No seasonal churn, no logos across the chest. Just the pieces you reach for first, restocked in the same fit and the same weight, year after year.</p>",
-        "cta_text": "Read our story",
-        "cta_url": "/pages/about-us"
-      },
-      "blocks": {
-        "p1": {
-          "type": "point",
-          "settings": {
-            "title": "Heavier fabrics",
-            "text": "200 GSM and up, so nothing goes sheer after a summer."
-          }
-        },
-        "p2": {
-          "type": "point",
-          "settings": {
-            "title": "Consistent fits",
-            "text": "One block, carried across the range. Your size stays your size."
-          }
-        },
-        "p3": {
-          "type": "point",
-          "settings": {
-            "title": "Honest pricing",
-            "text": "Sold direct from our own warehouse, priced without the markup."
-          }
-        }
-      },
-      "block_order": ["p1", "p2", "p3"]
-    },
-    "best_sellers": {
-      "type": "featured-collection",
-      "settings": {
-        "collection": "best-sellers",
-        "eyebrow": "The ones that keep selling",
-        "heading": "Best sellers",
-        "products_to_show": 4,
-        "columns": "4",
-        "show_view_all": true,
-        "view_all_text": "View all"
-      }
-    },
-    "quotes": {
-      "type": "testimonials",
-      "settings": {
-        "eyebrow": "Verified buyers",
-        "heading": "What holds up"
-      },
-      "blocks": {
-        "q1": {
-          "type": "quote",
-          "settings": {
-            "quote": "Third order this year. The weight of these tees is what sold me — they hold shape through the dryer, which nothing else in my closet does.",
-            "by": "Marcus T. — Austin, TX"
-          }
-        },
-        "q2": {
-          "type": "quote",
-          "settings": {
-            "quote": "Sizing is honest and it's the same across everything I've ordered. I stopped guessing, which is more than I can say for most brands.",
-            "by": "Devin R. — Chicago, IL"
-          }
-        },
-        "q3": {
-          "type": "quote",
-          "settings": {
-            "quote": "No logo, no fuss. Ordered Thursday, wore it Monday. It has quietly become the only thing I pack.",
-            "by": "Andre W. — Portland, OR"
-          }
-        }
-      },
-      "block_order": ["q1", "q2", "q3"]
-    },
-    "newsletter": {
-      "type": "newsletter",
-      "settings": {
-        "invert": true,
-        "eyebrow": "Stay in the loop",
-        "heading": "First to know",
-        "text": "Restocks, new colorways, and the occasional note on how things are made. No noise.",
-        "placeholder": "Email address",
-        "button_text": "Sign up",
-        "footnote": "Unsubscribe any time."
+        "collection": "all",
+        "layout_type": "grid",
+        "carousel_on_mobile": false,
+        "max_products": 8,
+        "columns": 4,
+        "mobile_columns": "2",
+        "mobile_card_size": "60cqw",
+        "columns_gap": 8,
+        "rows_gap": 24,
+        "icons_style": "arrow",
+        "icons_shape": "none",
+        "section_width": "page-width",
+        "horizontal_alignment": "flex-start",
+        "gap": 28,
+        "background_color": "{{ settings.color_palette.background }}",
+        "padding-block-start": 48,
+        "padding-block-end": 48
       }
     }
   },
   "order": [
-    "hero",
-    "usp",
-    "new_arrivals",
-    "categories",
-    "story",
-    "best_sellers",
-    "quotes",
-    "newsletter"
+    "hero_jVaWmY",
+    "product_list_fa6P9H"
   ]
 }

@@ -1,0 +1,188 @@
+{% doc %}
+  @prompt
+    Maak een dynamische variantkiezer ronde kleuren en en size maak het lekker strak en branded en als het kan een bundle tot 4 stuks
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-variant-bundle-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    color: {{ block.settings.text_color }};
+    font-family: {{ block.settings.body_font.family }};
+  }
+
+  .ai-variant-bundle-{{ ai_gen_id }}__inner {
+    padding: {{ block.settings.padding }}px;
+    background: {{ block.settings.background_color }};
+    border: 1px solid {{ block.settings.border_color }};
+    border-radius: {{ block.settings.border_radius }}px;
+  }
+
+  .ai-variant-bundle-{{ ai_gen_id }}__heading {
+    margin: 0 0 6px;
+    font-family: {{ block.settings.heading_font.family }};
+    font-size: {{ block.settings.heading_size }}px;
+    line-height: 1.1;
+    letter-spacing: .02em;
+  }
+
+  .ai-variant-bundle-{{ ai_gen_id }}__subheading {
+    margin: 0 0 22px;
+    color: {{ block.settings.muted_text_color }};
+    font-size: 14px;
+  }
+
+  .ai-variant-bundle-{{ ai_gen_id }}__option + .ai-variant-bundle-{{ ai_gen_id }}__option { margin-top: 20px; }
+  .ai-variant-bundle-{{ ai_gen_id }}__label {
+    display: block;
+    margin-bottom: 9px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .ai-variant-bundle-{{ ai_gen_id }}__values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+  }
+
+  .ai-variant-bundle-{{ ai_gen_id }}__value {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 54px;
+    min-height: 42px;
+    padding: 8px 14px;
+    border: 1px solid {{ block.settings.border_color }};
+    border-radius: {{ block.settings.button_radius }}px;
+    background: {{ block.settings.option_background }};
+    color: {{ block.settings.text_color }};
+    cursor: pointer;
+    font: inherit;
+    font-size: 13px;
+    transition: border-color .15s ease, background-color .15s ease, color .15s ease;
+  }
+
+  .ai-variant-bundle-{{ ai_gen_id }}__value--color {
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+    padding: 0;
+    border-radius: 50%;
+    border-color: {{ block.settings.border_color }};
+  }
+
+  .ai-variant-bundle-{{ ai_gen_id }}__value.is-selected {
+    background: {{ block.settings.selected_background }};
+    color: {{ block.settings.selected_text }};
+    border-color: {{ block.settings.selected_border }};
+    box-shadow: 0 0 0 2px {{ block.settings.background_color }}, 0 0 0 4px {{ block.settings.selected_border }};
+  }
+
+  .ai-variant-bundle-{{ ai_gen_id }}__value:focus-visible,
+  .ai-variant-bundle-{{ ai_gen_id }}__quantity:focus-visible,
+  .ai-variant-bundle-{{ ai_gen_id }}__submit:focus-visible { outline: 3px solid {{ block.settings.focus_color }}; outline-offset: 3px; }
+
+  .ai-variant-bundle-{{ ai_gen_id }}__footer { display: flex; align-items: end; gap: 12px; margin-top: 24px; }
+  .ai-variant-bundle-{{ ai_gen_id }}__quantity-wrap { flex: 0 0 92px; }
+  .ai-variant-bundle-{{ ai_gen_id }}__quantity { width: 100%; box-sizing: border-box; padding: 12px 10px; border: 1px solid {{ block.settings.border_color }}; border-radius: {{ block.settings.button_radius }}px; background: {{ block.settings.option_background }}; color: {{ block.settings.text_color }}; font: inherit; }
+  .ai-variant-bundle-{{ ai_gen_id }}__submit { flex: 1; min-height: 46px; padding: 12px 18px; border: 0; border-radius: {{ block.settings.button_radius }}px; background: {{ block.settings.button_background }}; color: {{ block.settings.button_text }}; cursor: pointer; font: inherit; font-weight: 700; }
+  .ai-variant-bundle-{{ ai_gen_id }}__message { margin-top: 12px; color: {{ block.settings.muted_text_color }}; font-size: 13px; }
+  @media screen and (max-width: 749px) { .ai-variant-bundle-{{ ai_gen_id }} { width: 100%; } .ai-variant-bundle-{{ ai_gen_id }}__inner { padding: 20px; } .ai-variant-bundle-{{ ai_gen_id }}__footer { align-items: stretch; } }
+{% endstyle %}
+
+<variant-bundle-{{ ai_gen_id }} class="ai-variant-bundle-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-variant-bundle-{{ ai_gen_id }}__inner">
+    <h2 class="ai-variant-bundle-{{ ai_gen_id }}__heading">{{ block.settings.heading }}</h2>
+    <p class="ai-variant-bundle-{{ ai_gen_id }}__subheading">{{ block.settings.subheading }}</p>
+    <form action="{{ routes.cart_add_url }}" method="post" data-variant-form>
+      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" data-variant-id>
+      {% for option in product.options_with_values %}
+        <fieldset class="ai-variant-bundle-{{ ai_gen_id }}__option">
+          <legend class="ai-variant-bundle-{{ ai_gen_id }}__label">{{ option.name }}</legend>
+          <div class="ai-variant-bundle-{{ ai_gen_id }}__values">
+            {% for value in option.values %}
+              {% assign color_value = value | downcase | remove: ' ' %}
+              <button type="button" class="ai-variant-bundle-{{ ai_gen_id }}__value{% if option.name == 'Color' or option.name == 'Colour' or option.name == 'Kleur' %} ai-variant-bundle-{{ ai_gen_id }}__value--color{% endif %}{% if option.selected_value == value %} is-selected{% endif %}" data-option-index="{{ option.position | minus: 1 }}" data-option-value="{{ value | escape }}" aria-pressed="{% if option.selected_value == value %}true{% else %}false{% endif %}" {% if option.name == 'Color' or option.name == 'Colour' or option.name == 'Kleur' %}style="background-color: {{ color_value }};" aria-label="{{ value | escape }}"{% endif %}>{% unless option.name == 'Color' or option.name == 'Colour' or option.name == 'Kleur' %}{{ value }}{% endunless %}</button>
+            {% endfor %}
+          </div>
+        </fieldset>
+      {% endfor %}
+      <div class="ai-variant-bundle-{{ ai_gen_id }}__footer">
+        <label class="ai-variant-bundle-{{ ai_gen_id }}__quantity-wrap"><span class="ai-variant-bundle-{{ ai_gen_id }}__label">{{ block.settings.quantity_label }}</span><input class="ai-variant-bundle-{{ ai_gen_id }}__quantity" type="number" name="quantity" value="1" min="1" max="4" inputmode="numeric" aria-label="{{ block.settings.quantity_label }}"></label>
+        <button class="ai-variant-bundle-{{ ai_gen_id }}__submit" type="submit">{{ block.settings.button_label }}</button>
+      </div>
+      <p class="ai-variant-bundle-{{ ai_gen_id }}__message" data-message role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</variant-bundle-{{ ai_gen_id }}>
+
+<script>
+(function() {
+  class VariantBundle{{ ai_gen_id }} extends HTMLElement {
+    connectedCallback() {
+      this.form = this.querySelector('[data-variant-form]');
+      this.variantInput = this.querySelector('[data-variant-id]');
+      this.message = this.querySelector('[data-message]');
+      this.variants = {{ product.variants | json }};
+      this.values = {};
+      this.querySelectorAll('[data-option-value]').forEach((button) => {
+        const index = button.dataset.optionIndex;
+        if (button.getAttribute('aria-pressed') === 'true') this.values[index] = button.dataset.optionValue;
+        button.addEventListener('click', () => {
+          this.values[index] = button.dataset.optionValue;
+          this.querySelectorAll('[data-option-index="' + index + '"]').forEach((item) => { item.classList.remove('is-selected'); item.setAttribute('aria-pressed', 'false'); });
+          button.classList.add('is-selected');
+          button.setAttribute('aria-pressed', 'true');
+          const variant = this.variants.find((item) => item.options.every((value, optionIndex) => this.values[optionIndex] === value));
+          if (variant) { this.variantInput.value = variant.id; this.message.textContent = variant.available ? '' : 'Deze variant is momenteel niet beschikbaar.'; } else { this.message.textContent = 'Deze combinatie is niet beschikbaar.'; }
+        });
+      });
+      this.form.addEventListener('submit', (event) => { if (!this.variantInput.value) event.preventDefault(); });
+    }
+  }
+  customElements.define('variant-bundle-{{ ai_gen_id }}', VariantBundle{{ ai_gen_id }});
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Variant bundle picker",
+  "settings": [
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Kies jouw stijl" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Selecteer kleur en maat. Bestel tot 4 stuks." },
+    { "type": "text", "id": "quantity_label", "label": "Quantity label", "default": "Aantal" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Toevoegen aan winkelwagen" },
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "desktop_width_percent", "label": "Desktop width", "min": 50, "max": 100, "step": 5, "unit": "%", "default": 100 },
+    { "type": "range", "id": "padding", "label": "Padding", "min": 12, "max": 48, "step": 4, "unit": "px", "default": 24 },
+    { "type": "range", "id": "border_radius", "label": "Container radius", "min": 0, "max": 32, "step": 2, "unit": "px", "default": 14 },
+    { "type": "range", "id": "button_radius", "label": "Button radius", "min": 0, "max": 32, "step": 2, "unit": "px", "default": 14 },
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "background_color", "label": "Background", "default": "#ffffff" },
+    { "type": "color", "id": "option_background", "label": "Option background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#000000" },
+    { "type": "color", "id": "muted_text_color", "label": "Muted text", "default": "#333333" },
+    { "type": "color", "id": "border_color", "label": "Border", "default": "#dfdfdf" },
+    { "type": "color", "id": "selected_background", "label": "Selected background", "default": "#000000" },
+    { "type": "color", "id": "selected_text", "label": "Selected text", "default": "#ffffff" },
+    { "type": "color", "id": "selected_border", "label": "Selected border", "default": "#000000" },
+    { "type": "color", "id": "button_background", "label": "Button background", "default": "#000000" },
+    { "type": "color", "id": "button_text", "label": "Button text", "default": "#ffffff" },
+    { "type": "color", "id": "focus_color", "label": "Focus color", "default": "#005fcc" },
+    { "type": "header", "content": "Typography" },
+    { "type": "font_picker", "id": "heading_font", "label": "Heading font", "default": "inter_n7" },
+    { "type": "font_picker", "id": "body_font", "label": "Body font", "default": "montserrat_n7" },
+    { "type": "range", "id": "heading_size", "label": "Heading size", "min": 16, "max": 40, "step": 2, "unit": "px", "default": 24 }
+  ],
+  "presets": [{ "name": "Variant bundle picker" }],
+  "tag": null,
+  "class": "variant-bundle-picker"
+}
+{% endschema %}
