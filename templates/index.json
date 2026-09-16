@@ -1,212 +1,197 @@
 {
   "sections": {
-    "lp_hero": {
-      "type": "lp-hero",
+    "hero": {
+      "type": "hero",
       "settings": {
-        "hero_layout": "centered",
-        "eyebrow": "Vorreni",
-        "heading": "havasta meerijdplankje",
-        "lede": "de havasta vasta qasta\nskfmkdm\nsfmkfm\nsjfmdskfmkmfkdfmskfmckdsvmkdsmcsdmcs,dlc,sdkvmksvmsdlvmskvvkmsv;s\nfskvmsk;lv,slv,s;lmvksd",
-        "price": "$29.99",
-        "compare_at": "$37",
-        "rating": "1,800+ reviews",
-        "cta_text": "Add to cart — $29.99",
-        "tag_title": "Why it works",
-        "tag_body": "havasta meerijdplankje is built from materials we can stand behind — chosen, not assembled",
-        "image_url": "https://pub-c78ad4b949584201a03628fda5a22167.r2.dev/users/07dc54bd-25c6-48e4-bdb5-4cfc2faff515/product/1789139867573-c61f0befd35f2176d653ce76.png"
-      },
-      "blocks": {
-        "chip_1": {
-          "type": "chip",
-          "settings": {
-            "label": "Ethically made"
-          }
-        },
-        "chip_2": {
-          "type": "chip",
-          "settings": {
-            "label": "Premium fabric"
-          }
-        },
-        "chip_3": {
-          "type": "chip",
-          "settings": {
-            "label": "True to size"
-          }
-        },
-        "chip_4": {
-          "type": "chip",
-          "settings": {
-            "label": "Free exchanges"
-          }
-        }
-      },
-      "block_order": [
-        "chip_1",
-        "chip_2",
-        "chip_3",
-        "chip_4"
-      ]
+        "height": "92vh",
+        "text_position": "center",
+        "overlay_opacity": 30,
+        "eyebrow": "Fall 2026",
+        "heading": "Essentials, made to last",
+        "subheading": "Heavyweight cottons, considered fits, and a range small enough that we get every piece right.",
+        "cta_text": "Shop new arrivals",
+        "cta_url": "shopify://collections/new-arrivals",
+        "cta2_text": "Shop all",
+        "cta2_url": "shopify://collections/all"
+      }
     },
-    "lp_strip": {
-      "type": "lp-strip",
+    "usp": {
+      "type": "usp-bar",
       "settings": {},
       "blocks": {
-        "item_1": {
+        "u1": {
           "type": "item",
           "settings": {
-            "label": "Loved by thousands"
+            "title": "Free shipping",
+            "text": "On U.S. orders over $75"
           }
         },
-        "item_2": {
+        "u2": {
           "type": "item",
           "settings": {
-            "label": "Free shipping over $45"
+            "title": "30-day returns",
+            "text": "Wear it, wash it, decide"
           }
         },
-        "item_3": {
+        "u3": {
           "type": "item",
-          "settings": {
-            "label": "Made with care"
-          }
-        },
-        "item_4": {
-          "type": "item",
-          "settings": {
-            "label": "Free 30-day returns"
-          }
-        }
-      },
-      "block_order": [
-        "item_1",
-        "item_2",
-        "item_3",
-        "item_4"
-      ]
-    },
-    "lp_benefits": {
-      "type": "lp-benefits",
-      "settings": {
-        "eyebrow": "What it does",
-        "heading": "Everything havasta meerijdplankje is for — nothing it isn’t."
-      },
-      "blocks": {
-        "point_1": {
-          "type": "point",
           "settings": {
             "title": "Made to last",
-            "desc": "havasta meerijdplankje is built from materials we can stand behind — chosen, not assembled."
+            "text": "200 GSM and up, never sheer"
           }
         },
-        "point_2": {
-          "type": "point",
+        "u4": {
+          "type": "item",
           "settings": {
-            "title": "Considered, not cluttered",
-            "desc": "One product, done properly. No filler, no upsell maze — just the thing you came for."
-          }
-        },
-        "point_3": {
-          "type": "point",
-          "settings": {
-            "title": "Backed by a promise",
-            "desc": "If it isn’t right, we make it right. Simple returns, real support."
+            "title": "Fair pricing",
+            "text": "Sold direct, no middleman"
           }
         }
       },
-      "block_order": [
-        "point_1",
-        "point_2",
-        "point_3"
-      ]
+      "block_order": ["u1", "u2", "u3", "u4"]
     },
-    "lp_steps": {
-      "type": "lp-steps",
+    "new_arrivals": {
+      "type": "featured-collection",
       "settings": {
-        "eyebrow": "How to use",
-        "heading": "Simple to use. Easy to love.",
-        "tone": "light"
+        "collection": "new-arrivals",
+        "eyebrow": "Just landed",
+        "heading": "New arrivals",
+        "products_to_show": 4,
+        "columns": "4",
+        "show_view_all": true,
+        "view_all_text": "View all"
+      }
+    },
+    "categories": {
+      "type": "category-tiles",
+      "settings": {
+        "eyebrow": "The range",
+        "heading": "Shop by category"
       },
       "blocks": {
-        "step_1": {
-          "type": "step",
+        "c1": {
+          "type": "tile",
           "settings": {
-            "title": "Find your size",
-            "desc": "True-to-size fit. Between sizes? We recommend sizing up for a relaxed cut."
+            "collection": "t-shirts",
+            "label": "T-Shirts"
           }
         },
-        "step_2": {
-          "type": "step",
+        "c2": {
+          "type": "tile",
           "settings": {
-            "title": "Wear it in",
-            "desc": "havasta meerijdplankje is made to settle into your life — better with every wear."
+            "collection": "pants",
+            "label": "Pants"
           }
         },
-        "step_3": {
-          "type": "step",
+        "c3": {
+          "type": "tile",
           "settings": {
-            "title": "Care simply",
-            "desc": "Cold wash, hang dry. Built to hold its shape for years, not seasons."
+            "collection": "outerwear",
+            "label": "Outerwear"
           }
         }
       },
-      "block_order": [
-        "step_1",
-        "step_2",
-        "step_3"
-      ]
+      "block_order": ["c1", "c2", "c3"]
     },
-    "lp_reviews": {
-      "type": "lp-reviews",
+    "story": {
+      "type": "brand-story",
       "settings": {
-        "eyebrow": "★★★★★ 4.9 average",
-        "heading": "The one people keep coming back for."
+        "media_position": "left",
+        "eyebrow": "Our approach",
+        "heading": "Fewer things, made properly",
+        "text": "<p>We build a short range and keep it. Every piece is cut from fabric chosen for how it wears after fifty washes — not how it photographs on day one.</p><p>No seasonal churn, no logos across the chest. Just the pieces you reach for first, restocked in the same fit and the same weight, year after year.</p>",
+        "cta_text": "Read our story",
+        "cta_url": "/pages/about-us"
       },
       "blocks": {
-        "review_1": {
-          "type": "review",
+        "p1": {
+          "type": "point",
           "settings": {
-            "quote": "Exactly what I hoped havasta meerijdplankje would be. The quality is obvious the moment it arrives.",
-            "by": "Maya R. · verified buyer"
+            "title": "Heavier fabrics",
+            "text": "200 GSM and up, so nothing goes sheer after a summer."
           }
         },
-        "review_2": {
-          "type": "review",
+        "p2": {
+          "type": "point",
           "settings": {
-            "quote": "First one I’ve found that actually does what it says. I cancelled the two others I was using.",
-            "by": "Devon L. · repeat customer"
+            "title": "Consistent fits",
+            "text": "One block, carried across the range. Your size stays your size."
           }
         },
-        "review_3": {
-          "type": "review",
+        "p3": {
+          "type": "point",
           "settings": {
-            "quote": "Simple, well-made, and it just works. The only one in my rotation now.",
-            "by": "Priya N. · verified buyer"
+            "title": "Honest pricing",
+            "text": "Sold direct from our own warehouse, priced without the markup."
           }
         }
       },
-      "block_order": [
-        "review_1",
-        "review_2",
-        "review_3"
-      ]
+      "block_order": ["p1", "p2", "p3"]
     },
-    "lp_final": {
-      "type": "lp-final",
+    "best_sellers": {
+      "type": "featured-collection",
       "settings": {
-        "eyebrow": "Ready when you are",
-        "heading": "Try havasta meerijdplankje today.",
-        "body": "$29.99 with free shipping over $45 — and a 30-day money-back guarantee if it isn’t for you.",
-        "cta_text": "Add to cart — $29.99",
-        "guarantee": "30-day money-back guarantee · free U.S. shipping over $45"
+        "collection": "best-sellers",
+        "eyebrow": "The ones that keep selling",
+        "heading": "Best sellers",
+        "products_to_show": 4,
+        "columns": "4",
+        "show_view_all": true,
+        "view_all_text": "View all"
+      }
+    },
+    "quotes": {
+      "type": "testimonials",
+      "settings": {
+        "eyebrow": "Verified buyers",
+        "heading": "What holds up"
+      },
+      "blocks": {
+        "q1": {
+          "type": "quote",
+          "settings": {
+            "quote": "Third order this year. The weight of these tees is what sold me — they hold shape through the dryer, which nothing else in my closet does.",
+            "by": "Marcus T. — Austin, TX"
+          }
+        },
+        "q2": {
+          "type": "quote",
+          "settings": {
+            "quote": "Sizing is honest and it's the same across everything I've ordered. I stopped guessing, which is more than I can say for most brands.",
+            "by": "Devin R. — Chicago, IL"
+          }
+        },
+        "q3": {
+          "type": "quote",
+          "settings": {
+            "quote": "No logo, no fuss. Ordered Thursday, wore it Monday. It has quietly become the only thing I pack.",
+            "by": "Andre W. — Portland, OR"
+          }
+        }
+      },
+      "block_order": ["q1", "q2", "q3"]
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "invert": true,
+        "eyebrow": "Stay in the loop",
+        "heading": "First to know",
+        "text": "Restocks, new colorways, and the occasional note on how things are made. No noise.",
+        "placeholder": "Email address",
+        "button_text": "Sign up",
+        "footnote": "Unsubscribe any time."
       }
     }
   },
   "order": [
-    "lp_hero",
-    "lp_strip",
-    "lp_benefits",
-    "lp_steps",
-    "lp_reviews",
-    "lp_final"
+    "hero",
+    "usp",
+    "new_arrivals",
+    "categories",
+    "story",
+    "best_sellers",
+    "quotes",
+    "newsletter"
   ]
 }

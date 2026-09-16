@@ -1,0 +1,895 @@
+/* ══════════════════════════════════════════════════════════════
+   ENDU-STYLE RESTYLE
+   Loaded after theme.css, so equal-specificity rules win here and
+   !important stays out of it.
+
+   The direction, in one line: monochrome, square, quiet. The page is
+   carried by product photography and uppercase grotesque type — no
+   accent colour, no rounded corners, no drop shadows, no lift-on-hover.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── TYPE ──────────────────────────────────────────────────── */
+
+body {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  letter-spacing: 0.005em;
+}
+
+/* theme.css sets -0.025em on headings, which suits a display serif but
+   makes uppercase grotesque headings collide. Positive tracking instead. */
+h1, h2, h3, h4 {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+
+/* ── SHARED SECTION FURNITURE ──────────────────────────────── */
+
+.container {
+  max-width: var(--page-max, 1440px);
+  padding-inline: var(--gutter, 1.5rem);
+}
+
+.section-feat-col,
+.section-cat-tiles,
+.section-quotes,
+.section-newsletter,
+.section-story {
+  display: block;
+  padding-block: var(--section-gap, 5rem);
+}
+
+/* Consecutive full-bleed bands shouldn't double their padding. */
+.section-story + .section-newsletter,
+.section-newsletter + .section-story {
+  padding-top: 0;
+}
+
+.sec-head {
+  margin-bottom: clamp(1.75rem, 4vw, 3rem);
+}
+
+.sec-head--row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.sec-head--center {
+  text-align: center;
+}
+
+.sec-head__eyebrow {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 0.9rem;
+}
+
+.sec-head__title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.35rem, 2.6vw, 2rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.sec-head__link,
+.link-underline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--color-text);
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.sec-head__link:hover,
+.link-underline:hover {
+  opacity: 0.55;
+}
+
+/* The theme's stock eyebrow tints toward --color-primary; flatten it. */
+.section-eyebrow {
+  color: var(--color-text-muted);
+  letter-spacing: 0.28em;
+  font-size: 0.625rem;
+}
+
+/* ── BUTTONS ───────────────────────────────────────────────── */
+
+.btn {
+  padding: 1rem 2.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  border-radius: 0;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.btn--primary {
+  background: var(--color-primary);
+  color: var(--color-background);
+  border: 1px solid var(--color-primary);
+}
+
+/* No translate-on-hover: the stock lift reads soft against a squared-off
+   palette. Invert instead. */
+.btn--primary:hover {
+  background: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  transform: none;
+}
+
+.btn--primary:active {
+  transform: none;
+}
+
+.btn--outline {
+  border: 1px solid var(--color-text);
+  border-radius: 0;
+}
+
+.btn--outline:hover {
+  background: var(--color-text);
+  color: var(--color-background);
+  border-color: var(--color-text);
+}
+
+.btn--small {
+  padding: 0.7rem 1.4rem;
+  font-size: 0.625rem;
+}
+
+.btn--pill {
+  border-radius: 0;
+}
+
+.skip-link {
+  border-radius: 0;
+  background: var(--color-text);
+}
+
+/* ── HERO ──────────────────────────────────────────────────── */
+
+.hero--endu .hero__slide-content {
+  width: 100%;
+  padding-bottom: clamp(3rem, 8vh, 6rem);
+  padding-top: 8rem;
+  text-align: center;
+}
+
+.hero--endu.hero--align-left {
+  justify-content: flex-start;
+}
+
+.hero--endu.hero--align-left .hero__slide-content {
+  text-align: left;
+}
+
+.hero--endu.hero--align-middle {
+  align-items: center;
+}
+
+.hero--endu.hero--align-middle .hero__slide-content {
+  padding-bottom: 0;
+}
+
+/* Keeps theme.css's two readability gradients (dark strip under the nav,
+   dark base under the copy) and layers the merchant-set dim underneath as a
+   flat fill — setting opacity on the whole overlay would wash out both. */
+.hero--endu .hero__overlay {
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 28%),
+    linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 55%),
+    rgba(0, 0, 0, var(--hero-dim, 0.3));
+}
+
+.hero--endu .hero__eyebrow {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1.1rem;
+}
+
+.hero--endu .hero__heading {
+  font-family: var(--font-heading);
+  font-size: var(--hero-heading-size);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.05;
+  margin: 0 0 1.1rem;
+}
+
+.hero--endu .hero__subheading {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  max-width: 46ch;
+  margin: 0 auto 2rem;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.hero--endu.hero--align-left .hero__subheading {
+  margin-inline: 0;
+}
+
+.hero--endu .hero__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.hero--endu.hero--align-left .hero__actions {
+  justify-content: flex-start;
+}
+
+.hero--endu .btn--primary {
+  background: var(--color-background);
+  color: var(--color-text);
+  border-color: var(--color-background);
+}
+
+.hero--endu .btn--primary:hover {
+  background: transparent;
+  color: #fff;
+  border-color: #fff;
+}
+
+.hero--endu .btn--outline {
+  border-color: rgba(255, 255, 255, 0.6);
+  color: #fff;
+}
+
+.hero--endu .btn--outline:hover {
+  background: #fff;
+  color: var(--color-text);
+  border-color: #fff;
+}
+
+@media (max-width: 768px) {
+  .hero--endu .hero__slide-content {
+    padding-top: 6rem;
+  }
+  .hero--endu .hero__actions .btn {
+    flex: 1 1 100%;
+  }
+}
+
+/* ── PROMISE BAR ───────────────────────────────────────────── */
+
+.usp-bar {
+  border-block: 1px solid var(--color-border);
+  background: var(--color-background);
+}
+
+.usp-bar__row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.usp-bar__item {
+  padding: 1.6rem 1rem;
+  text-align: center;
+  border-left: 1px solid var(--color-border);
+}
+
+.usp-bar__item:first-child {
+  border-left: 0;
+}
+
+.usp-bar__title {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.usp-bar__text {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 900px) {
+  .usp-bar__row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .usp-bar__item:nth-child(odd) {
+    border-left: 0;
+  }
+  .usp-bar__item:nth-child(n + 3) {
+    border-top: 1px solid var(--color-border);
+  }
+}
+
+/* ── CATEGORY TILES ────────────────────────────────────────── */
+
+.cat-tiles__grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.cat-tiles__grid--1 { grid-template-columns: 1fr; }
+.cat-tiles__grid--2,
+.cat-tiles__grid--4 { grid-template-columns: repeat(2, 1fr); }
+.cat-tiles__grid--5,
+.cat-tiles__grid--6 { grid-template-columns: repeat(3, 1fr); }
+
+.cat-tile {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: var(--color-surface-alt);
+}
+
+.cat-tile__media {
+  display: block;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+}
+
+.cat-tile__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s var(--ease-out-expo);
+}
+
+.cat-tile:hover .cat-tile__img {
+  transform: scale(1.04);
+}
+
+.cat-tile__placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: color-mix(in srgb, var(--color-text) 7%, var(--color-background));
+}
+
+.cat-tile__label {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  color: #fff;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.62), transparent);
+}
+
+.cat-tile__name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.cat-tile__arrow {
+  transition: transform 0.3s var(--ease-out-expo);
+}
+
+.cat-tile:hover .cat-tile__arrow {
+  transform: translateX(4px);
+}
+
+@media (max-width: 700px) {
+  .cat-tiles__grid,
+  .cat-tiles__grid--5,
+  .cat-tiles__grid--6 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* An odd trailing tile would otherwise sit alone beside an empty cell.
+     Let it run full width instead, on a shorter crop so it reads as a
+     deliberate banner rather than a very tall orphan. */
+  .cat-tiles__grid > .cat-tile:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .cat-tiles__grid > .cat-tile:last-child:nth-child(odd) .cat-tile__media {
+    aspect-ratio: 16 / 9;
+  }
+
+  /* A lone tile is the only one there — no orphan to solve. */
+  .cat-tiles__grid--1 > .cat-tile:last-child:nth-child(odd) .cat-tile__media {
+    aspect-ratio: 3 / 4;
+  }
+}
+
+/* ── PRODUCT CARDS — flat, borderless, no lift ─────────────── */
+
+.collection-grid {
+  gap: 0.75rem 0.75rem;
+}
+
+.collection-grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.product-card {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.product-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.product-card__media {
+  aspect-ratio: 3 / 4;
+  background: color-mix(in srgb, var(--color-text) 5%, var(--color-background));
+  border-radius: 0;
+}
+
+.product-card:hover .product-card__image {
+  transform: none;
+}
+
+.product-card__info {
+  padding: 0.9rem 0 0;
+  text-align: left;
+}
+
+.product-card__title {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.4;
+  margin: 0 0 0.35rem;
+}
+
+/* The stock card prints five filled stars for every product regardless of
+   whether it has a single review. Hidden — the real widget still renders
+   from review metafields below. */
+.product-card__stars {
+  display: none;
+}
+
+.product-card__price {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+}
+
+.product-card__price--current {
+  font-weight: 500;
+}
+
+.product-card__price--compare {
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+  font-size: 0.75rem;
+  order: 2;
+}
+
+.product-card__badge {
+  top: 0;
+  left: 0;
+  border-radius: 0;
+  background: var(--color-text);
+  color: var(--color-background);
+  font-size: 0.5625rem;
+  letter-spacing: 0.16em;
+  padding: 0.35rem 0.6rem;
+}
+
+.product-card__badge--sale {
+  background: var(--color-text);
+}
+
+.product-card__quick-add {
+  padding: 0.75rem;
+}
+
+.product-card__quick-add .btn {
+  width: 100%;
+  background: var(--color-background);
+  color: var(--color-text);
+  border: 1px solid var(--color-text);
+}
+
+.product-card__quick-add .btn:hover {
+  background: var(--color-text);
+  color: var(--color-background);
+}
+
+.product-card--empty .product-card__title,
+.product-card--empty .product-card__price {
+  opacity: 0.35;
+}
+
+/* Swatches: squared off to match everything else. */
+.swatch {
+  border-radius: 0;
+}
+
+.swatch--color,
+.product-option__swatch.swatch--color {
+  border-radius: 0;
+}
+
+/* Sits directly on the product image, so it carries its own contrast via a
+   drop-shadow rather than a chip background. */
+.wishlist-btn {
+  border-radius: 0;
+  border-color: transparent;
+  background: transparent;
+  color: #fff;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.55));
+}
+
+.wishlist-btn:hover {
+  background: transparent;
+  border-color: transparent;
+  transform: none;
+  opacity: 0.75;
+}
+
+.wishlist-btn.is-wishlisted {
+  color: #fff;
+  border-color: transparent;
+  transform: none;
+}
+
+.wishlist-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 0;
+}
+
+@media (max-width: 700px) {
+  .collection-grid--3,
+  .collection-grid--4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  /* theme.css centres a lone trailing card at 25% width; at two columns that
+     leaves it a sliver. Let it sit in its own column instead. */
+  .collection-grid > *:last-child:nth-child(4n + 1) {
+    grid-column: auto;
+    max-width: none;
+    justify-self: stretch;
+  }
+}
+
+/* ── BRAND STORY ───────────────────────────────────────────── */
+
+.story {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  gap: 0;
+}
+
+.story--media-right .story__media {
+  order: 2;
+}
+
+.story__media {
+  min-height: 60vh;
+}
+
+.story__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.story__body {
+  display: flex;
+  align-items: center;
+  background: color-mix(in srgb, var(--color-text) 4%, var(--color-background));
+  padding: clamp(2.5rem, 6vw, 5rem);
+}
+
+.story__inner {
+  max-width: 44ch;
+}
+
+.story__title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.4rem, 2.8vw, 2.1rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.15;
+  margin: 0 0 1.1rem;
+}
+
+.story__text {
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+}
+
+.story__text p + p {
+  margin-top: 0.9rem;
+}
+
+.story__points {
+  margin: 2rem 0;
+  display: grid;
+  gap: 1.1rem;
+}
+
+.story__point {
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.story__point dt {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+
+.story__point dd {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 900px) {
+  .story {
+    grid-template-columns: 1fr;
+  }
+  .story--media-right .story__media {
+    order: 0;
+  }
+  .story__media {
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* ── TESTIMONIALS ──────────────────────────────────────────── */
+
+.quotes__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--color-border);
+  border: 1px solid var(--color-border);
+}
+
+.quote {
+  margin: 0;
+  padding: clamp(1.6rem, 3vw, 2.4rem);
+  background: var(--color-background);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.quote__stars {
+  display: flex;
+  gap: 2px;
+  color: var(--color-text);
+}
+
+.quote__text {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+.quote__by {
+  margin-top: auto;
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 800px) {
+  .quotes__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── NEWSLETTER ────────────────────────────────────────────── */
+
+.newsletter--invert {
+  background: var(--color-text);
+  color: var(--color-background);
+}
+
+.newsletter--invert .sec-head__eyebrow {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.newsletter__inner {
+  max-width: 560px;
+  text-align: center;
+}
+
+.newsletter__title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.35rem, 2.6vw, 2rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 0.9rem;
+}
+
+.newsletter__text {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  margin: 0 auto 1.8rem;
+  opacity: 0.75;
+}
+
+.newsletter__form {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.newsletter__input {
+  flex: 1 1 240px;
+  min-width: 0;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+}
+
+.newsletter__input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.newsletter__input:focus {
+  outline: none;
+  border-color: var(--color-background);
+}
+
+.newsletter--invert .newsletter__submit {
+  background: var(--color-background);
+  color: var(--color-text);
+  border-color: var(--color-background);
+}
+
+.newsletter--invert .newsletter__submit:hover {
+  background: transparent;
+  color: var(--color-background);
+  border-color: var(--color-background);
+}
+
+/* Light variant — the inverted defaults above assume a dark band. */
+.newsletter:not(.newsletter--invert) .newsletter__input {
+  border-color: var(--color-border-strong);
+}
+
+.newsletter:not(.newsletter--invert) .newsletter__input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.newsletter__note {
+  flex: 1 1 100%;
+  margin-top: 0.6rem;
+  font-size: 0.75rem;
+  text-align: left;
+}
+
+.newsletter__footnote {
+  margin-top: 1rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+/* ── HEADER / NAV ──────────────────────────────────────────── */
+
+.header__logo-text {
+  font-family: var(--font-heading);
+  font-weight: var(--logo-weight);
+  letter-spacing: var(--logo-spacing);
+  text-transform: var(--logo-transform);
+}
+
+.nav-link {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: var(--nav-spacing);
+  text-transform: var(--nav-transform);
+}
+
+.section-header.header--scrolled {
+  border-bottom-color: var(--color-border);
+}
+
+/* ── ANNOUNCEMENT BAR ──────────────────────────────────────── */
+
+.announcement-bar,
+.section-announcement-bar {
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* ── FOOTER ────────────────────────────────────────────────── */
+
+.footer__heading {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.footer__link {
+  font-size: 0.8125rem;
+}
+
+.footer__logo-text,
+.site-footer .footer__wordmark {
+  font-family: var(--font-heading);
+  letter-spacing: var(--logo-spacing);
+  text-transform: uppercase;
+}
+
+.footer__social-link {
+  border-radius: 0;
+}
+
+.footer__copyright {
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+}
+
+/* ── FORMS & MISC — square everything off ──────────────────── */
+
+input[type="text"],
+input[type="email"],
+input[type="search"],
+input[type="tel"],
+input[type="number"],
+select,
+textarea {
+  border-radius: 0;
+}
+
+.back-to-top {
+  border-radius: 0;
+}
+
+/* Quantity steppers, cart drawer, drop-downs and quick-view panels all
+   inherit rounded corners from theme.css. One sweep, scoped to chrome. */
+:is(.cart-drawer, .quick-view, .promo-popup, .product-form, .collection-toolbar)
+  :is(button, input, select, .btn, .qty, .qty__btn) {
+  border-radius: 0;
+}

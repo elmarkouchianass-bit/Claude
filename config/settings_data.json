@@ -1,40 +1,65 @@
 {
   "current": {
-    "color_primary": "#2563eb",
-    "color_secondary": "#1e293b",
-    "color_background": "#ffffff",
+    "color_primary": "#14110F",
+    "color_secondary": "#4A443D",
+    "color_background": "#FBFAF8",
     "color_background_card": "#FFFFFF",
-    "color_text": "#0f172a",
-    "color_text_muted": "#484c55",
-    "font_heading": "Playfair Display",
-    "font_body": "Source Sans 3",
-    "logo_max_width": 140,
+    "color_text": "#14110F",
+    "color_text_muted": "#6B645C",
+    "font_heading": "Archivo",
+    "font_body": "Inter",
+    "logo_max_width": 150,
     "logo_bundled_filename": "",
     "preset_collection_style": "editorial",
     "popup_enabled": false,
     "social_instagram": "https://instagram.com/",
     "social_tiktok": "https://tiktok.com/",
-    "social_pinterest": "https://pinterest.com/",
-    "social_facebook": "https://facebook.com/",
-    "social_twitter": "https://x.com/",
+    "social_pinterest": "",
+    "social_facebook": "",
+    "social_twitter": "",
     "social_youtube": "https://youtube.com/",
-    "social_threads": "https://threads.net/",
-    "social_reddit": "https://reddit.com/",
-    "social_linkedin": "https://linkedin.com/",
+    "social_threads": "",
+    "social_reddit": "",
+    "social_linkedin": "",
     "sections": {
       "announcement-bar": {
         "type": "announcement-bar",
         "settings": {
-          "text": "Vorreni — complimentary shipping on qualifying orders",
+          "text": "Free U.S. shipping on orders over $75",
           "link": "",
-          "bar_style": "solid"
-        }
+          "bar_style": "solid",
+          "rotate_speed": 5
+        },
+        "blocks": {
+          "msg_1": {
+            "type": "message",
+            "settings": {
+              "text": "Free U.S. shipping on orders over $75",
+              "link": ""
+            }
+          },
+          "msg_2": {
+            "type": "message",
+            "settings": {
+              "text": "30-day returns — wear it, wash it, decide",
+              "link": ""
+            }
+          },
+          "msg_3": {
+            "type": "message",
+            "settings": {
+              "text": "Order before 8PM ET, ships the next business day",
+              "link": ""
+            }
+          }
+        },
+        "block_order": ["msg_1", "msg_2", "msg_3"]
       },
       "header": {
         "type": "header",
         "settings": {
-          "layout": "inline-left",
-          "icon_set": "outline",
+          "layout": "single-row",
+          "icon_set": "minimal",
           "show_locale_switcher": true,
           "menu": "main-menu",
           "wordmark": "Vorreni",
@@ -42,14 +67,13 @@
           "brand_name": "Vorreni",
           "logo_text": "Vorreni",
           "brand": "Vorreni"
-        },
-        "layout": "stacked"
+        }
       },
       "footer": {
         "type": "footer",
         "settings": {
-          "description": "Vorenni sells fashion apperael for men",
-          "footer_style": "standard",
+          "footer_style": "4col-sparse",
+          "description": "Menswear essentials, cut clean and built to outlast the season. No logos, no trends — just pieces that keep working.",
           "col2_heading": "Shop",
           "col3_heading": "Help"
         }

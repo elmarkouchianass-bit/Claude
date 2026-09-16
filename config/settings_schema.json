@@ -13,20 +13,22 @@
       {
         "type": "color",
         "id": "color_primary",
-        "label": "Primary accent",
-        "default": "#2563eb"
+        "label": "Ink (buttons, accents)",
+        "default": "#14110F",
+        "info": "Keep this near-black. The look depends on a monochrome palette."
       },
       {
         "type": "color",
         "id": "color_secondary",
         "label": "Secondary / hover",
-        "default": "#1e293b"
+        "default": "#4A443D"
       },
       {
         "type": "color",
         "id": "color_background",
-        "label": "Background",
-        "default": "#ffffff"
+        "label": "Page background",
+        "default": "#FBFAF8",
+        "info": "A warm off-white reads softer than pure white against product photography."
       },
       {
         "type": "color",
@@ -38,13 +40,13 @@
         "type": "color",
         "id": "color_text",
         "label": "Text",
-        "default": "#0f172a"
+        "default": "#14110F"
       },
       {
         "type": "color",
         "id": "color_text_muted",
         "label": "Muted text",
-        "default": "#484c55"
+        "default": "#6B645C"
       }
     ]
   },
@@ -55,13 +57,13 @@
         "type": "text",
         "id": "font_heading",
         "label": "Heading font family",
-        "default": "Playfair Display"
+        "default": "Archivo"
       },
       {
         "type": "text",
         "id": "font_body",
         "label": "Body font family",
-        "default": "Source Sans 3"
+        "default": "Inter"
       }
     ]
   },
@@ -156,7 +158,7 @@
         "type": "text",
         "id": "judgeme_shop_token",
         "label": "Judge.me shop token",
-        "info": "Find this in your Judge.me dashboard under Settings → Shop."
+        "info": "Find this in your Judge.me dashboard under Settings \u2192 Shop."
       }
     ]
   },

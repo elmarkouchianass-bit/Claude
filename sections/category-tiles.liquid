@@ -1,0 +1,85 @@
+{%- comment -%}
+  Category tiles — image with an uppercase label pinned to the bottom.
+  Falls back to the collection's own featured image when no image is picked,
+  so the section still looks right before a merchant customises it.
+{%- endcomment -%}
+<section class="cat-tiles" data-reveal>
+  <div class="container">
+    {%- if section.settings.heading != blank -%}
+      <div class="sec-head">
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="sec-head__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+        {%- endif -%}
+        <h2 class="sec-head__title">{{ section.settings.heading | escape }}</h2>
+      </div>
+    {%- endif -%}
+
+    <div class="cat-tiles__grid cat-tiles__grid--{{ section.blocks.size }}">
+      {%- for block in section.blocks -%}
+        {%- assign col = collections[block.settings.collection] -%}
+        {%- assign label = block.settings.label | default: col.title -%}
+        {%- assign tile_image = block.settings.image | default: col.featured_image -%}
+        <a
+          href="{{ col.url | default: block.settings.link | default: routes.all_products_collection_url }}"
+          class="cat-tile"
+          {{ block.shopify_attributes }}
+        >
+          <span class="cat-tile__media">
+            {%- if tile_image != blank -%}
+              {{
+                tile_image
+                | image_url: width: 1200
+                | image_tag:
+                  class: 'cat-tile__img',
+                  alt: label | escape,
+                  widths: '400, 600, 900, 1200',
+                  sizes: '(max-width: 768px) 50vw, 33vw',
+                  loading: 'lazy'
+              }}
+            {%- else -%}
+              <span class="cat-tile__placeholder" aria-hidden="true"></span>
+            {%- endif -%}
+          </span>
+          <span class="cat-tile__label">
+            <span class="cat-tile__name">{{ label | escape }}</span>
+            <span class="cat-tile__arrow" aria-hidden="true">&rarr;</span>
+          </span>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Category tiles",
+  "class": "section-cat-tiles",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The range" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Shop by category" }
+  ],
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Tile",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "text", "id": "label", "label": "Label override", "info": "Leave blank to use the collection title." },
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "Leave blank to use the collection image." },
+        { "type": "url", "id": "link", "label": "Link override" }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "Category tiles",
+      "blocks": [
+        { "type": "tile", "settings": { "label": "T-Shirts" } },
+        { "type": "tile", "settings": { "label": "Pants" } },
+        { "type": "tile", "settings": { "label": "Outerwear" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

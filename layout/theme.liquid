@@ -12,13 +12,14 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   {% if settings.favicon %}
     <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32 }}">
   {% endif %}
 
   {{ 'theme.css' | asset_url | stylesheet_tag }}
+  {{ 'endu.css' | asset_url | stylesheet_tag }}
   {{ content_for_header }}
 
   {% render 'json-ld' %}
@@ -45,22 +46,36 @@
       --color-success: color-mix(in srgb, green 40%, var(--color-text));
       --color-error: color-mix(in srgb, red 50%, var(--color-text));
 
-      /* Style tokens */
-      --header-padding: 1.4rem 0;
-      --header-border: 1px solid rgba(255,255,255,0.15);
-      --nav-font: var(--font-heading);
-      --nav-transform: none;
-      --nav-spacing: 0.02em;
+      /* ── Style tokens — ENDU direction ──
+         Square corners, uppercase labels and wide tracking everywhere.
+         Nothing here is decorative: the type does the work, the product
+         photography carries the page. */
+      --header-padding: 1.15rem 0;
+      --header-border: 1px solid rgba(255,255,255,0.14);
+      --nav-font: var(--font-body);
+      --nav-transform: uppercase;
+      --nav-spacing: 0.14em;
+      --hero-height: 92vh;
       --hero-text-align: center;
       --hero-text-css-align: center;
-      --hero-content-max-width: 700px;
-      --hero-heading-size: clamp(2.8rem, 6vw, 4.5rem);
-      --hero-heading-spacing: -0.01em;
-      --btn-radius: 4px;
-      --btn-letter-spacing: 0.05em;
-      --logo-size: 1.6rem;
+      --hero-text-valign: flex-end;
+      --hero-content-max-width: 720px;
+      --hero-heading-size: clamp(2.1rem, 5.6vw, 4rem);
+      --hero-heading-weight: 600;
+      --hero-heading-transform: uppercase;
+      --hero-heading-spacing: 0.04em;
+      --btn-radius: 0px;
+      --btn-transform: uppercase;
+      --btn-letter-spacing: 0.16em;
+      --logo-size: 1.45rem;
       --logo-weight: 700;
-      --logo-spacing: 0.15em;
+      --logo-spacing: 0.34em;
+      --logo-transform: uppercase;
+
+      /* Editorial rhythm — generous vertical space between sections */
+      --section-gap: clamp(3.5rem, 8vw, 7rem);
+      --page-max: 1440px;
+      --gutter: clamp(1.15rem, 4vw, 3rem);
 
       /* Animation easings */
       --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);

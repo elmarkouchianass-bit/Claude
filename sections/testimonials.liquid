@@ -1,0 +1,55 @@
+{%- comment -%} Quote row. Stars are drawn, not coloured — the palette stays monochrome. {%- endcomment -%}
+<section class="quotes" data-reveal>
+  <div class="container">
+    <div class="sec-head sec-head--center">
+      {%- if section.settings.eyebrow != blank -%}
+        <span class="sec-head__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="sec-head__title">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+    </div>
+
+    <div class="quotes__grid">
+      {%- for block in section.blocks -%}
+        <figure class="quote" {{ block.shopify_attributes }}>
+          <div class="quote__stars" role="img" aria-label="5 out of 5 stars">
+            {%- for i in (1..5) -%}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            {%- endfor -%}
+          </div>
+          <blockquote class="quote__text">{{ block.settings.quote | escape }}</blockquote>
+          <figcaption class="quote__by">{{ block.settings.by | escape }}</figcaption>
+        </figure>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "class": "section-quotes",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Verified buyers" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "What holds up" }
+  ],
+  "blocks": [
+    {
+      "type": "quote",
+      "name": "Quote",
+      "settings": [
+        { "type": "textarea", "id": "quote", "label": "Quote" },
+        { "type": "text", "id": "by", "label": "Attribution" }
+      ]
+    }
+  ],
+  "max_blocks": 3,
+  "presets": [
+    {
+      "name": "Testimonials",
+      "blocks": [{ "type": "quote" }, { "type": "quote" }, { "type": "quote" }]
+    }
+  ]
+}
+{% endschema %}

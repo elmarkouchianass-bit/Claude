@@ -1,0 +1,102 @@
+{%- comment -%} Editorial split — full-bleed image beside a short manifesto. {%- endcomment -%}
+<section class="story story--media-{{ section.settings.media_position }}" data-reveal>
+  <div class="story__media">
+    {%- if section.settings.image != blank -%}
+      {{
+        section.settings.image
+        | image_url: width: 1600
+        | image_tag:
+          class: 'story__img',
+          alt: section.settings.image.alt | default: section.settings.heading | escape,
+          widths: '600, 900, 1200, 1600',
+          sizes: '(max-width: 900px) 100vw, 50vw',
+          loading: 'lazy'
+      }}
+    {%- else -%}
+      <img
+        class="story__img"
+        src="{{ 'brand-story.png' | asset_url }}"
+        alt="{{ section.settings.heading | escape }}"
+        width="1600"
+        height="1200"
+        loading="lazy"
+      >
+    {%- endif -%}
+  </div>
+
+  <div class="story__body">
+    <div class="story__inner">
+      {%- if section.settings.eyebrow != blank -%}
+        <span class="sec-head__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="story__title">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="story__text">{{ section.settings.text }}</div>
+      {%- endif -%}
+
+      {%- if section.blocks.size > 0 -%}
+        <dl class="story__points">
+          {%- for block in section.blocks -%}
+            <div class="story__point" {{ block.shopify_attributes }}>
+              <dt>{{ block.settings.title | escape }}</dt>
+              <dd>{{ block.settings.text | escape }}</dd>
+            </div>
+          {%- endfor -%}
+        </dl>
+      {%- endif -%}
+
+      {%- if section.settings.cta_text != blank -%}
+        <a href="{{ section.settings.cta_url | default: '/pages/about-us' }}" class="link-underline">
+          {{ section.settings.cta_text | escape }}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Brand story",
+  "class": "section-story",
+  "settings": [
+    {
+      "type": "select",
+      "id": "media_position",
+      "label": "Image position",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Our approach" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Fewer things, made properly" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>We build a small range and keep it. Every piece is cut from fabric we picked for how it wears after fifty washes, not how it photographs on day one.</p>" },
+    { "type": "text", "id": "cta_text", "label": "Link text", "default": "Read our story" },
+    { "type": "url", "id": "cta_url", "label": "Link" }
+  ],
+  "blocks": [
+    {
+      "type": "point",
+      "name": "Point",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Heavier fabrics" },
+        { "type": "text", "id": "text", "label": "Text", "default": "200 GSM and up, so nothing goes sheer." }
+      ]
+    }
+  ],
+  "max_blocks": 4,
+  "presets": [
+    {
+      "name": "Brand story",
+      "blocks": [
+        { "type": "point" },
+        { "type": "point", "settings": { "title": "Honest pricing", "text": "Sold direct, priced without the markup." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

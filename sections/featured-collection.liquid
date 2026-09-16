@@ -1,0 +1,85 @@
+{%- comment -%}
+  Featured collection — heading with an inline "view all" link, then the
+  standard product grid. Uses the shared product-card snippet so cards stay
+  consistent with collection pages.
+{%- endcomment -%}
+{%- assign col = collections[section.settings.collection] -%}
+{%- assign limit = section.settings.products_to_show | default: 4 -%}
+
+<section class="feat-col" data-reveal>
+  <div class="container">
+    <div class="sec-head sec-head--row">
+      <div>
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="sec-head__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="sec-head__title">{{ section.settings.heading | escape }}</h2>
+        {%- endif -%}
+      </div>
+      {%- if section.settings.show_view_all -%}
+        <a href="{{ col.url | default: routes.all_products_collection_url }}" class="sec-head__link">
+          {{ section.settings.view_all_text | default: 'View all' | escape }}
+          <span aria-hidden="true">&rarr;</span>
+        </a>
+      {%- endif -%}
+    </div>
+
+    {%- if col.products.size > 0 -%}
+      <div class="collection-grid collection-grid--{{ section.settings.columns }}">
+        {%- for product in col.products limit: limit -%}
+          {% render 'product-card', product: product, index: forloop.index %}
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      {%- comment -%}
+        Onboarding state: a merchant who has not picked a collection yet still
+        sees the grid rhythm rather than an empty band.
+      {%- endcomment -%}
+      <div class="collection-grid collection-grid--{{ section.settings.columns }}">
+        {%- for i in (1..limit) -%}
+          <div class="product-card product-card--empty">
+            <div class="product-card__media">
+              <div class="product-card__placeholder">
+                <svg viewBox="0 0 300 380" fill="none" stroke="currentColor" stroke-width="1" opacity="0.12" aria-hidden="true">
+                  <rect x="90" y="40" width="120" height="220"/>
+                  <circle cx="150" cy="160" r="35"/>
+                </svg>
+              </div>
+            </div>
+            <div class="product-card__info">
+              <h3 class="product-card__title">Your product</h3>
+              <div class="product-card__price"><span class="product-card__price--current">$—</span></div>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Featured collection",
+  "class": "section-feat-col",
+  "settings": [
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Just landed" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "New arrivals" },
+    { "type": "range", "id": "products_to_show", "label": "Products to show", "min": 2, "max": 12, "step": 1, "default": 4 },
+    {
+      "type": "select",
+      "id": "columns",
+      "label": "Columns on desktop",
+      "default": "4",
+      "options": [
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" }
+      ]
+    },
+    { "type": "checkbox", "id": "show_view_all", "label": "Show \"view all\" link", "default": true },
+    { "type": "text", "id": "view_all_text", "label": "\"View all\" text", "default": "View all" }
+  ],
+  "presets": [{ "name": "Featured collection" }]
+}
+{% endschema %}
