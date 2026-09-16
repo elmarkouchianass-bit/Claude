@@ -2116,5 +2116,209 @@
         "default": "equal-width-buttons"
       }
     ]
+  },
+  {
+    "name": "t:vor.group",
+    "settings": [
+      {
+        "type": "color",
+        "id": "vor_accent_color",
+        "label": "t:vor.settings.accent_color",
+        "info": "t:vor.settings.accent_color_info",
+        "default": "#A34426"
+      },
+      {
+        "type": "paragraph",
+        "content": "t:vor.ladder.info"
+      },
+      {
+        "type": "checkbox",
+        "id": "vor_ladder_enabled",
+        "label": "t:vor.ladder.enabled",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "vor_ladder_apply_codes",
+        "label": "t:vor.ladder.apply_codes",
+        "info": "t:vor.ladder.apply_codes_info",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "t:vor.ladder.row_1"
+      },
+      {
+        "type": "range",
+        "id": "vor_ladder_qty_1",
+        "label": "t:vor.ladder.qty",
+        "min": 0,
+        "max": 20,
+        "step": 1,
+        "default": 2,
+        "info": "t:vor.ladder.qty_info"
+      },
+      {
+        "type": "range",
+        "id": "vor_ladder_percent_1",
+        "label": "t:vor.ladder.percent",
+        "min": 0,
+        "max": 90,
+        "step": 1,
+        "unit": "%",
+        "default": 10
+      },
+      {
+        "type": "text",
+        "id": "vor_ladder_code_1",
+        "label": "t:vor.ladder.code",
+        "default": "BUNDEL10"
+      },
+      {
+        "type": "header",
+        "content": "t:vor.ladder.row_2"
+      },
+      {
+        "type": "range",
+        "id": "vor_ladder_qty_2",
+        "label": "t:vor.ladder.qty",
+        "min": 0,
+        "max": 20,
+        "step": 1,
+        "default": 3
+      },
+      {
+        "type": "range",
+        "id": "vor_ladder_percent_2",
+        "label": "t:vor.ladder.percent",
+        "min": 0,
+        "max": 90,
+        "step": 1,
+        "unit": "%",
+        "default": 15
+      },
+      {
+        "type": "text",
+        "id": "vor_ladder_code_2",
+        "label": "t:vor.ladder.code",
+        "default": "BUNDEL15"
+      },
+      {
+        "type": "header",
+        "content": "t:vor.ladder.row_3"
+      },
+      {
+        "type": "range",
+        "id": "vor_ladder_qty_3",
+        "label": "t:vor.ladder.qty",
+        "min": 0,
+        "max": 20,
+        "step": 1,
+        "default": 4
+      },
+      {
+        "type": "range",
+        "id": "vor_ladder_percent_3",
+        "label": "t:vor.ladder.percent",
+        "min": 0,
+        "max": 90,
+        "step": 1,
+        "unit": "%",
+        "default": 20
+      },
+      {
+        "type": "text",
+        "id": "vor_ladder_code_3",
+        "label": "t:vor.ladder.code",
+        "default": "BUNDEL20"
+      },
+      {
+        "type": "header",
+        "content": "t:vor.ladder.row_4"
+      },
+      {
+        "type": "range",
+        "id": "vor_ladder_qty_4",
+        "label": "t:vor.ladder.qty",
+        "min": 0,
+        "max": 20,
+        "step": 1,
+        "default": 5
+      },
+      {
+        "type": "range",
+        "id": "vor_ladder_percent_4",
+        "label": "t:vor.ladder.percent",
+        "min": 0,
+        "max": 90,
+        "step": 1,
+        "unit": "%",
+        "default": 25
+      },
+      {
+        "type": "text",
+        "id": "vor_ladder_code_4",
+        "label": "t:vor.ladder.code",
+        "default": "BUNDEL25"
+      },
+      {
+        "type": "header",
+        "content": "t:vor.ladder.row_5"
+      },
+      {
+        "type": "range",
+        "id": "vor_ladder_qty_5",
+        "label": "t:vor.ladder.qty",
+        "min": 0,
+        "max": 20,
+        "step": 1,
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "vor_ladder_percent_5",
+        "label": "t:vor.ladder.percent",
+        "min": 0,
+        "max": 90,
+        "step": 1,
+        "unit": "%",
+        "default": 0
+      },
+      {
+        "type": "text",
+        "id": "vor_ladder_code_5",
+        "label": "t:vor.ladder.code",
+        "default": ""
+      },
+      {
+        "type": "header",
+        "content": "t:vor.ladder.row_6"
+      },
+      {
+        "type": "range",
+        "id": "vor_ladder_qty_6",
+        "label": "t:vor.ladder.qty",
+        "min": 0,
+        "max": 20,
+        "step": 1,
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "vor_ladder_percent_6",
+        "label": "t:vor.ladder.percent",
+        "min": 0,
+        "max": 90,
+        "step": 1,
+        "unit": "%",
+        "default": 0
+      },
+      {
+        "type": "text",
+        "id": "vor_ladder_code_6",
+        "label": "t:vor.ladder.code",
+        "default": ""
+      }
+    ]
   }
 ]
