@@ -1,0 +1,292 @@
+{
+  "name": "Vorreni",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Merk"
+    },
+    {
+      "type": "paragraph",
+      "content": "De accentkleur is de enige niet-neutrale kleur op de site: vierkante bullets, de actieve kortingstrede en de voortgangsbalk."
+    },
+    {
+      "type": "color",
+      "id": "vrn_accent",
+      "label": "Accentkleur",
+      "default": "#A6402A"
+    },
+    {
+      "type": "header",
+      "content": "Kortingsladder"
+    },
+    {
+      "type": "paragraph",
+      "content": "Maak de kortingscodes eerst aan in Kortingen. Zonder bestaande code doet een trede niets. Zie README.md voor de exacte instellingen per code."
+    },
+    {
+      "type": "checkbox",
+      "id": "vrn_ladder_enabled",
+      "label": "Kortingsladder aan",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "vrn_ladder_show_collection_bar",
+      "label": "Balk tonen op collectiepagina's",
+      "default": true,
+      "visible_if": "{{ settings.vrn_ladder_enabled }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "vrn_ladder_show_drawer",
+      "label": "Ladder tonen in de cart drawer",
+      "default": true,
+      "visible_if": "{{ settings.vrn_ladder_enabled }}"
+    },
+    {
+      "type": "header",
+      "content": "Trede 1",
+      "visible_if": "{{ settings.vrn_ladder_enabled }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "vrn_tier1_enabled",
+      "label": "Trede 1 gebruiken",
+      "default": true,
+      "visible_if": "{{ settings.vrn_ladder_enabled }}"
+    },
+    {
+      "type": "range",
+      "id": "vrn_tier1_qty",
+      "label": "Aantal artikelen",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 1,
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier1_enabled }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "vrn_tier1_plus",
+      "label": "Dit aantal of meer",
+      "default": false,
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier1_enabled }}",
+      "info": "Zet aan op de hoogste trede, zodat 5, 6, 7 … artikelen allemaal deze korting krijgen."
+    },
+    {
+      "type": "range",
+      "id": "vrn_tier1_percent",
+      "label": "Korting",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "%",
+      "default": 0,
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier1_enabled }}"
+    },
+    {
+      "type": "text",
+      "id": "vrn_tier1_code",
+      "label": "Kortingscode",
+      "default": "",
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier1_enabled }}",
+      "info": "Laat leeg bij 0%. Moet exact overeenkomen met de code in Kortingen."
+    },
+    {
+      "type": "header",
+      "content": "Trede 2",
+      "visible_if": "{{ settings.vrn_ladder_enabled }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "vrn_tier2_enabled",
+      "label": "Trede 2 gebruiken",
+      "default": true,
+      "visible_if": "{{ settings.vrn_ladder_enabled }}"
+    },
+    {
+      "type": "range",
+      "id": "vrn_tier2_qty",
+      "label": "Aantal artikelen",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 2,
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier2_enabled }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "vrn_tier2_plus",
+      "label": "Dit aantal of meer",
+      "default": false,
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier2_enabled }}",
+      "info": "Zet aan op de hoogste trede, zodat 5, 6, 7 … artikelen allemaal deze korting krijgen."
+    },
+    {
+      "type": "range",
+      "id": "vrn_tier2_percent",
+      "label": "Korting",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "%",
+      "default": 10,
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier2_enabled }}"
+    },
+    {
+      "type": "text",
+      "id": "vrn_tier2_code",
+      "label": "Kortingscode",
+      "default": "BUNDEL10",
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier2_enabled }}",
+      "info": "Laat leeg bij 0%. Moet exact overeenkomen met de code in Kortingen."
+    },
+    {
+      "type": "header",
+      "content": "Trede 3",
+      "visible_if": "{{ settings.vrn_ladder_enabled }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "vrn_tier3_enabled",
+      "label": "Trede 3 gebruiken",
+      "default": true,
+      "visible_if": "{{ settings.vrn_ladder_enabled }}"
+    },
+    {
+      "type": "range",
+      "id": "vrn_tier3_qty",
+      "label": "Aantal artikelen",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 3,
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier3_enabled }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "vrn_tier3_plus",
+      "label": "Dit aantal of meer",
+      "default": false,
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier3_enabled }}",
+      "info": "Zet aan op de hoogste trede, zodat 5, 6, 7 … artikelen allemaal deze korting krijgen."
+    },
+    {
+      "type": "range",
+      "id": "vrn_tier3_percent",
+      "label": "Korting",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "%",
+      "default": 15,
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier3_enabled }}"
+    },
+    {
+      "type": "text",
+      "id": "vrn_tier3_code",
+      "label": "Kortingscode",
+      "default": "BUNDEL15",
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier3_enabled }}",
+      "info": "Laat leeg bij 0%. Moet exact overeenkomen met de code in Kortingen."
+    },
+    {
+      "type": "header",
+      "content": "Trede 4",
+      "visible_if": "{{ settings.vrn_ladder_enabled }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "vrn_tier4_enabled",
+      "label": "Trede 4 gebruiken",
+      "default": true,
+      "visible_if": "{{ settings.vrn_ladder_enabled }}"
+    },
+    {
+      "type": "range",
+      "id": "vrn_tier4_qty",
+      "label": "Aantal artikelen",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 4,
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier4_enabled }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "vrn_tier4_plus",
+      "label": "Dit aantal of meer",
+      "default": false,
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier4_enabled }}",
+      "info": "Zet aan op de hoogste trede, zodat 5, 6, 7 … artikelen allemaal deze korting krijgen."
+    },
+    {
+      "type": "range",
+      "id": "vrn_tier4_percent",
+      "label": "Korting",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "%",
+      "default": 20,
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier4_enabled }}"
+    },
+    {
+      "type": "text",
+      "id": "vrn_tier4_code",
+      "label": "Kortingscode",
+      "default": "BUNDEL20",
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier4_enabled }}",
+      "info": "Laat leeg bij 0%. Moet exact overeenkomen met de code in Kortingen."
+    },
+    {
+      "type": "header",
+      "content": "Trede 5",
+      "visible_if": "{{ settings.vrn_ladder_enabled }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "vrn_tier5_enabled",
+      "label": "Trede 5 gebruiken",
+      "default": true,
+      "visible_if": "{{ settings.vrn_ladder_enabled }}"
+    },
+    {
+      "type": "range",
+      "id": "vrn_tier5_qty",
+      "label": "Aantal artikelen",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 5,
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier5_enabled }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "vrn_tier5_plus",
+      "label": "Dit aantal of meer",
+      "default": true,
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier5_enabled }}",
+      "info": "Zet aan op de hoogste trede, zodat 5, 6, 7 … artikelen allemaal deze korting krijgen."
+    },
+    {
+      "type": "range",
+      "id": "vrn_tier5_percent",
+      "label": "Korting",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "%",
+      "default": 25,
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier5_enabled }}"
+    },
+    {
+      "type": "text",
+      "id": "vrn_tier5_code",
+      "label": "Kortingscode",
+      "default": "BUNDEL25",
+      "visible_if": "{{ settings.vrn_ladder_enabled and settings.vrn_tier5_enabled }}",
+      "info": "Laat leeg bij 0%. Moet exact overeenkomen met de code in Kortingen."
+    }
+  ]
+}

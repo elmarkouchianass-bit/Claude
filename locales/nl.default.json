@@ -1,4 +1,67 @@
 {
+  "vrn": {
+    "ladder": {
+      "heading": "Meer kopen, meer korting",
+      "tier": "{{ count }} artikelen = {{ percent }}% korting",
+      "tier_plus": "{{ count }}+ artikelen = {{ percent }}% korting",
+      "tier_single": "1 artikel = geen korting",
+      "inline_separator": " · ",
+      "inline_tier": "{{ count }} = {{ percent }}%",
+      "inline_tier_plus": "{{ count }}+ = {{ percent }}%",
+      "progress": {
+        "one": "Nog 1 artikel voor {{ percent }}% korting",
+        "other": "Nog {{ count }} artikelen voor {{ percent }}% korting"
+      },
+      "max_reached": "Maximale korting van {{ percent }}% bereikt",
+      "active": "Nu actief",
+      "saved": "Je bespaart {{ amount }}",
+      "aria_progress": "Voortgang naar de volgende kortingstrede",
+      "aria_list": "Kortingstredes"
+    },
+    "size_fit": {
+      "label": "Pasvorm",
+      "scale_small": "Klein",
+      "scale_normal": "Valt normaal",
+      "scale_large": "Groot",
+      "value_1": "Valt klein",
+      "value_2": "Valt iets klein",
+      "value_3": "Valt normaal",
+      "value_4": "Valt iets groot",
+      "value_5": "Valt groot",
+      "aria": "Pasvorm van dit artikel: {{ value }}"
+    },
+    "size_strip": {
+      "choose": "Kies je maat",
+      "sold_out": "{{ size }} is uitverkocht",
+      "add": "Toevoegen",
+      "adding": "Bezig",
+      "added": "Toegevoegd",
+      "error": "Toevoegen lukte niet. Probeer het opnieuw.",
+      "aria_group": "Maat kiezen voor {{ product }}"
+    },
+    "size_guide": {
+      "open": "Maattabel",
+      "title": "Maattabel",
+      "close": "Sluiten"
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "aria": "Kruimelpad"
+    },
+    "usp": {
+      "returns": "30 dagen retourrecht",
+      "shipping_free": "Gratis verzending vanaf € 75",
+      "shipping_fast": "Besteld voor 22:00, morgen verzonden",
+      "service": "Klantenservice in Nederland"
+    },
+    "editorial": {
+      "label": "Over Vorreni"
+    },
+    "reviews": {
+      "label": "Wat klanten zeggen",
+      "attribution": "{{ name }} — {{ product }}"
+    }
+  },
   "blocks": {
     "load_video": "Video laden: {{ description }}",
     "sold_out": "Uitverkocht",
