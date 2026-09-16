@@ -1,0 +1,130 @@
+{% doc %}
+  Kruimelpad met bijbehorende BreadcrumbList JSON-LD.
+
+  Horizon levert al Product-, Organization- en Article-structured data
+  (sections/product-information.liquid, sections/header.liquid,
+  sections/main-blog-post.liquid) plus volledige Open Graph en Twitter Cards
+  in snippets/meta-tags.liquid. BreadcrumbList was het enige dat ontbrak, dus
+  dat is het enige wat hier bij komt.
+{% enddoc %}
+
+{% render 'vrn-styles' %}
+
+{%- liquid
+  assign crumbs_name = ''
+  assign crumbs_url = ''
+
+  case request.page_type
+    when 'product'
+      assign collection_context = closest.product.collections.first
+      if collection_context != blank
+        assign crumbs_name = collection_context.title
+        assign crumbs_url = collection_context.url
+      endif
+      assign leaf_name = closest.product.title
+      assign leaf_url = closest.product.url
+    when 'collection'
+      assign leaf_name = collection.title
+      assign leaf_url = collection.url
+    when 'page'
+      assign leaf_name = page.title
+      assign leaf_url = page.url
+    when 'article'
+      assign crumbs_name = blog.title
+      assign crumbs_url = blog.url
+      assign leaf_name = article.title
+      assign leaf_url = article.url
+    else
+      assign leaf_name = ''
+  endcase
+-%}
+
+{%- if leaf_name != blank -%}
+  <nav
+    class="vrn-breadcrumb spacing-style"
+    aria-label="{{ 'vrn.breadcrumb.aria' | t }}"
+    style="{% render 'spacing-style', settings: block.settings %}"
+    {{ block.shopify_attributes }}
+  >
+    <ol>
+      <li><a href="{{ routes.root_url }}">{{ 'vrn.breadcrumb.home' | t }}</a></li>
+      {%- if crumbs_name != blank -%}
+        <li><a href="{{ crumbs_url }}">{{ crumbs_name }}</a></li>
+      {%- endif -%}
+      <li><span aria-current="page">{{ leaf_name }}</span></li>
+    </ol>
+  </nav>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": {{ 'vrn.breadcrumb.home' | t | json }},
+          "item": {{ request.origin | append: routes.root_url | json }}
+        }{% if crumbs_name != blank %},
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": {{ crumbs_name | json }},
+          "item": {{ request.origin | append: crumbs_url | json }}
+        }{% endif %},
+        {
+          "@type": "ListItem",
+          "position": {% if crumbs_name != blank %}3{% else %}2{% endif %},
+          "name": {{ leaf_name | json }},
+          "item": {{ request.origin | append: leaf_url | json }}
+        }
+      ]
+    }
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Vorreni kruimelpad",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Toont het pad en voegt BreadcrumbList structured data toe. Horizon levert Product, Organization en Article al zelf, dus dat wordt hier niet herhaald."
+    },
+    {
+      "type": "header",
+      "content": "Ruimte"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Boven",
+      "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Onder",
+      "min": 0, "max": 100, "step": 1, "unit": "px", "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "Links",
+      "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "Rechts",
+      "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vorreni kruimelpad"
+    }
+  ]
+}
+{% endschema %}

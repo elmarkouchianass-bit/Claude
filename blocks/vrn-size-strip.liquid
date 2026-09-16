@@ -1,0 +1,148 @@
+{% doc %}
+  Compacte maatkeuze op de productkaart. Eén tik op een maat legt dat artikel
+  direct in de cart en opent Horizon's cart drawer.
+
+  Uitverkochte maten blijven staan, doorgestreept en uitgeschakeld, zodat
+  zichtbaar is wat het product voert.
+
+  Heeft het product meer dan één optie, dan worden de andere opties
+  vastgehouden op de variant die de kaart nu toont. De strip verkoopt dus de
+  getoonde kleur; voor de rest blijft Horizon's quick-add-dialoog bestaan.
+{% enddoc %}
+
+{% render 'vrn-styles' %}
+
+{%- liquid
+  assign product = closest.product
+  assign option_names = block.settings.option_names | downcase | split: ','
+  assign size_index = 0
+
+  for option in product.options_with_values
+    assign option_name = option.name | downcase | strip
+    for candidate in option_names
+      assign candidate_name = candidate | strip
+      if option_name == candidate_name
+        assign size_index = forloop.index
+      endif
+    endfor
+    if size_index > 0
+      assign size_option = option
+      break
+    endif
+  endfor
+
+  assign base = product.selected_or_first_available_variant
+  assign options_count = product.options.size
+-%}
+
+{%- if size_index > 0 and size_option.values.size > 1 -%}
+  <vrn-size-strip
+    class="vrn-product-card__sizes"
+    data-product-id="{{ product.id }}"
+    data-product-title="{{ product.title | escape }}"
+    data-label-adding="{{ 'vrn.size_strip.adding' | t }}"
+    data-label-added="{{ 'vrn.size_strip.added' | t }}"
+    data-label-error="{{ 'vrn.size_strip.error' | t }}"
+    {{ block.shopify_attributes }}
+  >
+    <fieldset class="vrn-size-strip">
+      <legend class="vrn-size-strip__legend">
+        {{- 'vrn.size_strip.aria_group' | t: product: product.title -}}
+      </legend>
+
+      {%- for value in size_option.values -%}
+        {%- liquid
+          assign value_name = value.name | default: value
+          assign match_id = 0
+          assign match_available = false
+
+          for variant in product.variants
+            case size_index
+              when 1
+                assign variant_value = variant.option1
+              when 2
+                assign variant_value = variant.option2
+              else
+                assign variant_value = variant.option3
+            endcase
+
+            unless variant_value == value_name
+              continue
+            endunless
+
+            # De overige opties vastgehouden op de variant die de kaart toont.
+            assign matches = true
+            if size_index != 1 and variant.option1 != base.option1
+              assign matches = false
+            endif
+            if size_index != 2 and options_count >= 2 and variant.option2 != base.option2
+              assign matches = false
+            endif
+            if size_index != 3 and options_count >= 3 and variant.option3 != base.option3
+              assign matches = false
+            endif
+
+            if matches
+              assign match_id = variant.id
+              assign match_available = variant.available
+              break
+            endif
+          endfor
+        -%}
+
+        {%- if match_id > 0 -%}
+          <button
+            type="button"
+            class="vrn-size-strip__option"
+            data-variant-id="{{ match_id }}"
+            data-available="{{ match_available }}"
+            aria-pressed="false"
+            {% unless match_available %}
+              disabled
+              aria-label="{{ 'vrn.size_strip.sold_out' | t: size: value_name }}"
+            {% endunless %}
+          >
+            {{- value_name -}}
+          </button>
+        {%- endif -%}
+      {%- endfor -%}
+    </fieldset>
+
+    <p
+      class="vrn-size-strip__status"
+      role="status"
+      aria-live="polite"
+      data-vrn-size-strip-status
+    ></p>
+  </vrn-size-strip>
+
+  <script
+    src="{{ 'vrn-size-strip.js' | asset_url }}"
+    type="module"
+  ></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Vorreni matenstrip",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Verschijnt alleen bij producten met een maatoptie en meer dan één maat. Toevoegen opent de cart drawer."
+    },
+    {
+      "type": "text",
+      "id": "option_names",
+      "label": "Namen van de maatoptie",
+      "default": "Maat,Size",
+      "info": "Komma-gescheiden. Hoofdletters maken niet uit."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vorreni matenstrip"
+    }
+  ]
+}
+{% endschema %}

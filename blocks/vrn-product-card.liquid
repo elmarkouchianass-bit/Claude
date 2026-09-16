@@ -1,0 +1,125 @@
+{% doc %}
+  Vorreni-productkaart.
+
+  Dit is Horizon's eigen kaart, niet een kopie ervan: de opmaak, de hover op
+  de tweede foto, de badges en de quick-add komen uit `snippets/product-card.liquid`
+  en de bijbehorende styles. Het enige verschil is dat deze kaart ook een
+  `vrn-size-strip` als kindblock accepteert, wat Horizon's `_product-card` niet
+  doet omdat die een gesloten lijst heeft zonder `@theme`.
+
+  @param {string} [product_view_context] - Context die aan de kaart-snippet wordt doorgegeven.
+{% enddoc %}
+
+{% render 'vrn-styles' %}
+
+{% liquid
+  assign product = closest.product
+-%}
+
+{% capture children %}
+  {% content_for 'blocks', closest.product: product %}
+{% endcapture %}
+
+{% render 'product-card',
+  children: children,
+  product: product,
+  block: block,
+  product_view_context: product_view_context
+%}
+
+{% render 'quantity-selector-styles' %}
+{% render 'buy-buttons-styles' %}
+{% render 'quick-add-styles' %}
+{% render 'quick-add-modal-styles' %}
+{% render 'swatch-styles' %}
+{% render 'variant-picker-styles' %}
+{% render 'product-badges-styles' %}
+
+{% stylesheet %}
+  .vrn-product-card__sizes {
+    display: block;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Vorreni productkaart",
+  "tag": null,
+  "blocks": [
+    { "type": "vrn-size-strip" },
+    { "type": "_product-card-gallery" },
+    { "type": "_product-card-group" },
+    { "type": "product-title" },
+    { "type": "price" },
+    { "type": "swatches" },
+    { "type": "sku" },
+    { "type": "review" },
+    { "type": "text" },
+    { "type": "image" },
+    { "type": "custom-liquid" },
+    { "type": "@app" }
+  ],
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "De kaart erft alle opmaak uit Horizon's productkaart-instellingen. Zet er een matenstrip in voor quick add met maatkeuze."
+    },
+    {
+      "type": "range",
+      "id": "product_card_gap",
+      "label": "Verticale ruimte",
+      "min": 0, "max": 50, "step": 1, "unit": "px", "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Randen"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Hoekradius",
+      "min": 0, "max": 32, "step": 1, "unit": "px", "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Ruimte"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Boven",
+      "min": 0, "max": 50, "step": 1, "unit": "px", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Onder",
+      "min": 0, "max": 50, "step": 1, "unit": "px", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "Links",
+      "min": 0, "max": 50, "step": 1, "unit": "px", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "Rechts",
+      "min": 0, "max": 50, "step": 1, "unit": "px", "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vorreni productkaart",
+      "blocks": {
+        "gallery": { "type": "_product-card-gallery" },
+        "sizes": { "type": "vrn-size-strip" },
+        "title": { "type": "product-title" },
+        "price": { "type": "price" }
+      },
+      "block_order": ["gallery", "sizes", "title", "price"]
+    }
+  ]
+}
+{% endschema %}

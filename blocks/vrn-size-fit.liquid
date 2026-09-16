@@ -1,0 +1,118 @@
+{% doc %}
+  Pasvorm-balk: een horizontale schaal van Klein via Valt normaal naar Groot,
+  met een indicator die per product te zetten is.
+
+  De positie komt uit het metafield `custom.size_fit` (integer 1 t/m 5). Staat
+  dat leeg, dan valt het terug op de instelling in dit block. Zo hoeft de
+  merchant alleen de producten te vullen die afwijken.
+{% enddoc %}
+
+{% render 'vrn-styles' %}
+
+{%- liquid
+  assign fit = closest.product.metafields.custom.size_fit.value
+  if fit == blank
+    assign fit = block.settings.fallback_value
+  endif
+  assign fit = fit | at_least: 1 | at_most: 5
+
+  assign position = fit | minus: 1 | times: 0.25
+  capture value_key
+    echo 'vrn.size_fit.value_'
+    echo fit
+  endcapture
+  assign value_label = value_key | t
+-%}
+
+<div
+  class="vrn-size-fit spacing-style"
+  style="{% render 'spacing-style', settings: block.settings %}"
+  {{ block.shopify_attributes }}
+>
+  {%- if block.settings.show_label -%}
+    <p class="vrn-eyebrow">{{ 'vrn.size_fit.label' | t }}</p>
+  {%- endif -%}
+
+  <div
+    class="vrn-size-fit__track"
+    role="img"
+    aria-label="{{ 'vrn.size_fit.aria' | t: value: value_label }}"
+  >
+    <div class="vrn-size-fit__ticks" aria-hidden="true">
+      {%- for i in (1..5) -%}
+        <span class="vrn-size-fit__tick"></span>
+      {%- endfor -%}
+    </div>
+    <span
+      class="vrn-size-fit__indicator"
+      style="--vrn-fit-position: {{ position }};"
+    ></span>
+  </div>
+
+  <div class="vrn-size-fit__scale" aria-hidden="true">
+    <span>{{ 'vrn.size_fit.scale_small' | t }}</span>
+    <span class="vrn-size-fit__value">{{ value_label }}</span>
+    <span>{{ 'vrn.size_fit.scale_large' | t }}</span>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Vorreni pasvorm",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Per product te sturen met het metafield custom.size_fit (geheel getal 1 t/m 5). 1 is klein, 3 is normaal, 5 is groot. Zonder metafield geldt de waarde hieronder."
+    },
+    {
+      "type": "range",
+      "id": "fallback_value",
+      "label": "Standaardpositie",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "checkbox",
+      "id": "show_label",
+      "label": "Kop tonen",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Ruimte"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Boven",
+      "min": 0, "max": 100, "step": 1, "unit": "px", "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Onder",
+      "min": 0, "max": 100, "step": 1, "unit": "px", "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "Links",
+      "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "Rechts",
+      "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vorreni pasvorm"
+    }
+  ]
+}
+{% endschema %}

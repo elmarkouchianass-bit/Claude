@@ -1,0 +1,92 @@
+{% doc %}
+  Eén korte klantreview: citaat, naam en het gekochte product.
+
+  Bewust zonder sterren of scores. Zet er drie naast elkaar in een sectie met
+  drie kolommen.
+{% enddoc %}
+
+{% render 'vrn-styles' %}
+
+<figure
+  class="vrn-review spacing-style"
+  style="{% render 'spacing-style', settings: block.settings %}"
+  {{ block.shopify_attributes }}
+>
+  <blockquote class="vrn-review__quote">{{ block.settings.quote }}</blockquote>
+  {%- if block.settings.name != blank -%}
+    <figcaption class="vrn-review__attribution">
+      {%- if block.settings.product != blank -%}
+        {{- 'vrn.reviews.attribution' | t: name: block.settings.name, product: block.settings.product -}}
+      {%- else -%}
+        {{- block.settings.name -}}
+      {%- endif -%}
+    </figcaption>
+  {%- endif -%}
+</figure>
+
+{% stylesheet %}
+  .vrn-review {
+    margin: 0;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Vorreni review",
+  "tag": null,
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "quote",
+      "label": "Citaat",
+      "default": "Zit als gegoten en de wol voelt zwaar aan, in de goede zin.",
+      "info": "Houd het bij één of twee zinnen."
+    },
+    {
+      "type": "text",
+      "id": "name",
+      "label": "Naam",
+      "default": "Daan"
+    },
+    {
+      "type": "text",
+      "id": "product",
+      "label": "Product",
+      "default": "Wollen overshirt"
+    },
+    {
+      "type": "header",
+      "content": "Ruimte"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Boven",
+      "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Onder",
+      "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "Links",
+      "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "Rechts",
+      "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vorreni review"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,41 @@
+{% doc %}
+  Eén regel in een Vorreni USP-lijst: vierkante bullet, korte titel, optioneel
+  een regel toelichting.
+{% enddoc %}
+
+{% render 'vrn-styles' %}
+
+<li class="vrn-usp__item" {{ block.shopify_attributes }}>
+  <div>
+    <p class="vrn-usp__title">{{ block.settings.title }}</p>
+    {%- if block.settings.body != blank -%}
+      <p class="vrn-usp__body">{{ block.settings.body }}</p>
+    {%- endif -%}
+  </div>
+</li>
+
+{% schema %}
+{
+  "name": "Vorreni USP",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titel",
+      "default": "30 dagen retourrecht"
+    },
+    {
+      "type": "text",
+      "id": "body",
+      "label": "Toelichting",
+      "info": "Eén korte regel. Laat leeg als de titel genoeg zegt."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vorreni USP"
+    }
+  ]
+}
+{% endschema %}
