@@ -9,91 +9,109 @@
  */
 {
   "sections": {
-    "hero_jVaWmY": {
+    "hero": {
       "type": "hero",
       "blocks": {
-        "text_YLPk4p": {
+        "hero-heading": {
           "type": "text",
-          "name": "t:names.heading",
           "settings": {
-            "text": "<p>Browse our latest products</p>",
-            "width": "fit-content",
-            "max_width": "normal",
-            "alignment": "left",
-            "type_preset": "h2",
-            "font": "var(--font-body--family)",
-            "font_size": "1rem",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
+            "text": "<h1>Wol die de winter uitzit</h1>",
+            "type_preset": "h1",
             "text_color": "{{ settings.color_palette.background }}",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
+            "max_width": "narrow"
+          }
         },
-        "button_H9gpTf": {
+        "hero-button": {
           "type": "button",
-          "name": "t:names.button",
           "settings": {
-            "label": "Shop all",
+            "label": "Shop jassen",
             "link": "shopify://collections/all",
-            "open_in_new_tab": false,
             "style_class": "button-custom",
             "custom_button_background": "rgba(0, 0, 0, 0)",
             "custom_button_text": "{{ settings.color_palette.background }}",
-            "custom_button_border": "{{ settings.color_palette.background }}",
-            "width": "fit-content",
-            "custom_width": 100,
-            "width_mobile": "fit-content",
-            "custom_width_mobile": 100
-          },
-          "blocks": {}
+            "custom_button_border": "{{ settings.color_palette.background }}"
+          }
         }
       },
       "block_order": [
-        "text_YLPk4p",
-        "button_H9gpTf"
+        "hero-heading",
+        "hero-button"
       ],
-      "name": "t:names.hero",
       "settings": {
         "media_type_1": "image",
-        "media_type_2": "image",
-        "link": "",
-        "open_in_new_tab": false,
-        "content_direction": "column",
-        "vertical_on_mobile": true,
-        "horizontal_alignment": "space-between",
-        "vertical_alignment": "flex-end",
-        "align_baseline": true,
-        "horizontal_alignment_flex_direction_column": "center",
+        "section_width": "full-width",
+        "section_height": "large",
+        "horizontal_alignment_flex_direction_column": "flex-start",
         "vertical_alignment_flex_direction_column": "flex-end",
-        "gap": 24,
-        "section_width": "page-width",
-        "section_height": "medium",
-        "section_height_custom": 50,
         "toggle_overlay": true,
-        "overlay_color": "#12121266",
+        "overlay_color": "#14110F40",
         "overlay_style": "solid",
-        "gradient_direction": "to bottom",
-        "blurred_reflection": false,
-        "reflection_opacity": 75,
-        "padding-block-start": 100,
-        "padding-block-end": 72
+        "gap": 20,
+        "padding-block-start": 72,
+        "padding-block-end": 56
       }
     },
-    "product_list_fa6P9H": {
+    "categories": {
+      "type": "collection-list",
+      "blocks": {
+        "categories-heading": {
+          "type": "text",
+          "settings": {
+            "text": "<h2>Categorieën</h2>",
+            "type_preset": "h4"
+          }
+        },
+        "static-collection-card": {
+          "type": "_collection-card",
+          "static": true,
+          "settings": {
+            "placement": "below_image",
+            "collection_card_gap": 8,
+            "border": "none",
+            "border_radius": 0
+          },
+          "blocks": {
+            "collection-card-image": {
+              "type": "_collection-card-image",
+              "settings": {
+                "image_ratio": "portrait",
+                "border_radius": 0
+              }
+            },
+            "collection-title": {
+              "type": "collection-title",
+              "settings": {
+                "type_preset": "h6",
+                "alignment": "left"
+              }
+            }
+          },
+          "block_order": [
+            "collection-title"
+          ]
+        }
+      },
+      "block_order": [
+        "categories-heading"
+      ],
+      "settings": {
+        "layout_type": "grid",
+        "columns": 4,
+        "mobile_columns": "2",
+        "max_collections": 4,
+        "columns_gap": 8,
+        "rows_gap": 8,
+        "section_width": "page-width",
+        "gap": 28,
+        "padding-block-start": 56,
+        "padding-block-end": 56
+      }
+    },
+    "featured": {
       "type": "product-list",
       "blocks": {
         "static-header": {
           "type": "_product-list-content",
-          "name": "t:names.header",
           "static": true,
           "settings": {
             "content_direction": "row",
@@ -101,182 +119,274 @@
             "horizontal_alignment": "space-between",
             "vertical_alignment": "flex-end",
             "align_baseline": true,
-            "horizontal_alignment_flex_direction_column": "flex-start",
-            "vertical_alignment_flex_direction_column": "center",
             "gap": 12,
-            "width": "fill",
-            "custom_width": 100,
-            "width_mobile": "fill",
-            "custom_width_mobile": 100,
-            "height": "fit",
-            "custom_height": 100,
-            "background_media": "none",
-            "video_position": "cover",
-            "background_image_position": "cover",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
+            "width": "fill"
           },
           "blocks": {
-            "product_list_text_YFtzcL": {
+            "list-title": {
               "type": "_product-list-text",
-              "name": "t:names.collection_title",
               "settings": {
-                "text": "<h3>{{ closest.collection.title }}</h3>",
-                "width": "fit-content",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "h4",
-                "font": "var(--font-body--family)",
-                "font_size": "",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
+                "text": "<h2>Uitgelicht</h2>",
+                "type_preset": "h4"
+              }
             },
-            "product_list_button_MWeP9V": {
+            "list-button": {
               "type": "_product-list-button",
-              "name": "t:names.product_list_button",
               "settings": {
-                "label": "View all",
-                "open_in_new_tab": false,
-                "style_class": "button-unstyled",
-                "width": "fit-content",
-                "custom_width": 100,
-                "width_mobile": "fit-content",
-                "custom_width_mobile": 100
-              },
-              "blocks": {}
+                "label": "Alles bekijken",
+                "link": "shopify://collections/all",
+                "style_class": "button-unstyled"
+              }
             }
           },
           "block_order": [
-            "product_list_text_YFtzcL",
-            "product_list_button_MWeP9V"
+            "list-title",
+            "list-button"
           ]
         },
         "static-product-card": {
           "type": "_product-card",
-          "name": "t:names.product_card",
           "static": true,
           "settings": {
             "product_card_gap": 4,
             "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
             "border_radius": 0,
             "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
+            "padding-block-end": 8
           },
           "blocks": {
-            "product_card_gallery_677WP3": {
+            "card-gallery": {
               "type": "_product-card-gallery",
-              "name": "t:names.product_card_media",
               "settings": {
-                "image_ratio": "adapt",
-                "border": "none",
-                "border_width": 1,
-                "border_opacity": 100,
-                "border_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
+                "image_ratio": "portrait",
+                "border_radius": 0
+              }
             },
-            "product_title_YXxMTj": {
+            "card-title": {
               "type": "product-title",
-              "name": "t:names.product_title",
               "settings": {
-                "width": "100%",
-                "max_width": "normal",
-                "alignment": "left",
                 "type_preset": "paragraph",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 4,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
+                "padding-block-start": 8
+              }
             },
-            "price_JQzVV4": {
+            "card-price": {
               "type": "price",
-              "name": "t:names.product_price",
               "settings": {
+                "type_preset": "paragraph",
                 "show_sale_price_first": true,
                 "show_installments": false,
-                "show_tax_info": false,
-                "type_preset": "h6",
-                "width": "100%",
-                "alignment": "left",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
+                "show_tax_info": false
+              }
+            },
+            "card-sizes": {
+              "type": "custom-liquid",
+              "settings": {
+                "custom_liquid": "{% render 'vor-card-size-add', option_name: 'Maat' %}"
+              }
             }
           },
           "block_order": [
-            "product_card_gallery_677WP3",
-            "product_title_YXxMTj",
-            "price_JQzVV4"
+            "card-gallery",
+            "card-title",
+            "card-price",
+            "card-sizes"
           ]
         }
       },
-      "name": "t:names.featured_collection",
+      "block_order": [],
       "settings": {
-        "collection": "all",
         "layout_type": "grid",
-        "carousel_on_mobile": false,
-        "max_products": 8,
+        "max_products": 4,
         "columns": 4,
         "mobile_columns": "2",
-        "mobile_card_size": "60cqw",
         "columns_gap": 8,
         "rows_gap": 24,
-        "icons_style": "arrow",
-        "icons_shape": "none",
         "section_width": "page-width",
-        "horizontal_alignment": "flex-start",
         "gap": 28,
-        "padding-block-start": 48,
-        "padding-block-end": 48
+        "padding-block-start": 24,
+        "padding-block-end": 56
+      }
+    },
+    "usp": {
+      "type": "section",
+      "blocks": {
+        "usp-list": {
+          "type": "vor-usp-list",
+          "settings": {
+            "columns": 4,
+            "padding-block-start": 0,
+            "padding-block-end": 0
+          },
+          "blocks": {
+            "usp-1": {
+              "type": "_vor-usp-item",
+              "settings": {
+                "text": "30 dagen bedenktijd, retour is gratis"
+              }
+            },
+            "usp-2": {
+              "type": "_vor-usp-item",
+              "settings": {
+                "text": "Gratis verzending vanaf € 100"
+              }
+            },
+            "usp-3": {
+              "type": "_vor-usp-item",
+              "settings": {
+                "text": "Voor 22:00 besteld, binnen 24 uur verzonden"
+              }
+            },
+            "usp-4": {
+              "type": "_vor-usp-item",
+              "settings": {
+                "text": "Klantenservice in Nederland, ma t/m vr"
+              }
+            }
+          },
+          "block_order": [
+            "usp-1",
+            "usp-2",
+            "usp-3",
+            "usp-4"
+          ]
+        }
+      },
+      "block_order": [
+        "usp-list"
+      ],
+      "settings": {
+        "content_direction": "column",
+        "section_width": "page-width",
+        "background_color": "{{ settings.color_palette.color2 }}",
+        "padding-block-start": 28,
+        "padding-block-end": 28
+      }
+    },
+    "editorial": {
+      "type": "media-with-content",
+      "blocks": {
+        "media": {
+          "type": "_media-without-appearance",
+          "static": true
+        },
+        "content": {
+          "type": "_content-without-appearance",
+          "static": true,
+          "settings": {
+            "horizontal_alignment_flex_direction_column": "flex-start",
+            "vertical_alignment_flex_direction_column": "center"
+          },
+          "blocks": {
+            "caption": {
+              "type": "text",
+              "settings": {
+                "text": "<p>Over Vorreni</p>",
+                "type_preset": "h6"
+              }
+            },
+            "heading": {
+              "type": "text",
+              "settings": {
+                "text": "<h2>Gemaakt om lang te dragen</h2>",
+                "type_preset": "h3"
+              }
+            },
+            "body": {
+              "type": "text",
+              "settings": {
+                "text": "<p>We werken met een korte lijst leveranciers: merinowol uit Portugal, wolmix uit Italië en katoen dat we al jaren afnemen. Elk model wordt in drie maten gedragen voordat het in productie gaat, zodat de pasvorm klopt voordat jij hem bestelt. Daarom is de collectie klein en verandert er per seizoen weinig: wat werkt, blijft.</p>",
+                "type_preset": "rte",
+                "max_width": "normal"
+              }
+            }
+          },
+          "block_order": [
+            "caption",
+            "heading",
+            "body"
+          ]
+        }
+      },
+      "settings": {
+        "media_position": "left",
+        "media_width": "medium",
+        "media_height": "60svh",
+        "section_width": "page-width",
+        "padding-block-start": 56,
+        "padding-block-end": 56
+      }
+    },
+    "reviews": {
+      "type": "section",
+      "blocks": {
+        "reviews-heading": {
+          "type": "text",
+          "settings": {
+            "text": "<h2>Wat klanten zeggen</h2>",
+            "type_preset": "h4"
+          }
+        },
+        "reviews-row": {
+          "type": "group",
+          "settings": {
+            "content_direction": "row",
+            "vertical_on_mobile": true,
+            "gap": 32,
+            "width": "fill",
+            "vertical_alignment": "flex-start"
+          },
+          "blocks": {
+            "review-1": {
+              "type": "vor-review",
+              "settings": {
+                "quote": "De jas valt precies zoals beschreven en de wol voelt zwaar aan. Na drie weken dragen nog geen pluisjes.",
+                "author": "Thomas",
+                "product_name": "Wollen overjas"
+              }
+            },
+            "review-2": {
+              "type": "vor-review",
+              "settings": {
+                "quote": "Snel geleverd en netjes verpakt. De maat klopte, ik hoefde niets te ruilen.",
+                "author": "Sander",
+                "product_name": "Merino trui"
+              }
+            },
+            "review-3": {
+              "type": "vor-review",
+              "settings": {
+                "quote": "Simpele broek, goede stof, zit strak zonder te knellen. Ik heb er een tweede besteld.",
+                "author": "Joris",
+                "product_name": "Wolmix pantalon"
+              }
+            }
+          },
+          "block_order": [
+            "review-1",
+            "review-2",
+            "review-3"
+          ]
+        }
+      },
+      "block_order": [
+        "reviews-heading",
+        "reviews-row"
+      ],
+      "settings": {
+        "content_direction": "column",
+        "section_width": "page-width",
+        "gap": 28,
+        "padding-block-start": 24,
+        "padding-block-end": 72
       }
     }
   },
   "order": [
-    "hero_jVaWmY",
-    "product_list_fa6P9H"
+    "hero",
+    "categories",
+    "featured",
+    "usp",
+    "editorial",
+    "reviews"
   ]
 }

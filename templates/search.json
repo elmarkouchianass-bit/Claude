@@ -150,12 +150,19 @@
                 "padding-inline-end": 0
               },
               "blocks": {}
+            },
+            "card-sizes": {
+              "type": "custom-liquid",
+              "settings": {
+                "custom_liquid": "{% render 'vor-card-size-add', option_name: 'Maat' %}"
+              }
             }
           },
           "block_order": [
             "product_card_gallery_cFExAi",
             "product_title_j7qXTx",
-            "price_fYkUgG"
+            "price_fYkUgG",
+            "card-sizes"
           ]
         }
       },
