@@ -1,0 +1,925 @@
+{%- comment -%}
+  Bundle selector + variant picker.
+
+  Rendered inside main-product.liquid so it sits in the product info column,
+  beside the gallery, and is the page's only buy box.
+
+  Params:
+    cfg     - section.settings of the calling section
+    tiers   - section.blocks (only blocks of type "tier" are read)
+    uid     - section.id, used to pair the markup with its JSON data
+    product - the product being sold
+{%- endcomment -%}
+
+{%- liquid
+  assign color_key = cfg.color_option_name | downcase | strip
+  assign size_key = cfg.size_option_name | downcase | strip
+
+  # A collection setting hands back a Collection object, but a merchant
+  # copying a handle into a JSON template hands back a string. Accept both.
+  assign bundle_collection = cfg.bundle_collection
+  if bundle_collection != blank and bundle_collection.id == blank
+    assign bundle_collection = collections[cfg.bundle_collection]
+  endif
+-%}
+
+<div
+  class="bundle"
+  data-bundle
+  data-section-id="{{ uid }}"
+  data-money-format="{{ shop.money_format | escape }}"
+  data-color-key="{{ color_key | escape }}"
+  data-size-key="{{ size_key | escape }}"
+  data-mix="{% if cfg.allow_mix %}true{% else %}false{% endif %}"
+  data-atc-label="{{ cfg.atc_label | escape }}"
+  data-soldout-label="{{ cfg.soldout_label | escape }}"
+  data-save-label="{{ cfg.save_label | escape }}"
+  data-item-label="{{ cfg.item_label | escape }}"
+>
+  {%- if cfg.heading != blank -%}
+    <h2 class="bundle__heading">{{ cfg.heading | escape }}</h2>
+  {%- endif -%}
+
+  <div class="bundle__tiers" role="radiogroup" aria-label="{{ cfg.heading | default: 'Bundle' | escape }}">
+    {%- assign tier_i = 0 -%}
+    {%- for block in tiers -%}
+      {%- if block.type != 'tier' -%}{%- continue -%}{%- endif -%}
+      {%- assign qty = block.settings.quantity | at_least: 1 -%}
+      {%- if tier_i == 0 -%}{%- assign is_first = true -%}{%- else -%}{%- assign is_first = false -%}{%- endif -%}
+      {%- assign tier_i = tier_i | plus: 1 -%}
+      <button
+        type="button"
+        class="bundle-tier{% if is_first %} is-active{% endif %}"
+        role="radio"
+        aria-checked="{% if is_first %}true{% else %}false{% endif %}"
+        data-tier
+        data-qty="{{ qty }}"
+        data-discount="{{ block.settings.discount_percent | default: 0 }}"
+        data-code="{{ block.settings.discount_code | escape }}"
+        {{ block.shopify_attributes }}
+      >
+        {%- if block.settings.badge != blank -%}
+          <span class="bundle-tier__badge bundle-tier__badge--{{ block.settings.badge_style }}">{{ block.settings.badge | escape }}</span>
+        {%- endif -%}
+        <span class="bundle-tier__qty">
+          {{ qty }} {% if qty == 1 %}{{ cfg.unit_singular | escape }}{% else %}{{ cfg.unit_plural | escape }}{% endif %}
+        </span>
+        <span class="bundle-tier__price" data-tier-price>&nbsp;</span>
+        <span class="bundle-tier__compare" data-tier-compare>&nbsp;</span>
+        <span class="bundle-tier__save" data-tier-save>&nbsp;</span>
+      </button>
+    {%- endfor -%}
+  </div>
+
+  {%- comment -%} Slots are cloned from this template, one per bundle item. {%- endcomment -%}
+  <template data-slot-template>
+    <div class="bundle-slot" data-slot>
+      <div class="bundle-slot__head">
+        <span class="bundle-slot__label" data-slot-label></span>
+        <span class="bundle-slot__chosen" data-slot-chosen></span>
+      </div>
+
+      <div class="bundle-field" data-product-field hidden>
+        <span class="bundle-field__label">{{ cfg.product_label | escape }}</span>
+        <select class="bundle-select" data-product-select aria-label="{{ cfg.product_label | escape }}"></select>
+      </div>
+
+      <div class="bundle-field" data-color-field hidden>
+        <span class="bundle-field__label">{{ cfg.color_label | escape }}</span>
+        <div class="bundle-swatches" data-color-row role="radiogroup" aria-label="{{ cfg.color_label | escape }}"></div>
+      </div>
+
+      <div class="bundle-field" data-size-field hidden>
+        <span class="bundle-field__label">{{ cfg.size_label | escape }}</span>
+        <div class="bundle-sizes" data-size-row role="radiogroup" aria-label="{{ cfg.size_label | escape }}"></div>
+      </div>
+    </div>
+  </template>
+
+  <div class="bundle__slots" data-slots></div>
+
+  <div class="bundle__summary">
+    <div class="bundle__total">
+      <span class="bundle__total-label">{{ cfg.total_label | escape }}</span>
+      <span class="bundle__total-value">
+        <span class="bundle__total-compare" data-total-compare></span>
+        <span class="bundle__total-current" data-total-current></span>
+      </span>
+    </div>
+    <p class="bundle__saving" data-total-save hidden></p>
+  </div>
+
+  <button type="button" class="bundle__atc btn btn--primary" data-bundle-add>
+    <span data-bundle-add-label>{{ cfg.atc_label | escape }}</span>
+  </button>
+
+  <p class="bundle__error" data-bundle-error role="alert" hidden></p>
+
+  {%- if cfg.footnote != blank -%}
+    <p class="bundle__footnote">{{ cfg.footnote | escape }}</p>
+  {%- endif -%}
+</div>
+
+{%- comment -%}
+  Variant data for every product a slot may choose. The current product is
+  always first so a slot defaults to the product being viewed.
+{%- endcomment -%}
+{%- capture bundle_json -%}
+{"products":[
+{%- render 'bundle-product-json', p: product -%}
+{%- if bundle_collection != blank -%}
+  {%- for other in bundle_collection.products -%}
+    {%- unless other.handle == product.handle -%}
+      ,{%- render 'bundle-product-json', p: other -%}
+    {%- endunless -%}
+  {%- endfor -%}
+{%- endif -%}
+]}
+{%- endcapture -%}
+
+<script type="application/json" data-bundle-data-for="{{ uid }}">
+{{ bundle_json }}
+</script>
+
+<style>
+  .bundle {
+    border: 1px solid var(--color-border-strong);
+    padding: clamp(1rem, 2.5vw, 1.5rem);
+    margin-block: 1.5rem;
+  }
+
+  .bundle__heading,
+  .bundle-field__label,
+  .bundle-slot__label {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin: 0 0 0.75rem;
+  }
+
+  .bundle__tiers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .bundle-tier {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    padding: 1.35rem 0.5rem 0.9rem;
+    border: 1px solid var(--color-border-strong);
+    background: var(--color-background);
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .bundle-tier:hover { border-color: var(--color-text); }
+
+  /* Selected state carries a thicker rule AND the filled radio dot below,
+     so it never rests on colour alone. */
+  .bundle-tier.is-active {
+    border-color: var(--color-text);
+    box-shadow: inset 0 0 0 1px var(--color-text);
+  }
+
+  .bundle-tier:focus-visible {
+    outline: 2px solid var(--color-text);
+    outline-offset: 2px;
+  }
+
+  .bundle-tier__badge {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    font-size: 0.5625rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.5rem;
+    background: var(--color-text);
+    color: var(--color-background);
+  }
+
+  .bundle-tier__badge--outline {
+    background: var(--color-background);
+    color: var(--color-text);
+    border: 1px solid var(--color-text);
+  }
+
+  .bundle-tier__qty {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .bundle-tier__price {
+    font-size: 1.15rem;
+    font-weight: 600;
+  }
+
+  .bundle-tier__compare {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-decoration: line-through;
+    min-height: 1.1em;
+  }
+
+  .bundle-tier__save {
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    min-height: 1.1em;
+  }
+
+  .bundle-slot {
+    padding-top: 1.1rem;
+    margin-top: 1.1rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .bundle__slots > .bundle-slot:first-child {
+    padding-top: 0;
+    margin-top: 0;
+    border-top: 0;
+  }
+
+  .bundle-slot__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .bundle-slot__label {
+    margin: 0;
+  }
+
+  .bundle-slot__chosen {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-align: right;
+  }
+
+  .bundle-field { margin-bottom: 1rem; }
+  .bundle-field__label { display: block; margin-bottom: 0.5rem; }
+
+  .bundle-select {
+    width: 100%;
+    padding: 0.7rem 0.75rem;
+    border: 1px solid var(--color-border-strong);
+    background: var(--color-background);
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    color: var(--color-text);
+  }
+
+  .bundle-swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .bundle-swatch {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    background: var(--color-background);
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+  }
+
+  .bundle-swatch__img {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    display: block;
+    background: color-mix(in srgb, var(--color-text) 5%, var(--color-background));
+  }
+
+  .bundle-swatch__name {
+    font-size: 0.625rem;
+    letter-spacing: 0.06em;
+    text-align: center;
+    padding: 0 0.15rem 0.35rem;
+    color: var(--color-text-muted);
+  }
+
+  .bundle-swatch:hover { border-color: var(--color-text); }
+
+  .bundle-swatch.is-active {
+    border-color: var(--color-text);
+    box-shadow: inset 0 0 0 1px var(--color-text);
+  }
+
+  .bundle-swatch.is-active .bundle-swatch__name { color: var(--color-text); font-weight: 600; }
+
+  .bundle-swatch:focus-visible { outline: 2px solid var(--color-text); outline-offset: 2px; }
+
+  /* Sold out reads as a diagonal strike plus a label, never colour alone. */
+  .bundle-swatch[aria-disabled="true"],
+  .bundle-size[aria-disabled="true"] {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .bundle-swatch { position: relative; }
+
+  .bundle-swatch[aria-disabled="true"]::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: linear-gradient(to top right, transparent calc(50% - 1px), var(--color-text) 50%, transparent calc(50% + 1px));
+  }
+
+  .bundle-sizes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .bundle-size {
+    min-width: 3rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--color-border-strong);
+    background: var(--color-background);
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .bundle-size:hover { border-color: var(--color-text); }
+
+  .bundle-size.is-active {
+    background: var(--color-text);
+    color: var(--color-background);
+    border-color: var(--color-text);
+  }
+
+  .bundle-size[aria-disabled="true"] { text-decoration: line-through; }
+
+  .bundle-size:focus-visible { outline: 2px solid var(--color-text); outline-offset: 2px; }
+
+  .bundle__summary {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .bundle__total {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .bundle__total-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .bundle__total-current { font-size: 1.3rem; font-weight: 600; }
+
+  .bundle__total-compare {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    text-decoration: line-through;
+    margin-right: 0.5rem;
+  }
+
+  .bundle__saving {
+    margin: 0.35rem 0 0;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .bundle__atc {
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .bundle__atc[disabled] { opacity: 0.45; cursor: not-allowed; }
+
+  .bundle__error {
+    margin: 0.65rem 0 0;
+    font-size: 0.8125rem;
+    color: var(--color-error);
+  }
+
+  .bundle__footnote {
+    margin: 0.75rem 0 0;
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+
+  @media (max-width: 480px) {
+    .bundle__tiers { grid-template-columns: 1fr; }
+    .bundle-tier { flex-direction: row; flex-wrap: wrap; justify-content: space-between; padding-top: 1rem; }
+    .bundle-tier__badge { left: auto; right: 0.5rem; transform: translateY(-50%); }
+  }
+</style>
+
+<script>
+  (function () {
+    var root = document.querySelector('[data-bundle]');
+    if (!root) return;
+
+    var sectionId = root.getAttribute('data-section-id');
+    var dataEl = null;
+    document.querySelectorAll('script[data-bundle-data-for]').forEach(function (el) {
+      if (el.getAttribute('data-bundle-data-for') === sectionId) dataEl = el;
+    });
+    if (!dataEl) return;
+
+    var PRODUCTS = [];
+    try {
+      PRODUCTS = (JSON.parse(dataEl.textContent) || {}).products || [];
+    } catch (e) {
+      return;
+    }
+    if (!PRODUCTS.length) return;
+
+    var COLOR_KEY = (root.getAttribute('data-color-key') || '').toLowerCase();
+    var SIZE_KEY = (root.getAttribute('data-size-key') || '').toLowerCase();
+    var ALLOW_MIX = root.getAttribute('data-mix') === 'true';
+    var MONEY = root.getAttribute('data-money-format') || '';
+    var ATC_LABEL = root.getAttribute('data-atc-label') || 'Add to cart';
+    var SOLDOUT_LABEL = root.getAttribute('data-soldout-label') || 'Sold out';
+    var SAVE_LABEL = root.getAttribute('data-save-label') || 'Save';
+    var ITEM_LABEL = root.getAttribute('data-item-label') || 'Item';
+
+    var slotsHost = root.querySelector('[data-slots]');
+    var tplEl = root.querySelector('[data-slot-template]');
+    var addBtn = root.querySelector('[data-bundle-add]');
+    var addLabel = root.querySelector('[data-bundle-add-label]');
+    var errorEl = root.querySelector('[data-bundle-error]');
+    var tierEls = [].slice.call(root.querySelectorAll('[data-tier]'));
+
+    /* ---- money ---------------------------------------------------- */
+
+    function group(num, precision, thousands, decimal) {
+      if (isNaN(num) || num === null) num = 0;
+      var fixed = (num / 100).toFixed(precision);
+      var parts = fixed.split('.');
+      var whole = parts[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1' + thousands);
+      return parts[1] ? whole + decimal + parts[1] : whole;
+    }
+
+    function formatMoney(cents) {
+      if (!MONEY) return group(cents, 2, ',', '.');
+      var value;
+      if (MONEY.indexOf('amount_no_decimals_with_comma_separator') > -1) value = group(cents, 0, '.', ',');
+      else if (MONEY.indexOf('amount_with_comma_separator') > -1) value = group(cents, 2, '.', ',');
+      else if (MONEY.indexOf('amount_no_decimals_with_space_separator') > -1) value = group(cents, 0, ' ', ',');
+      else if (MONEY.indexOf('amount_with_space_separator') > -1) value = group(cents, 2, ' ', ',');
+      else if (MONEY.indexOf('amount_with_apostrophe_separator') > -1) value = group(cents, 2, String.fromCharCode(39), '.');
+      else if (MONEY.indexOf('amount_no_decimals') > -1) value = group(cents, 0, ',', '.');
+      else value = group(cents, 2, ',', '.');
+      return MONEY.replace(/\{\{[^}]*\}\}/, value);
+    }
+
+    /* ---- product helpers ------------------------------------------ */
+
+    function optionIndex(product, key) {
+      var names = product.optionNames || [];
+      for (var i = 0; i < names.length; i++) {
+        if (String(names[i]).toLowerCase().trim() === key) return i;
+      }
+      return -1;
+    }
+
+    function optionValues(product, idx) {
+      var seen = [];
+      if (idx < 0) return seen;
+      (product.variants || []).forEach(function (v) {
+        var val = v.options[idx];
+        if (val != null && seen.indexOf(val) === -1) seen.push(val);
+      });
+      return seen;
+    }
+
+    /* Matches on the options this product actually has, so a product with only
+       a colour (or no options at all) still resolves to a real variant. */
+    function findVariant(product, color, size) {
+      var ci = optionIndex(product, COLOR_KEY);
+      var si = optionIndex(product, SIZE_KEY);
+      var list = product.variants || [];
+      for (var i = 0; i < list.length; i++) {
+        var v = list[i];
+        if (ci > -1 && color != null && v.options[ci] !== color) continue;
+        if (si > -1 && size != null && v.options[si] !== size) continue;
+        return v;
+      }
+      return null;
+    }
+
+    function anyAvailable(product, color, size) {
+      var ci = optionIndex(product, COLOR_KEY);
+      var si = optionIndex(product, SIZE_KEY);
+      return (product.variants || []).some(function (v) {
+        if (!v.available) return false;
+        if (ci > -1 && color != null && v.options[ci] !== color) return false;
+        if (si > -1 && size != null && v.options[si] !== size) return false;
+        return true;
+      });
+    }
+
+    function imageForColor(product, color) {
+      var ci = optionIndex(product, COLOR_KEY);
+      var list = product.variants || [];
+      for (var i = 0; i < list.length; i++) {
+        if (ci < 0 || list[i].options[ci] === color) {
+          if (list[i].image) return list[i].image;
+        }
+      }
+      return product.featured || null;
+    }
+
+    function defaultSelection(product) {
+      var list = product.variants || [];
+      var v = null;
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].available) { v = list[i]; break; }
+      }
+      if (!v) v = list[0];
+      var ci = optionIndex(product, COLOR_KEY);
+      var si = optionIndex(product, SIZE_KEY);
+      return {
+        color: v && ci > -1 ? v.options[ci] : null,
+        size: v && si > -1 ? v.options[si] : null
+      };
+    }
+
+    /* ---- state ----------------------------------------------------- */
+
+    var state = { qty: 1, discount: 0, code: '', slots: [] };
+
+    function makeSlot() {
+      var sel = defaultSelection(PRODUCTS[0]);
+      return { productIndex: 0, color: sel.color, size: sel.size };
+    }
+
+    function slotVariant(slot) {
+      var product = PRODUCTS[slot.productIndex];
+      if (!product) return null;
+      return findVariant(product, slot.color, slot.size);
+    }
+
+    /* ---- rendering -------------------------------------------------- */
+
+    function buildSwatches(row, slot, onPick) {
+      var product = PRODUCTS[slot.productIndex];
+      var ci = optionIndex(product, COLOR_KEY);
+      row.textContent = '';
+      var values = optionValues(product, ci);
+      if (!values.length) return false;
+
+      values.forEach(function (value) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'bundle-swatch';
+        btn.setAttribute('role', 'radio');
+        var usable = anyAvailable(product, value, null);
+        var picked = slot.color === value;
+        btn.setAttribute('aria-checked', picked ? 'true' : 'false');
+        if (picked) btn.classList.add('is-active');
+        if (!usable) btn.setAttribute('aria-disabled', 'true');
+        btn.setAttribute('aria-label', value + (usable ? '' : ' - ' + SOLDOUT_LABEL));
+
+        var src = imageForColor(product, value);
+        var img = document.createElement('img');
+        img.className = 'bundle-swatch__img';
+        img.loading = 'lazy';
+        img.width = 120;
+        img.height = 160;
+        img.alt = '';
+        if (src) img.src = src;
+        btn.appendChild(img);
+
+        var name = document.createElement('span');
+        name.className = 'bundle-swatch__name';
+        name.textContent = value;
+        btn.appendChild(name);
+
+        btn.addEventListener('click', function () {
+          if (btn.getAttribute('aria-disabled') === 'true') return;
+          onPick(value);
+        });
+        row.appendChild(btn);
+      });
+      return true;
+    }
+
+    function buildSizes(row, slot, onPick) {
+      var product = PRODUCTS[slot.productIndex];
+      var si = optionIndex(product, SIZE_KEY);
+      row.textContent = '';
+      var values = optionValues(product, si);
+      if (!values.length) return false;
+
+      values.forEach(function (value) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'bundle-size';
+        btn.setAttribute('role', 'radio');
+        /* Availability is judged against the colour already chosen, so a size
+           sold out only in this colour still reads as sold out. */
+        var usable = anyAvailable(product, slot.color, value);
+        var picked = slot.size === value;
+        btn.setAttribute('aria-checked', picked ? 'true' : 'false');
+        if (picked) btn.classList.add('is-active');
+        if (!usable) btn.setAttribute('aria-disabled', 'true');
+        btn.setAttribute('aria-label', value + (usable ? '' : ' - ' + SOLDOUT_LABEL));
+        btn.textContent = value;
+
+        btn.addEventListener('click', function () {
+          if (btn.getAttribute('aria-disabled') === 'true') return;
+          onPick(value);
+        });
+        row.appendChild(btn);
+      });
+      return true;
+    }
+
+    function buildSlot(node, slot, index) {
+      var labelEl = node.querySelector('[data-slot-label]');
+      var chosenEl = node.querySelector('[data-slot-chosen]');
+      var productField = node.querySelector('[data-product-field]');
+      var productSelect = node.querySelector('[data-product-select]');
+      var colorField = node.querySelector('[data-color-field]');
+      var colorRow = node.querySelector('[data-color-row]');
+      var sizeField = node.querySelector('[data-size-field]');
+      var sizeRow = node.querySelector('[data-size-row]');
+
+      labelEl.textContent = state.qty > 1 ? ITEM_LABEL + ' ' + (index + 1) : '';
+
+      if (ALLOW_MIX && PRODUCTS.length > 1) {
+        productField.hidden = false;
+        productSelect.textContent = '';
+        PRODUCTS.forEach(function (p, i) {
+          var opt = document.createElement('option');
+          opt.value = String(i);
+          opt.textContent = p.title;
+          if (i === slot.productIndex) opt.selected = true;
+          productSelect.appendChild(opt);
+        });
+        productSelect.addEventListener('change', function () {
+          slot.productIndex = parseInt(productSelect.value, 10) || 0;
+          var sel = defaultSelection(PRODUCTS[slot.productIndex]);
+          slot.color = sel.color;
+          slot.size = sel.size;
+          renderSlots();
+        });
+      } else {
+        productField.hidden = true;
+      }
+
+      var hasColor = buildSwatches(colorRow, slot, function (value) {
+        slot.color = value;
+        /* Keep the size if this colour still offers it, otherwise fall back to
+           the first size that is actually in stock. */
+        if (!anyAvailable(PRODUCTS[slot.productIndex], value, slot.size)) {
+          var product = PRODUCTS[slot.productIndex];
+          var sizes = optionValues(product, optionIndex(product, SIZE_KEY));
+          var replacement = null;
+          sizes.forEach(function (s) {
+            if (replacement === null && anyAvailable(product, value, s)) replacement = s;
+          });
+          if (replacement !== null) slot.size = replacement;
+        }
+        renderSlots();
+        if (index === 0) syncGallery(slotVariant(slot));
+      });
+      colorField.hidden = !hasColor;
+
+      var hasSize = buildSizes(sizeRow, slot, function (value) {
+        slot.size = value;
+        renderSlots();
+      });
+      sizeField.hidden = !hasSize;
+
+      var parts = [];
+      if (slot.color) parts.push(slot.color);
+      if (slot.size) parts.push(slot.size);
+      chosenEl.textContent = parts.join(' / ');
+    }
+
+    function renderSlots() {
+      while (state.slots.length < state.qty) state.slots.push(makeSlot());
+      state.slots.length = state.qty;
+
+      slotsHost.textContent = '';
+      state.slots.forEach(function (slot, i) {
+        var node = tplEl.content.firstElementChild.cloneNode(true);
+        buildSlot(node, slot, i);
+        slotsHost.appendChild(node);
+      });
+      updateTotals();
+    }
+
+    /* ---- totals ----------------------------------------------------- */
+
+    function discounted(cents, percent) {
+      return Math.round(cents * (100 - percent) / 100);
+    }
+
+    function updateTotals() {
+      var subtotal = 0;
+      var compare = 0;
+      var allResolved = true;
+      var allAvailable = true;
+
+      state.slots.forEach(function (slot) {
+        var v = slotVariant(slot);
+        if (!v) { allResolved = false; return; }
+        if (!v.available) allAvailable = false;
+        subtotal += v.price;
+        compare += v.compareAt > v.price ? v.compareAt : v.price;
+      });
+
+      var total = discounted(subtotal, state.discount);
+      var wasPrice = compare > total ? compare : 0;
+      var saving = wasPrice ? wasPrice - total : 0;
+
+      var currentEl = root.querySelector('[data-total-current]');
+      var compareEl = root.querySelector('[data-total-compare]');
+      var saveEl = root.querySelector('[data-total-save]');
+
+      currentEl.textContent = allResolved ? formatMoney(total) : '';
+      compareEl.textContent = allResolved && wasPrice ? formatMoney(wasPrice) : '';
+      if (allResolved && saving > 0) {
+        saveEl.hidden = false;
+        saveEl.textContent = SAVE_LABEL + ' ' + formatMoney(saving);
+      } else {
+        saveEl.hidden = true;
+        saveEl.textContent = '';
+      }
+
+      var ok = allResolved && allAvailable;
+      addBtn.disabled = !ok;
+      addLabel.textContent = ok
+        ? ATC_LABEL + (allResolved ? ' — ' + formatMoney(total) : '')
+        : SOLDOUT_LABEL;
+    }
+
+    /* Tier cards preview the price for their own quantity, using the first
+       slot's unit price so the comparison across tiers is like for like. */
+    function updateTierPrices() {
+      var first = state.slots[0];
+      var unit = null;
+      if (first) {
+        var v = slotVariant(first);
+        if (v) unit = v;
+      }
+      if (!unit) {
+        var fallback = PRODUCTS[0].variants || [];
+        unit = fallback[0] || null;
+      }
+      if (!unit) return;
+
+      tierEls.forEach(function (el) {
+        var qty = parseInt(el.getAttribute('data-qty'), 10) || 1;
+        var pct = parseFloat(el.getAttribute('data-discount')) || 0;
+        var gross = unit.price * qty;
+        var net = discounted(gross, pct);
+        var priceEl = el.querySelector('[data-tier-price]');
+        var compareEl = el.querySelector('[data-tier-compare]');
+        var saveEl = el.querySelector('[data-tier-save]');
+        if (priceEl) priceEl.textContent = formatMoney(net);
+        if (compareEl) compareEl.textContent = pct > 0 ? formatMoney(gross) : '';
+        if (saveEl) saveEl.textContent = pct > 0 ? SAVE_LABEL + ' ' + pct + '%' : '';
+      });
+    }
+
+    /* ---- gallery ---------------------------------------------------- */
+
+    function syncGallery(variant) {
+      if (!variant || variant.mediaId === null || variant.mediaId === undefined) return;
+      var page = document.querySelector('.product-page');
+      if (!page) return;
+      var wanted = String(variant.mediaId);
+
+      var thumb = null;
+      page.querySelectorAll('[data-thumb-index]').forEach(function (t) {
+        if (t.getAttribute('data-media-id') === wanted) thumb = t;
+      });
+      if (thumb) { thumb.click(); return; }
+
+      var mains = page.querySelectorAll('.product-gallery__main > [data-media-index]');
+      var target = null;
+      mains.forEach(function (m) {
+        if (m.getAttribute('data-media-id') === wanted) target = m;
+      });
+      if (!target) return;
+      mains.forEach(function (m) { m.classList.remove('is-active'); });
+      target.classList.add('is-active');
+    }
+
+    /* ---- tiers ------------------------------------------------------ */
+
+    function selectTier(el) {
+      tierEls.forEach(function (t) {
+        var on = t === el;
+        t.classList.toggle('is-active', on);
+        t.setAttribute('aria-checked', on ? 'true' : 'false');
+      });
+      state.qty = parseInt(el.getAttribute('data-qty'), 10) || 1;
+      state.discount = parseFloat(el.getAttribute('data-discount')) || 0;
+      state.code = el.getAttribute('data-code') || '';
+      renderSlots();
+      updateTierPrices();
+    }
+
+    tierEls.forEach(function (el) {
+      el.addEventListener('click', function () { selectTier(el); });
+    });
+
+    /* ---- add to cart ------------------------------------------------ */
+
+    function showError(message) {
+      if (!errorEl) return;
+      errorEl.hidden = !message;
+      errorEl.textContent = message || '';
+    }
+
+    addBtn.addEventListener('click', function () {
+      showError('');
+      var items = [];
+      var stamp = String(Date.now());
+      var bundleName = state.qty + ' x';
+
+      for (var i = 0; i < state.slots.length; i++) {
+        var v = slotVariant(state.slots[i]);
+        if (!v) { showError(SOLDOUT_LABEL); return; }
+        var props = {};
+        if (state.qty > 1) {
+          props._bundle = bundleName;
+          props._bundle_id = stamp;
+        }
+        items.push({ id: v.id, quantity: 1, properties: props });
+      }
+
+      addBtn.disabled = true;
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ items: items })
+      })
+        .then(function (res) {
+          if (!res.ok) return res.json().then(function (body) { throw new Error(body.description || body.message || 'Could not add to cart'); });
+          return res.json();
+        })
+        .then(function () {
+          /* A tier discount only becomes real when Shopify applies it. With a
+             code we hand the cart the code; without one the merchant must have
+             a matching automatic discount. */
+          if (state.code) {
+            window.location.href = '/discount/' + encodeURIComponent(state.code) + '?redirect=/cart';
+            return;
+          }
+          document.dispatchEvent(new CustomEvent('cart:updated'));
+          if (typeof window.openCartDrawer === 'function') window.openCartDrawer();
+          else window.location.href = '/cart';
+        })
+        .catch(function (err) {
+          showError(err && err.message ? err.message : 'Could not add to cart');
+        })
+        .finally(function () {
+          addBtn.disabled = false;
+          updateTotals();
+        });
+    });
+
+    /* ---- boot -------------------------------------------------------- */
+
+    if (tierEls.length) selectTier(tierEls[0]);
+    else { renderSlots(); updateTierPrices(); }
+  })();
+</script>
+

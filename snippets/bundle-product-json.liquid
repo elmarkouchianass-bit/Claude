@@ -1,0 +1,27 @@
+{%- comment -%}
+  One product as JSON for the bundle selector. Params: p (product).
+  Kept in a snippet so the current product and the bundle collection emit
+  byte-identical shapes.
+{%- endcomment -%}
+{
+  "id": {{ p.id }},
+  "handle": {{ p.handle | json }},
+  "title": {{ p.title | json }},
+  "url": {{ p.url | json }},
+  "optionNames": {{ p.options | json }},
+  "featured": {% if p.featured_image %}{{ p.featured_image | image_url: width: 240 | json }}{% else %}null{% endif %},
+  "variants": [
+    {%- for v in p.variants -%}
+      {%- unless forloop.first -%},{%- endunless -%}
+      {
+        "id": {{ v.id }},
+        "options": {{ v.options | json }},
+        "price": {{ v.price }},
+        "compareAt": {{ v.compare_at_price | default: 0 }},
+        "available": {{ v.available }},
+        "image": {% if v.featured_image %}{{ v.featured_image | image_url: width: 240 | json }}{% elsif p.featured_image %}{{ p.featured_image | image_url: width: 240 | json }}{% else %}null{% endif %},
+        "mediaId": {% if v.featured_media %}{{ v.featured_media.id }}{% else %}null{% endif %}
+      }
+    {%- endfor -%}
+  ]
+}

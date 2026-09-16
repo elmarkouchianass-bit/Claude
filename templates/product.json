@@ -2,7 +2,54 @@
   "sections": {
     "main-product": {
       "type": "main-product",
-      "settings": {}
+      "settings": {
+        "enable_bundle": true,
+        "heading": "Choose your bundle",
+        "allow_mix": true,
+        "item_label": "Item",
+        "product_label": "Product",
+        "color_option_name": "Color",
+        "size_option_name": "Size",
+        "color_label": "Choose your color",
+        "size_label": "Choose your size",
+        "unit_singular": "piece",
+        "unit_plural": "pieces",
+        "total_label": "Total",
+        "save_label": "Save",
+        "atc_label": "Add to cart",
+        "soldout_label": "Sold out",
+        "footnote": "Free U.S. shipping over $75"
+      },
+      "blocks": {
+        "tier_1": {
+          "type": "tier",
+          "settings": {
+            "quantity": 1,
+            "discount_percent": 0,
+            "badge": "",
+            "badge_style": "solid"
+          }
+        },
+        "tier_2": {
+          "type": "tier",
+          "settings": {
+            "quantity": 2,
+            "discount_percent": 10,
+            "badge": "Most popular",
+            "badge_style": "solid"
+          }
+        },
+        "tier_3": {
+          "type": "tier",
+          "settings": {
+            "quantity": 3,
+            "discount_percent": 20,
+            "badge": "Best value",
+            "badge_style": "outline"
+          }
+        }
+      },
+      "block_order": ["tier_1", "tier_2", "tier_3"]
     },
     "product-recommendations": {
       "type": "product-recommendations",
