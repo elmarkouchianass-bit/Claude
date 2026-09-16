@@ -10,6 +10,7 @@
 
 {%- assign img = section.settings.image -%}
 {%- assign overlay = section.settings.overlay_opacity | default: 30 -%}
+{%- assign hero_alt = img.alt | default: section.settings.heading -%}
 
 <section
   class="hero hero--single-image hero--endu hero--align-{{ section.settings.text_position }}"
@@ -24,7 +25,7 @@
         | image_url: width: 2400
         | image_tag:
           class: 'hero__slide-image',
-          alt: img.alt | default: section.settings.heading | escape,
+          alt: hero_alt,
           widths: '800, 1200, 1600, 2000, 2400',
           sizes: '100vw',
           fetchpriority: 'high',

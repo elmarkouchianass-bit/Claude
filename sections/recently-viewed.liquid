@@ -175,14 +175,40 @@
           var card = document.createElement('a');
           card.href = '/products/' + handle;
           card.className = 'recently-viewed__card';
-          card.innerHTML =
-            '<div class="recently-viewed__image-wrap">' +
-              (imgSrc ? '<img src="' + imgSrc + '" alt="' + (p.title || '').replace(/"/g, '&quot;') + '" loading="lazy" width="300" height="300">' : '') +
-            '</div>' +
-            '<div class="recently-viewed__info">' +
-              '<p class="recently-viewed__title">' + (p.title || '') + '</p>' +
-              (price ? '<span class="recently-viewed__price">' + price + '</span>' : '') +
-            '</div>';
+          /* Built with DOM calls rather than an innerHTML string. The string
+             version put double quotes inside JS string literals, which stops
+             the Liquid parser from finding the closing script tag and makes
+             Shopify reject the whole theme on upload. It also interpolated
+             p.title straight into markup. */
+          var wrap = document.createElement('div');
+          wrap.className = 'recently-viewed__image-wrap';
+          if (imgSrc) {
+            var img = document.createElement('img');
+            img.src = imgSrc;
+            img.alt = p.title || '';
+            img.loading = 'lazy';
+            img.width = 300;
+            img.height = 300;
+            wrap.appendChild(img);
+          }
+
+          var info = document.createElement('div');
+          info.className = 'recently-viewed__info';
+
+          var titleEl = document.createElement('p');
+          titleEl.className = 'recently-viewed__title';
+          titleEl.textContent = p.title || '';
+          info.appendChild(titleEl);
+
+          if (price) {
+            var priceEl = document.createElement('span');
+            priceEl.className = 'recently-viewed__price';
+            priceEl.textContent = price;
+            info.appendChild(priceEl);
+          }
+
+          card.appendChild(wrap);
+          card.appendChild(info);
 
           grid.appendChild(card);
         })

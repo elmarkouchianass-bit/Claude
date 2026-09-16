@@ -1,4 +1,5 @@
 {%- comment -%} Editorial split — full-bleed image beside a short manifesto. {%- endcomment -%}
+{%- assign story_alt = section.settings.image.alt | default: section.settings.heading -%}
 <section class="story story--media-{{ section.settings.media_position }}" data-reveal>
   <div class="story__media">
     {%- if section.settings.image != blank -%}
@@ -7,7 +8,7 @@
         | image_url: width: 1600
         | image_tag:
           class: 'story__img',
-          alt: section.settings.image.alt | default: section.settings.heading | escape,
+          alt: story_alt,
           widths: '600, 900, 1200, 1600',
           sizes: '(max-width: 900px) 100vw, 50vw',
           loading: 'lazy'
