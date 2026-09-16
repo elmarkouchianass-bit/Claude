@@ -1,88 +1,84 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */{
+{
   "sections": {
-    "main": {
+    "intro": {
       "type": "main-page",
+      "settings": {
+        "section_width": "page-width",
+        "padding-block-start": 40,
+        "padding-block-end": 8
+      },
       "blocks": {
         "title": {
           "type": "text",
-          "name": "t:names.title",
           "settings": {
-            "text": "<h1>{{ closest.page.title }}</h1>",
-            "width": "100%",
-            "max_width": "normal",
-            "alignment": "center",
+            "text": "<h1>Contact</h1>",
             "type_preset": "h2",
-            "font": "var(--font-body--family)",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
+            "alignment": "left"
+          }
         },
-        "content": {
+        "intro": {
           "type": "text",
-          "name": "t:names.content",
           "settings": {
-            "text": "{{ closest.page.content }}",
-            "width": "100%",
-            "max_width": "narrow",
-            "alignment": "center",
+            "text": "<p>Vraag over een bestelling, een maat of een retour? Mail ons en je hebt op werkdagen binnen één werkdag antwoord. Bellen kan ook, van 9 tot 17 uur.</p>",
             "type_preset": "rte",
-            "font": "var(--font-body--family)",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
+            "max_width": "narrow",
+            "alignment": "left"
+          }
         }
       },
       "block_order": [
         "title",
-        "content"
-      ],
-      "settings": {
-        "content_direction": "column",
-        "gap": 32,
-        "background_color": "{{ settings.color_palette.background }}",
-        "padding-block-start": 40,
-        "padding-block-end": 0
-      }
+        "intro"
+      ]
     },
     "form": {
       "type": "section",
+      "settings": {
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "horizontal_alignment_flex_direction_column": "center",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 32,
+        "section_width": "page-width",
+        "section_height": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "padding-block-start": 8,
+        "padding-block-end": 64
+      },
       "blocks": {
-        "contact_form_UwiCkQ": {
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "t:html_defaults.contact_us",
+            "type_preset": "rte",
+            "font": "var(--font-body--family)",
+            "font_size": "",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "center",
+            "padding-block-start": 0,
+            "padding-block-end": 0
+          }
+        },
+        "contact_form": {
           "type": "contact-form",
           "settings": {
             "width": "custom",
             "custom_width": 50,
             "width_mobile": "custom",
             "custom_width_mobile": 100,
-            "input_style": "default",
             "padding-block-start": 0,
             "padding-block-end": 0,
             "padding-inline-start": 0,
@@ -93,53 +89,26 @@
               "type": "contact-form-submit-button",
               "static": true,
               "settings": {
-                "label": "Submit",
+                "label": "t:text_defaults.submit_button_label",
                 "style_class": "button",
                 "width": "fit-content",
                 "custom_width": 100,
                 "width_mobile": "fit-content",
                 "custom_width_mobile": 100
-              },
-              "blocks": {}
+              }
             }
           },
           "block_order": []
         }
       },
       "block_order": [
-        "contact_form_UwiCkQ"
-      ],
-      "name": "t:names.contact_form",
-      "settings": {
-        "content_direction": "column",
-        "vertical_on_mobile": true,
-        "horizontal_alignment": "flex-start",
-        "vertical_alignment": "center",
-        "align_baseline": false,
-        "horizontal_alignment_flex_direction_column": "center",
-        "vertical_alignment_flex_direction_column": "center",
-        "gap": 32,
-        "section_width": "page-width",
-        "section_height_custom": 50,
-        "background_media": "none",
-        "background_color": "{{ settings.color_palette.background }}",
-        "video_position": "cover",
-        "background_image_position": "cover",
-        "border": "none",
-        "border_width": 1,
-        "border_opacity": 100,
-        "border_radius": 0,
-        "toggle_overlay": false,
-        "overlay_color": "#00000026",
-        "overlay_style": "solid",
-        "gradient_direction": "to top",
-        "padding-block-start": 32,
-        "padding-block-end": 84
-      }
+        "text",
+        "contact_form"
+      ]
     }
   },
   "order": [
-    "main",
+    "intro",
     "form"
   ]
 }

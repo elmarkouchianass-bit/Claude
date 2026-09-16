@@ -1,0 +1,96 @@
+{% doc %}
+  Tekst uit een productmetafield, met een terugval.
+
+  Bedoeld voor de accordions op de productpagina: staat het metafield gevuld,
+  dan wint dat; anders de vaste tekst in dit block; en als dat ook leeg is,
+  optioneel de productomschrijving. Zo hoeft de merchant alleen in te vullen
+  wat per product verschilt.
+{% enddoc %}
+
+{% render 'vrn-styles' %}
+
+{%- liquid
+  assign namespace = block.settings.namespace | strip | default: 'custom'
+  assign key = block.settings.key | strip
+  assign field = closest.product.metafields[namespace][key]
+-%}
+
+<div
+  class="vrn-rte rte spacing-style"
+  style="{% render 'spacing-style', settings: block.settings %}"
+  {{ block.shopify_attributes }}
+>
+  {%- if key != blank and field != blank -%}
+    {{ field | metafield_tag }}
+  {%- elsif block.settings.fallback != blank -%}
+    {{ block.settings.fallback }}
+  {%- elsif block.settings.use_description and closest.product.description != blank -%}
+    {{ closest.product.description }}
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Vorreni metafieldtekst",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "namespace",
+      "label": "Namespace",
+      "default": "custom"
+    },
+    {
+      "type": "text",
+      "id": "key",
+      "label": "Sleutel",
+      "info": "Bijvoorbeeld material_care, shipping of returns."
+    },
+    {
+      "type": "richtext",
+      "id": "fallback",
+      "label": "Terugvaltekst",
+      "info": "Wordt getoond als het metafield leeg is. Handig voor informatie die voor alle producten gelijk is."
+    },
+    {
+      "type": "checkbox",
+      "id": "use_description",
+      "label": "Anders de productomschrijving tonen",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Ruimte"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Boven",
+      "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Onder",
+      "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "Links",
+      "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "Rechts",
+      "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vorreni metafieldtekst"
+    }
+  ]
+}
+{% endschema %}
