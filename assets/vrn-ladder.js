@@ -38,6 +38,12 @@ const UPDATE_EVENT = 'vrn:ladder:update';
 const DRAWER_SELECTOR = '#cart-drawer';
 const DRAWER_TARGET = '.cart-drawer__summary';
 
+/**
+ * Sommige winkels zetten HTML in hun money_format. De ladder schrijft met
+ * textContent, dus die tags moeten eruit voordat de klant ze letterlijk ziet.
+ */
+const plain = (value) => String(value).replace(/<[^>]*>/g, '').trim();
+
 /** Vervangt [placeholder] in een locale-string. */
 const fill = (template, values) =>
   Object.entries(values).reduce((text, [key, value]) => text.replaceAll(`[${key}]`, String(value)), template ?? '');
@@ -95,7 +101,7 @@ export function render(root, detail) {
     const show = totalDiscount > 0;
     saved.toggleAttribute('hidden', !show);
     if (show) {
-      const amount = formatMoney(totalDiscount, config.moneyFormat, Shopify.currency.active);
+      const amount = plain(formatMoney(totalDiscount, config.moneyFormat, Shopify.currency?.active ?? 'EUR'));
       saved.textContent = fill(labels.saved, { amount });
     }
   }
