@@ -3,7 +3,8 @@
     "intro": {
       "type": "main-page",
       "settings": {
-        "section_width": "page-width",
+        "content_direction": "column",
+        "gap": 8,
         "padding-block-start": 40,
         "padding-block-end": 8
       },

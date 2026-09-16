@@ -259,7 +259,7 @@ collection_main = {
                  'mobile_product_card_size': 'small', 'enable_infinite_scroll': False,
                  'products_per_page': 24, 'product_grid_width': 'centered',
                  'full_width_on_mobile': False,
-                 'columns_gap': 16, 'columns_gap_vertical': 32,
+                 'columns_gap_horizontal': 16, 'columns_gap_vertical': 32,
                  'padding-block-start': 8, 'padding-block-end': 64},
     'blocks': {
         'filters': {'type': 'filters', 'static': True, 'settings': {
@@ -312,7 +312,7 @@ write('cart.json', {'cart': cart_main, 'cross_sell': cart_cross_sell},
 # ------------------------------------------------------------- contact -----
 contact_intro = {
     'type': 'main-page',
-    'settings': {'section_width': 'page-width',
+    'settings': {'content_direction': 'column', 'gap': 8,
                  'padding-block-start': 40, 'padding-block-end': 8},
     'blocks': {
         'title': text('<h1>Contact</h1>', type_preset='h2', alignment='left'),

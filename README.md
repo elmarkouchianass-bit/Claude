@@ -34,10 +34,18 @@ het script dat het na een Horizon-update herstelt.
 
 ```bash
 shopify theme dev --store <jouw-store>.myshopify.com
-node bin/vrn-merge.mjs          # controleert of de core-injecties nog staan
-./bin/vrn-check.sh              # shopify theme check
+node bin/vrn-merge.mjs               # controleert of de core-injecties nog staan
+./bin/vrn-check.sh                   # shopify theme check
+python3 bin/vrn-validate.py          # controles die theme check niet doet
 python3 bin/vrn-build-templates.py   # genereert templates/*.json opnieuw
 ```
+
+`bin/vrn-validate.py` vangt af wat `theme check` laat lopen: setting-ids in de
+templates die niet in het schema van die sectie of dat block bestaan,
+verwijzingen naar niet-bestaande blocks, blocks zonder preset (die verschijnen
+niet in de picker), locale-sleutels die in de Liquid gebruikt worden maar
+nergens gedefinieerd zijn, en talen waarin de `vrn`-sleutels afwijken. Alle
+drie de scripts geven exit 1 bij een probleem, dus ze zijn geschikt voor CI.
 
 `bin/vrn-check.sh` gebruikt de Shopify CLI uit `$SHOPIFY_CLI` of uit de
 lokale installatie. De verwachte uitkomst is **0 errors en 6 warnings**; die
@@ -435,6 +443,7 @@ docs/vrn-schema-overrides.json     ingekorte Nederlandse editor-labels
 
 bin/vrn-merge.mjs                  injecteert de bovenstaande drie
 bin/vrn-build-templates.py         genereert templates/*.json
+bin/vrn-validate.py                controles die theme check niet doet
 bin/vrn-check.sh                   shopify theme check
 ```
 
