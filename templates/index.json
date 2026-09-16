@@ -76,7 +76,8 @@
               "settings": {
                 "image_ratio": "portrait",
                 "border_radius": 0
-              }
+              },
+              "static": true
             },
             "collection-title": {
               "type": "collection-title",

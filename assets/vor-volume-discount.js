@@ -44,6 +44,47 @@ function readConfig() {
   }
 }
 
+/**
+ * The tier that applies to an item count, and the one after it.
+ *
+ * @param {LadderTier[]} tiers - The tiers, ascending on quantity.
+ * @param {number} itemCount - The number of items in the cart.
+ * @returns {{ active: LadderTier | null, next: LadderTier | null }}
+ */
+export function resolveTierState(tiers, itemCount) {
+  let active = null;
+  let next = null;
+
+  for (const tier of tiers) {
+    if (itemCount >= tier.qty) {
+      active = tier;
+    } else if (!next) {
+      next = tier;
+    }
+  }
+
+  return { active, next };
+}
+
+/**
+ * The discount codes the cart should end up with. Codes the shopper entered themselves are kept;
+ * only the ladder's own codes are swapped.
+ *
+ * @param {{ code: string }[]} currentCodes - The codes currently on the cart.
+ * @param {string | null} targetCode - The code for the tier that applies now.
+ * @param {Set<string>} managedCodes - Every code the ladder owns.
+ * @returns {string[] | null} The codes to send, or null when the cart already has the right set.
+ */
+export function resolveDesiredCodes(currentCodes, targetCode, managedCodes) {
+  const current = currentCodes.map(({ code }) => code).filter(Boolean);
+  const kept = current.filter((code) => !managedCodes.has(code));
+  const desired = targetCode ? [...kept, targetCode] : kept;
+
+  const same = desired.length === current.length && desired.every((code) => current.includes(code));
+
+  return same ? null : desired;
+}
+
 const config = readConfig();
 
 if (config?.enabled && Array.isArray(config.tiers) && config.tiers.length > 0) {
@@ -61,24 +102,7 @@ function start(config) {
     totalDiscount: Number(config.cart?.totalDiscount) || 0,
   };
 
-  /**
-   * The tier that applies to a given item count, and the one after it.
-   * @param {number} itemCount
-   */
-  function resolveTiers(itemCount) {
-    let active = null;
-    let next = null;
-
-    for (const tier of tiers) {
-      if (itemCount >= tier.qty) {
-        active = tier;
-      } else if (!next) {
-        next = tier;
-      }
-    }
-
-    return { active, next };
-  }
+  const resolveTiers = (itemCount) => resolveTierState(tiers, itemCount);
 
   /* -------------------------------------------------- rendering */
 
@@ -265,15 +289,7 @@ function start(config) {
    */
   function resolveCodes(currentCodes) {
     const { active } = resolveTiers(state.itemCount);
-    const target = active?.code || null;
-
-    const kept = currentCodes.map(({ code }) => code).filter((code) => code && !managedCodes.has(code));
-    const desired = target ? [...kept, target] : kept;
-    const current = currentCodes.map(({ code }) => code).filter(Boolean);
-
-    const same = desired.length === current.length && desired.every((code) => current.includes(code));
-
-    return same ? null : desired;
+    return resolveDesiredCodes(currentCodes, active?.code || null, managedCodes);
   }
 
   /** @param {string[]} codes */

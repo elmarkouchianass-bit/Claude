@@ -1,0 +1,7 @@
+{ "name": "vor-tests", "type": "module", "private": true,
+  "imports": {
+    "@shopify/events": "./stubs/events.js",
+    "@theme/section-renderer": "./stubs/noop.js",
+    "@theme/utilities": "./stubs/utilities.js",
+    "@theme/money-formatting": "./stubs/noop.js"
+  } }

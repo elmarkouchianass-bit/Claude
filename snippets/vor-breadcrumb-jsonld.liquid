@@ -1,0 +1,59 @@
+{%- doc -%}
+  Emits BreadcrumbList structured data for collection and product pages.
+
+  Horizon already ships Organization (header), Product (product-information) and Article
+  (main-blog-post) structured data, so this only adds what is missing. Rendered once from the
+  Vorreni brand block.
+{%- enddoc -%}
+{%- liquid
+  assign show_breadcrumbs = false
+  if template.name == 'product' or template.name == 'collection'
+    assign show_breadcrumbs = true
+  endif
+
+  assign home_url = request.origin | append: routes.root_url
+  assign crumb_collection = collection
+
+  if template.name == 'product' and collection.url == blank
+    assign crumb_collection = product.collections.first
+  endif
+
+  assign product_position = 2
+  if crumb_collection.url != blank
+    assign product_position = 3
+  endif
+-%}
+{%- if show_breadcrumbs -%}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": {{ 'vor.breadcrumb.home' | t | json }},
+          "item": {{ home_url | json }}
+        }
+        {%- if crumb_collection.url != blank -%}
+          {%- assign collection_url = request.origin | append: crumb_collection.url -%}
+          ,{
+            "@type": "ListItem",
+            "position": 2,
+            "name": {{ crumb_collection.title | json }},
+            "item": {{ collection_url | json }}
+          }
+        {%- endif -%}
+        {%- if template.name == 'product' -%}
+          {%- assign product_url = request.origin | append: product.url -%}
+          ,{
+            "@type": "ListItem",
+            "position": {{ product_position }},
+            "name": {{ product.title | json }},
+            "item": {{ product_url | json }}
+          }
+        {%- endif -%}
+      ]
+    }
+  </script>
+{%- endif -%}

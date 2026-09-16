@@ -385,6 +385,9 @@
     },
     "review": {
       "about": "over {{ product }}"
+    },
+    "breadcrumb": {
+      "home": "Home"
     }
   }
 }
