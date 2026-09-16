@@ -343,5 +343,48 @@
       "default_title": "Standaardtitel",
       "sticky_add_to_cart": "Balk voor snel toevoegen aan winkelwagen"
     }
+  },
+  "vor": {
+    "ladder": {
+      "heading": "Staffelkorting",
+      "tier": {
+        "one": "{{ count }} artikel = {{ percent }}%",
+        "other": "{{ count }} artikelen = {{ percent }}%"
+      },
+      "tier_max": "{{ count }}+ artikelen = {{ percent }}%",
+      "tier_short": "{{ count }} = {{ percent }}%",
+      "tier_short_max": "{{ count }}+ = {{ percent }}%",
+      "progress": {
+        "one": "Nog 1 artikel voor {{ percent }}% korting",
+        "other": "Nog {{ count }} artikelen voor {{ percent }}% korting"
+      },
+      "max_reached": "Hoogste korting bereikt: {{ percent }}%",
+      "active": "Actief",
+      "saved": "Je bespaart {{ amount }}",
+      "progress_label": "Voortgang naar de volgende korting",
+      "codes_note": "De korting wordt automatisch in je winkelwagen toegepast."
+    },
+    "size_fit": {
+      "heading": "Pasvorm",
+      "scale_small": "Klein",
+      "scale_true": "Valt normaal",
+      "scale_large": "Groot",
+      "value_announcement": "Pasvorm: {{ label }}"
+    },
+    "size_guide": {
+      "title": "Maattabel",
+      "open": "Bekijk de maattabel"
+    },
+    "card": {
+      "choose_size": "Kies maat",
+      "sold_out": "Uitverkocht",
+      "add": "Toevoegen",
+      "added": "Toegevoegd",
+      "error": "Toevoegen is niet gelukt. Probeer het opnieuw.",
+      "size_legend": "Maat voor {{ product }}"
+    },
+    "review": {
+      "about": "over {{ product }}"
+    }
   }
 }

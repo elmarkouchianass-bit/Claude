@@ -350,5 +350,48 @@
       "default_title": "Titlu implicit",
       "sticky_add_to_cart": "Bara de adăugare rapidă în coș"
     }
+  },
+  "vor": {
+    "ladder": {
+      "heading": "Volume discount",
+      "tier": {
+        "one": "{{ count }} item = {{ percent }}%",
+        "other": "{{ count }} items = {{ percent }}%"
+      },
+      "tier_max": "{{ count }}+ items = {{ percent }}%",
+      "tier_short": "{{ count }} = {{ percent }}%",
+      "tier_short_max": "{{ count }}+ = {{ percent }}%",
+      "progress": {
+        "one": "Add 1 more item for {{ percent }}% off",
+        "other": "Add {{ count }} more items for {{ percent }}% off"
+      },
+      "max_reached": "Highest discount reached: {{ percent }}%",
+      "active": "Active",
+      "saved": "You save {{ amount }}",
+      "progress_label": "Progress towards the next discount",
+      "codes_note": "The discount is applied automatically in your cart."
+    },
+    "size_fit": {
+      "heading": "Fit",
+      "scale_small": "Small",
+      "scale_true": "True to size",
+      "scale_large": "Large",
+      "value_announcement": "Fit: {{ label }}"
+    },
+    "size_guide": {
+      "title": "Size guide",
+      "open": "View the size guide"
+    },
+    "card": {
+      "choose_size": "Choose size",
+      "sold_out": "Sold out",
+      "add": "Add",
+      "added": "Added",
+      "error": "Could not add to cart. Please try again.",
+      "size_legend": "Size for {{ product }}"
+    },
+    "review": {
+      "about": "on {{ product }}"
+    }
   }
 }
