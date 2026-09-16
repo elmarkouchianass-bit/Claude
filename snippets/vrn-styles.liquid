@@ -1,0 +1,18 @@
+{% doc %}
+  Laadt de Vorreni-stylesheet en zet de merk-tokens die uit theme settings komen.
+
+  Elk Vorreni-block rendert dit, zodat een block blijft werken ook als het los
+  in een andere template wordt gesleept. Dubbele <link>-tags naar dezelfde URL
+  levert de browser als één request af, en de :root-regel is idempotent.
+{% enddoc %}
+
+{{ 'vrn-theme.css' | asset_url | stylesheet_tag }}
+
+{% style %}
+  :root {
+    --vrn-accent: {{ settings.vrn_accent }};
+    --vrn-accent-rgb: {{ settings.vrn_accent.rgb }};
+    --vrn-stone: {{ settings.color_palette.color2 | default: '#F4F2EF' }};
+    --vrn-ash: {{ settings.color_palette.color3 | default: '#6B635B' }};
+  }
+{% endstyle %}

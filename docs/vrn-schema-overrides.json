@@ -1,0 +1,11 @@
+{
+  "_comment": "Nederlandse editor-labels uit Horizon die langer zijn dan de 25 tekens die Shopify voor een schema-naam toestaat. Dat viel pas op toen Nederlands de standaardtaal werd. bin/vrn-merge.mjs schrijft deze kortere varianten terug in locales/nl.default.schema.json.",
+  "locales/nl.default.schema.json": {
+    "names.products_carousel": "Collectie: carrousel",
+    "names.products_grid": "Collectie: grid",
+    "names.collections_editorial": "Collecties: redactie",
+    "names.products_editorial": "Collectie: redactie",
+    "names.footer_password": "Voettekst wachtwoord",
+    "names.slideshow_full_frame": "Diashow: volledig"
+  }
+}

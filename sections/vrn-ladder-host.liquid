@@ -1,0 +1,66 @@
+{% comment %}
+  Draagt de kortingsladder voor de hele site.
+
+  Staat in de footer-groep en is dus op elke pagina aanwezig. Doet drie dingen:
+  de ladderconfiguratie als JSON in de pagina zetten, de twee scripts laden, en
+  het paneel bevatten dat `assets/vrn-ladder.js` in Horizon's cart drawer
+  plaatst.
+
+  De sectie zelf is onzichtbaar. Verwijder hem niet uit de footer-groep: dan
+  verdwijnt de ladder uit de drawer en wordt er geen kortingscode meer
+  toegepast.
+{% endcomment %}
+
+{% render 'vrn-styles' %}
+
+{%- if settings.vrn_ladder_enabled -%}
+  <script
+    type="application/json"
+    id="vrn-ladder-config"
+  >
+    {%- render 'vrn-ladder-tiers' -%}
+  </script>
+
+  <script
+    src="{{ 'vrn-volume-discount.js' | asset_url }}"
+    type="module"
+  ></script>
+  <script
+    src="{{ 'vrn-ladder.js' | asset_url }}"
+    type="module"
+  ></script>
+
+  {%- if settings.vrn_ladder_show_drawer and settings.cart_type == 'drawer' -%}
+    <vrn-ladder-host hidden>
+      <div
+        class="vrn-ladder-panel"
+        data-vrn-ladder-panel
+      >
+        {%- assign ladder_heading = 'vrn.ladder.heading' | t -%}
+        {%- render 'vrn-ladder-markup', variant: 'list', heading: ladder_heading -%}
+      </div>
+    </vrn-ladder-host>
+  {%- endif -%}
+{%- endif -%}
+
+{% stylesheet %}
+  vrn-ladder-host[hidden] {
+    display: none;
+  }
+
+  .vrn-ladder-panel {
+    inline-size: 100%;
+    padding-block-end: var(--padding-lg);
+    border-block-end: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Vorreni ladderdrager",
+  "enabled_on": {
+    "groups": ["footer"]
+  },
+  "settings": []
+}
+{% endschema %}

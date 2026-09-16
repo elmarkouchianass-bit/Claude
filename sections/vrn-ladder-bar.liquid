@@ -1,0 +1,62 @@
+{% comment %}
+  Dunne kortingsbalk voor de collectiepagina.
+
+  Onderin vastgezet op mobiel, boven het grid op desktop. Verschijnt alleen als
+  de cart niet leeg is; `assets/vrn-ladder.js` zet het hidden-attribuut bij
+  elke cart-wijziging opnieuw.
+
+  Dit is een sectie en geen block, omdat Horizon's `main-collection` geen
+  `content_for 'blocks'` heeft en dus geen eigen blocks accepteert.
+{% endcomment %}
+
+{% render 'vrn-styles' %}
+
+{%- if settings.vrn_ladder_enabled and settings.vrn_ladder_show_collection_bar -%}
+  <div
+    class="vrn-ladder-bar-wrapper section section--{{ section.settings.section_width }}"
+    data-vrn-ladder-bar-wrapper
+    {% if cart.item_count == 0 %}
+      hidden
+    {% endif %}
+  >
+    <div class="vrn-ladder-bar">
+      {%- render 'vrn-ladder-markup', variant: 'progress' -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Vorreni kortingsbalk",
+  "enabled_on": {
+    "templates": ["collection", "search"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Toont hoeveel artikelen er nog nodig zijn voor de volgende korting. Alleen zichtbaar bij een gevulde winkelwagen."
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Breedte",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "Pagina"
+        },
+        {
+          "value": "full-width",
+          "label": "Volledig"
+        }
+      ],
+      "default": "page-width"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vorreni kortingsbalk"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,92 @@
+{% doc %}
+  De volledige kortingsladder met vierkante bullets, de actieve trede
+  gemarkeerd en het bespaarde bedrag.
+
+  Bedoeld voor de cartpagina; werkt overal waar theme blocks zijn toegestaan.
+  In Horizon's cart drawer wordt dezelfde ladder geplaatst door
+  sections/vrn-ladder-host.liquid, want de drawer accepteert geen blocks.
+{% enddoc %}
+
+{% render 'vrn-styles' %}
+
+{%- if settings.vrn_ladder_enabled -%}
+  <div
+    class="vrn-ladder-block spacing-style"
+    style="{% render 'spacing-style', settings: block.settings %}"
+    {{ block.shopify_attributes }}
+  >
+    {%- assign ladder_heading = '' -%}
+    {%- if block.settings.show_heading -%}
+      {%- assign ladder_heading = 'vrn.ladder.heading' | t -%}
+    {%- endif -%}
+    {%- render 'vrn-ladder-markup', variant: 'list', heading: ladder_heading -%}
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Vorreni kortingsladder",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Tredes en kortingscodes stel je in bij Theme settings › Vorreni."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_heading",
+      "label": "Kop tonen",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Ruimte"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Boven",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Onder",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "Links",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "Rechts",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vorreni kortingsladder"
+    }
+  ]
+}
+{% endschema %}

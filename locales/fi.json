@@ -1,4 +1,65 @@
 {
+  "vrn": {
+    "ladder": {
+      "heading": "Buy more, save more",
+      "tier": "{{ count }} items = {{ percent }}% off",
+      "tier_plus": "{{ count }}+ items = {{ percent }}% off",
+      "tier_single": "1 item = no discount",
+      "inline_separator": " · ",
+      "inline_tier": "{{ count }} = {{ percent }}%",
+      "inline_tier_plus": "{{ count }}+ = {{ percent }}%",
+      "max_reached": "Maximum discount of {{ percent }}% reached",
+      "active": "Active now",
+      "saved": "You save {{ amount }}",
+      "aria_progress": "Progress towards the next discount tier",
+      "aria_list": "Discount tiers",
+      "progress_one": "1 more item for {{ percent }}% off",
+      "progress_other": "{{ count }} more items for {{ percent }}% off"
+    },
+    "size_fit": {
+      "label": "Fit",
+      "scale_small": "Small",
+      "scale_normal": "True to size",
+      "scale_large": "Large",
+      "value_1": "Runs small",
+      "value_2": "Runs slightly small",
+      "value_3": "True to size",
+      "value_4": "Runs slightly large",
+      "value_5": "Runs large",
+      "aria": "Fit of this item: {{ value }}"
+    },
+    "size_strip": {
+      "choose": "Choose your size",
+      "sold_out": "{{ size }} is sold out",
+      "add": "Add",
+      "adding": "Adding",
+      "added": "Added",
+      "error": "Could not add. Please try again.",
+      "aria_group": "Choose a size for {{ product }}"
+    },
+    "size_guide": {
+      "open": "Size guide",
+      "title": "Size guide",
+      "close": "Close"
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "aria": "Breadcrumb"
+    },
+    "usp": {
+      "returns": "30-day returns",
+      "shipping_free": "Free shipping over € 75",
+      "shipping_fast": "Order by 10pm, ships next day",
+      "service": "Customer service in the Netherlands"
+    },
+    "editorial": {
+      "label": "About Vorreni"
+    },
+    "reviews": {
+      "label": "What customers say",
+      "attribution": "{{ name }} — {{ product }}"
+    }
+  },
   "blocks": {
     "load_video": "Lataa video: {{ description }}",
     "sold_out": "Loppuunmyyty",

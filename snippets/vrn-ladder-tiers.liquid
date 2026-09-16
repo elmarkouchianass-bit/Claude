@@ -1,0 +1,65 @@
+{% doc %}
+  Echoot de kortingsladder als JSON, voor assets/vrn-volume-discount.js.
+
+  Vorm: {"tiers":[{"qty":2,"percent":10,"code":"BUNDEL10","plus":false}, ...],
+         "moneyFormat":"...", "labels":{...}}
+  Tredes zijn gesorteerd op aantal, oplopend. Alleen ingeschakelde tredes met
+  een percentage boven 0 en een code doen mee; die zonder code is puur tekst.
+{% enddoc %}
+{%- liquid
+  assign tiers = ''
+  for i in (1..5)
+    assign key_enabled = 'vrn_tier' | append: i | append: '_enabled'
+    unless settings[key_enabled]
+      continue
+    endunless
+
+    assign key_qty = 'vrn_tier' | append: i | append: '_qty'
+    assign key_percent = 'vrn_tier' | append: i | append: '_percent'
+    assign key_code = 'vrn_tier' | append: i | append: '_code'
+    assign key_plus = 'vrn_tier' | append: i | append: '_plus'
+
+    assign qty = settings[key_qty]
+    assign percent = settings[key_percent]
+    assign code = settings[key_code] | strip
+
+    if percent <= 0 or code == blank
+      continue
+    endif
+
+    assign plus = 'false'
+    if settings[key_plus]
+      assign plus = 'true'
+    endif
+
+    capture tier
+      echo '{"qty":'
+      echo qty
+      echo ',"percent":'
+      echo percent
+      echo ',"code":'
+      echo code | json
+      echo ',"plus":'
+      echo plus
+      echo '}'
+    endcapture
+
+    if tiers == blank
+      assign tiers = tier
+    else
+      assign tiers = tiers | append: ',' | append: tier
+    endif
+  endfor
+-%}
+{
+  "tiers": [{{ tiers }}],
+  "moneyFormat": {{ shop.money_format | json }},
+  "cartUrl": {{ routes.cart_url | json }},
+  "labels": {
+    "active": {{ 'vrn.ladder.active' | t | json }},
+    "saved": {{ 'vrn.ladder.saved' | t: amount: '[amount]' | json }},
+    "maxReached": {{ 'vrn.ladder.max_reached' | t: percent: '[percent]' | json }},
+    "progressOne": {{ 'vrn.ladder.progress_one' | t: percent: '[percent]' | json }},
+    "progressOther": {{ 'vrn.ladder.progress_other' | t: count: '[count]', percent: '[percent]' | json }}
+  }
+}

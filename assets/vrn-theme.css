@@ -1,0 +1,463 @@
+/* ==========================================================================
+   Vorreni — de enige eigen stylesheet.
+   Consumeert Horizon's tokens (--padding-*, --gap-*, --font-*, --color-*,
+   --animation-*, --minimum-touch-target). Introduceert geen eigen
+   spacing-schaal; --vrn-* bestaat alleen voor merk-specifieke waarden die
+   Horizon niet kent.
+   Tokens die uit theme settings komen staan in snippets/vrn-styles.liquid.
+   ========================================================================== */
+
+:root {
+  --vrn-bullet-size: 6px;
+  --vrn-hairline: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-15));
+  --vrn-hairline-strong: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-30));
+}
+
+/* --------------------------------------------------------------------------
+   Vierkante bullets. Overal: USP's, ladder, accordions, RTE-output.
+   Een echte ::marker waar dat kan; de list-style-position zorgt dat lange
+   regels netjes inspringen in plaats van onder de bullet door te lopen.
+   -------------------------------------------------------------------------- */
+.vrn-bullets {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--gap-sm);
+}
+
+.vrn-bullets > li {
+  display: grid;
+  grid-template-columns: var(--vrn-bullet-size) 1fr;
+  align-items: start;
+  gap: var(--gap-sm);
+}
+
+.vrn-bullets > li::before {
+  content: '';
+  display: block;
+  inline-size: var(--vrn-bullet-size);
+  block-size: var(--vrn-bullet-size);
+  background-color: var(--vrn-accent);
+  /* optisch uitlijnen met de x-hoogte van de eerste regel */
+  margin-block-start: calc((1em * var(--font-paragraph--line-height) - var(--vrn-bullet-size)) / 2);
+}
+
+/* Dezelfde bullet binnen door de merchant ingevoerde rich text. */
+.vrn-rte ul {
+  list-style: none;
+  padding-inline-start: 0;
+}
+
+.vrn-rte ul > li {
+  position: relative;
+  padding-inline-start: calc(var(--vrn-bullet-size) + var(--gap-sm));
+}
+
+.vrn-rte ul > li::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-start: calc((1em * var(--font-paragraph--line-height) - var(--vrn-bullet-size)) / 2);
+  inline-size: var(--vrn-bullet-size);
+  block-size: var(--vrn-bullet-size);
+  background-color: var(--vrn-accent);
+}
+
+/* --------------------------------------------------------------------------
+   Eyebrow / labelstijl. Gebruikt de h6-preset uit theme settings, dus de
+   merchant stuurt 'm vanuit de editor.
+   -------------------------------------------------------------------------- */
+.vrn-eyebrow {
+  font-family: var(--font-h6--family);
+  font-size: var(--font-h6--size);
+  font-weight: var(--font-h6--weight);
+  letter-spacing: var(--font-h6--letter-spacing);
+  line-height: var(--font-h6--line-height);
+  text-transform: var(--font-h6--case);
+  color: var(--vrn-ash);
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Size fit — horizontale schaal met indicator.
+   -------------------------------------------------------------------------- */
+.vrn-size-fit {
+  display: grid;
+  gap: var(--gap-xs);
+}
+
+.vrn-size-fit__track {
+  position: relative;
+  block-size: 2px;
+  background-color: rgb(var(--color-foreground-rgb) / var(--opacity-15));
+  margin-block: calc(var(--vrn-bullet-size) + 4px) var(--gap-2xs);
+}
+
+.vrn-size-fit__ticks {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.vrn-size-fit__tick {
+  inline-size: 1px;
+  block-size: 6px;
+  background-color: rgb(var(--color-foreground-rgb) / var(--opacity-20));
+}
+
+.vrn-size-fit__indicator {
+  position: absolute;
+  inset-block-start: 50%;
+  /* --vrn-fit-position is 0-1, gezet door het block */
+  inset-inline-start: calc(var(--vrn-fit-position, 0.5) * 100%);
+  inline-size: 10px;
+  block-size: 10px;
+  background-color: var(--vrn-accent);
+  transform: translate(-50%, -50%);
+}
+
+.vrn-size-fit__scale {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--gap-xs);
+  color: var(--vrn-ash);
+  font-size: var(--font-size--2xs);
+}
+
+.vrn-size-fit__scale > :nth-child(2) {
+  text-align: center;
+}
+
+.vrn-size-fit__scale > :last-child {
+  text-align: end;
+}
+
+.vrn-size-fit__value {
+  font-family: var(--font-subheading--family);
+  font-weight: var(--font-subheading--weight);
+  color: var(--color-foreground);
+}
+
+/* --------------------------------------------------------------------------
+   Kortingsladder — gedeeld door drawer, cartpagina en collectiebalk.
+   -------------------------------------------------------------------------- */
+.vrn-ladder {
+  display: grid;
+  gap: var(--gap-sm);
+}
+
+.vrn-ladder__heading {
+  font-family: var(--font-h6--family);
+  font-size: var(--font-h6--size);
+  font-weight: var(--font-h6--weight);
+  letter-spacing: var(--font-h6--letter-spacing);
+  text-transform: var(--font-h6--case);
+  margin: 0;
+}
+
+.vrn-ladder__tiers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--gap-2xs);
+}
+
+.vrn-ladder__tier {
+  display: grid;
+  grid-template-columns: var(--vrn-bullet-size) 1fr auto;
+  align-items: center;
+  gap: var(--gap-sm);
+  font-size: var(--font-size--sm);
+  color: var(--vrn-ash);
+  padding-block: var(--padding-3xs);
+}
+
+.vrn-ladder__tier::before {
+  content: '';
+  inline-size: var(--vrn-bullet-size);
+  block-size: var(--vrn-bullet-size);
+  background-color: rgb(var(--color-foreground-rgb) / var(--opacity-20));
+}
+
+.vrn-ladder__tier[data-state='reached']::before,
+.vrn-ladder__tier[data-state='active']::before {
+  background-color: var(--vrn-accent);
+}
+
+.vrn-ladder__tier[data-state='active'] {
+  color: var(--color-foreground);
+  font-family: var(--font-subheading--family);
+  font-weight: var(--font-subheading--weight);
+}
+
+.vrn-ladder__badge {
+  font-size: var(--font-size--2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-sm);
+  color: var(--vrn-accent);
+}
+
+.vrn-ladder__saved {
+  font-family: var(--font-subheading--family);
+  font-weight: var(--font-subheading--weight);
+  font-size: var(--font-size--sm);
+  margin: 0;
+}
+
+/* Voortgangsbalk */
+.vrn-progress {
+  display: grid;
+  gap: var(--gap-2xs);
+}
+
+.vrn-progress__label {
+  display: grid;
+  grid-template-columns: var(--vrn-bullet-size) 1fr;
+  align-items: center;
+  gap: var(--gap-sm);
+  font-size: var(--font-size--sm);
+  margin: 0;
+}
+
+.vrn-progress__label::before {
+  content: '';
+  inline-size: var(--vrn-bullet-size);
+  block-size: var(--vrn-bullet-size);
+  background-color: var(--vrn-accent);
+}
+
+.vrn-progress__track {
+  block-size: 2px;
+  background-color: rgb(var(--color-foreground-rgb) / var(--opacity-15));
+  overflow: hidden;
+}
+
+.vrn-progress__bar {
+  block-size: 100%;
+  inline-size: calc(var(--vrn-progress, 0) * 100%);
+  background-color: var(--vrn-accent);
+  transition: inline-size var(--animation-speed-slow) var(--ease-out-cubic);
+}
+
+/* Sticky balk op de collectiepagina */
+.vrn-ladder-bar {
+  background-color: var(--color-background);
+  border-block-start: var(--vrn-hairline);
+  padding: var(--padding-sm) var(--padding-lg);
+}
+
+.vrn-ladder-bar[hidden] {
+  display: none;
+}
+
+@media screen and (max-width: 749px) {
+  .vrn-ladder-bar {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: var(--layer-sticky);
+    padding-block-end: calc(var(--padding-sm) + var(--safe-area-inset-bottom));
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .vrn-ladder-bar {
+    border-block-start: 0;
+    border-block-end: var(--vrn-hairline);
+    padding-inline: 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Maten-strip op de productkaart.
+   -------------------------------------------------------------------------- */
+.vrn-size-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-2xs);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.vrn-size-strip__legend {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.vrn-size-strip__option {
+  min-inline-size: 2.25rem;
+  min-block-size: 2rem;
+  padding-inline: var(--padding-2xs);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size--2xs);
+  font-family: var(--font-subheading--family);
+  font-weight: var(--font-subheading--weight);
+  color: var(--color-foreground);
+  background-color: transparent;
+  border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
+  border-radius: var(--variant-picker-button-radius);
+  cursor: pointer;
+  transition: border-color var(--animation-speed) var(--animation-easing),
+    background-color var(--animation-speed) var(--animation-easing);
+}
+
+.vrn-size-strip__option:hover {
+  border-color: var(--color-foreground);
+}
+
+.vrn-size-strip__option[aria-pressed='true'] {
+  background-color: var(--color-selected-variant-background);
+  color: var(--color-selected-variant-text);
+  border-color: var(--color-selected-variant-border);
+}
+
+/* Uitverkocht blijft zichtbaar en leesbaar, maar doorgestreept. */
+.vrn-size-strip__option[data-available='false'] {
+  color: var(--vrn-ash);
+  text-decoration: line-through;
+  border-style: dashed;
+}
+
+.vrn-size-strip__status {
+  font-size: var(--font-size--2xs);
+  color: var(--vrn-ash);
+  min-block-size: 1lh;
+  margin: 0;
+}
+
+.vrn-size-strip__status[data-state='error'] {
+  color: var(--color-error);
+}
+
+/* Op touch is er geen hover, dus de strip staat er altijd. Op desktop
+   verschijnt hij bij hover of focus binnen de kaart. */
+@media (hover: hover) and (min-width: 750px) {
+  .vrn-product-card__sizes {
+    opacity: 0;
+    transition: opacity var(--animation-speed) var(--animation-easing);
+  }
+
+  .vrn-product-card:hover .vrn-product-card__sizes,
+  .vrn-product-card:focus-within .vrn-product-card__sizes {
+    opacity: 1;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   USP-balk
+   -------------------------------------------------------------------------- */
+.vrn-usp {
+  display: grid;
+  gap: var(--gap-lg);
+  grid-template-columns: 1fr;
+}
+
+@media screen and (min-width: 750px) {
+  .vrn-usp {
+    grid-template-columns: repeat(var(--vrn-usp-columns, 4), 1fr);
+    gap: var(--gap-2xl);
+  }
+}
+
+.vrn-usp__item {
+  display: grid;
+  grid-template-columns: var(--vrn-bullet-size) 1fr;
+  align-items: start;
+  gap: var(--gap-sm);
+}
+
+.vrn-usp__item::before {
+  content: '';
+  inline-size: var(--vrn-bullet-size);
+  block-size: var(--vrn-bullet-size);
+  background-color: var(--vrn-accent);
+  margin-block-start: calc((1em * var(--font-paragraph--line-height) - var(--vrn-bullet-size)) / 2);
+}
+
+.vrn-usp__title {
+  margin: 0;
+  font-family: var(--font-subheading--family);
+  font-weight: var(--font-subheading--weight);
+  font-size: var(--font-size--sm);
+}
+
+.vrn-usp__body {
+  margin: 0;
+  font-size: var(--font-size--sm);
+  color: var(--vrn-ash);
+}
+
+/* --------------------------------------------------------------------------
+   Reviews
+   -------------------------------------------------------------------------- */
+.vrn-review__quote {
+  margin: 0 0 var(--margin-lg);
+  font-family: var(--font-h4--family);
+  font-size: var(--font-h4--size);
+  line-height: var(--font-h4--line-height);
+  letter-spacing: var(--font-h4--letter-spacing);
+}
+
+.vrn-review__attribution {
+  margin: 0;
+  font-size: var(--font-size--2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-sm);
+  color: var(--vrn-ash);
+}
+
+/* --------------------------------------------------------------------------
+   Kruimelpad
+   -------------------------------------------------------------------------- */
+.vrn-breadcrumb {
+  font-size: var(--font-size--2xs);
+  color: var(--vrn-ash);
+}
+
+.vrn-breadcrumb ol {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-2xs);
+  margin: 0;
+  padding: 0;
+}
+
+.vrn-breadcrumb li + li::before {
+  content: '/';
+  margin-inline-end: var(--gap-2xs);
+  color: rgb(var(--color-foreground-rgb) / var(--opacity-40));
+}
+
+.vrn-breadcrumb a {
+  color: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   Toegankelijkheid
+   -------------------------------------------------------------------------- */
+.vrn-size-strip__option:focus-visible,
+.vrn-ladder a:focus-visible,
+.vrn-breadcrumb a:focus-visible {
+  outline: var(--focus-outline-width) solid var(--vrn-accent);
+  outline-offset: var(--focus-outline-offset);
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+  .vrn-progress__bar,
+  .vrn-size-strip__option,
+  .vrn-product-card__sizes {
+    transition: none;
+  }
+}

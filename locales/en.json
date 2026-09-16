@@ -17,15 +17,13 @@
       "inline_separator": " · ",
       "inline_tier": "{{ count }} = {{ percent }}%",
       "inline_tier_plus": "{{ count }}+ = {{ percent }}%",
-      "progress": {
-        "one": "1 more item for {{ percent }}% off",
-        "other": "{{ count }} more items for {{ percent }}% off"
-      },
       "max_reached": "Maximum discount of {{ percent }}% reached",
       "active": "Active now",
       "saved": "You save {{ amount }}",
       "aria_progress": "Progress towards the next discount tier",
-      "aria_list": "Discount tiers"
+      "aria_list": "Discount tiers",
+      "progress_one": "1 more item for {{ percent }}% off",
+      "progress_other": "{{ count }} more items for {{ percent }}% off"
     },
     "size_fit": {
       "label": "Fit",

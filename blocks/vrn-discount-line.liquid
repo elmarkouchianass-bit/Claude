@@ -1,0 +1,88 @@
+{% doc %}
+  Eén regel met de kortingstredes, bedoeld direct onder de add-to-cart-knop.
+
+  Voorbeeld: "2 = 10% · 3 = 15% · 4 = 20% · 5+ = 25%".
+  Leest dezelfde theme settings als de ladder, dus de tekst kan nooit uit de
+  pas lopen met wat er in de cart gebeurt.
+{% enddoc %}
+
+{% render 'vrn-styles' %}
+
+{%- if settings.vrn_ladder_enabled -%}
+  <div
+    class="vrn-discount-line spacing-style"
+    style="{% render 'spacing-style', settings: block.settings %}"
+    {{ block.shopify_attributes }}
+  >
+    {%- render 'vrn-ladder-markup', variant: 'inline' -%}
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .vrn-discount-line .vrn-ladder__inline {
+    font-size: var(--font-size--sm);
+    color: var(--color-foreground);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Vorreni kortingsregel",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Toont de kortingstredes op één regel. Tredes stel je in bij Theme settings › Vorreni."
+    },
+    {
+      "type": "header",
+      "content": "Ruimte"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Boven",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Onder",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "Links",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "Rechts",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vorreni kortingsregel"
+    }
+  ]
+}
+{% endschema %}

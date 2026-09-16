@@ -14,7 +14,7 @@
  * De bewerking is tekstueel, niet parse-en-herschrijf: Horizon's locale-
  * bestanden staan vol vertalerscommentaar dat een JSON.stringify zou wissen.
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -62,15 +62,20 @@ const report = (what, ok) => {
 
 const doc = (p) => parseLoose(raw(join('docs', p)));
 
-// 1. Locales ---------------------------------------------------------------
+// 1. Locales -------------------------------------------------------------
+// Shopify valt voor een ontbrekende sleutel terug op de standaardtaal, maar
+// theme-check wil dat elke locale dezelfde sleutels heeft. Nederlands krijgt
+// de Nederlandse teksten, al het andere de Engelse als tussenstand.
 const locales = doc('vrn-locales.json');
 
-for (const [lang, file] of [
-  ['nl', 'locales/nl.default.json'],
-  ['en', 'locales/en.json'],
-]) {
+const localeFiles = readdirSync(join(root, 'locales'))
+  .filter((name) => name.endsWith('.json') && !name.endsWith('.schema.json'))
+  .sort();
+
+for (const name of localeFiles) {
+  const file = join('locales', name);
   const text = raw(file);
-  const wanted = locales[lang];
+  const wanted = name.startsWith('nl') ? locales.nl : locales.en;
   const ok = JSON.stringify(parseLoose(text).vrn) === JSON.stringify(wanted);
 
   if (!ok && write) {
@@ -85,8 +90,10 @@ for (const [lang, file] of [
     }
     writeFileSync(join(root, file), next);
   }
-  report(`${file} -> vrn.*`, ok);
+  if (!ok || process.argv.includes('--verbose')) report(`${file} -> vrn.*`, ok);
 }
+
+console.log(`  ${localeFiles.length} locale-bestanden gecontroleerd`);
 
 // 2. Theme settings --------------------------------------------------------
 const group = doc('vrn-settings-group.json');
@@ -108,6 +115,29 @@ if (!ok && write) {
   writeFileSync(join(root, file), next);
 }
 report(`${file} -> "${group.name}"`, ok);
+
+// 3. Te lange Nederlandse editor-labels ------------------------------------
+const overrides = doc('vrn-schema-overrides.json');
+
+for (const [file, entries] of Object.entries(overrides)) {
+  if (file.startsWith('_')) continue;
+
+  const data = parseLoose(raw(file));
+  const pending = Object.entries(entries).filter(([path, value]) => {
+    const current = path.split('.').reduce((node, key) => node?.[key], data);
+    return current !== value;
+  });
+
+  if (pending.length > 0 && write) {
+    for (const [path, value] of pending) {
+      const keys = path.split('.');
+      const leaf = keys.pop();
+      keys.reduce((node, key) => (node[key] ??= {}), data)[leaf] = value;
+    }
+    writeFileSync(join(root, file), JSON.stringify(data, null, 2) + '\n');
+  }
+  report(`${file} -> ${Object.keys(entries).length} ingekorte labels`, pending.length === 0);
+}
 
 if (!write && missing > 0) {
   console.error(`\n${missing} item(s) ontbreken. Draai: node bin/vrn-merge.mjs --write`);

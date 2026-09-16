@@ -1,0 +1,187 @@
+{% doc %}
+  Rendert de kortingsladder. Drie varianten, dezelfde bron.
+
+  @param {string} variant - 'list' (volledige ladder), 'progress' (regel +
+    voortgangsbalk) of 'inline' (één regel onder de add-to-cart).
+  @param {string} [heading] - Kop boven de lijst. Alleen bij variant 'list'.
+
+  Dit is de serverzijdige startstaat. assets/vrn-volume-discount.js werkt
+  dezelfde nodes daarna bij op elke cart-wijziging; de datastructuur hier en
+  de selectors daar horen bij elkaar.
+{% enddoc %}
+
+{%- liquid
+  assign count = cart.item_count
+
+  # Hoogste bereikte trede en eerstvolgende trede bepalen.
+  assign active_percent = 0
+  assign active_qty = 0
+  assign next_qty = 0
+  assign next_percent = 0
+  assign tier_count = 0
+
+  for i in (1..5)
+    assign key_enabled = 'vrn_tier' | append: i | append: '_enabled'
+    unless settings[key_enabled]
+      continue
+    endunless
+
+    assign key_qty = 'vrn_tier' | append: i | append: '_qty'
+    assign key_percent = 'vrn_tier' | append: i | append: '_percent'
+    assign qty = settings[key_qty]
+    assign percent = settings[key_percent]
+
+    assign tier_count = tier_count | plus: 1
+
+    if count >= qty and percent > active_percent
+      assign active_percent = percent
+      assign active_qty = qty
+    endif
+
+    if qty > count and percent > 0
+      if next_qty == 0 or qty < next_qty
+        assign next_qty = qty
+        assign next_percent = percent
+      endif
+    endif
+  endfor
+
+  assign saved_amount = cart.total_discount | money
+  assign remaining = next_qty | minus: count
+  assign span = next_qty | minus: active_qty
+  if span > 0
+    assign progress = count | minus: active_qty | times: 1.0 | divided_by: span
+  else
+    assign progress = 0
+  endif
+-%}
+
+{%- case variant -%}
+
+  {%- when 'inline' -%}
+    {%- capture inline_text -%}
+      {%- assign printed = 0 -%}
+      {%- for i in (1..5) -%}
+        {%- assign key_enabled = 'vrn_tier' | append: i | append: '_enabled' -%}
+        {%- unless settings[key_enabled] -%}{%- continue -%}{%- endunless -%}
+        {%- assign key_qty = 'vrn_tier' | append: i | append: '_qty' -%}
+        {%- assign key_percent = 'vrn_tier' | append: i | append: '_percent' -%}
+        {%- assign key_plus = 'vrn_tier' | append: i | append: '_plus' -%}
+        {%- assign percent = settings[key_percent] -%}
+        {%- if percent <= 0 -%}{%- continue -%}{%- endif -%}
+        {%- if printed > 0 -%}{{ 'vrn.ladder.inline_separator' | t }}{%- endif -%}
+        {%- if settings[key_plus] -%}
+          {{- 'vrn.ladder.inline_tier_plus' | t: count: settings[key_qty], percent: percent -}}
+        {%- else -%}
+          {{- 'vrn.ladder.inline_tier' | t: count: settings[key_qty], percent: percent -}}
+        {%- endif -%}
+        {%- assign printed = printed | plus: 1 -%}
+      {%- endfor -%}
+    {%- endcapture -%}
+
+    {%- if inline_text != blank -%}
+      <p class="vrn-progress__label vrn-ladder__inline">{{ inline_text }}</p>
+    {%- endif -%}
+
+  {%- when 'progress' -%}
+    <div
+      class="vrn-progress"
+      data-vrn-ladder
+      data-vrn-ladder-variant="progress"
+    >
+      <p
+        class="vrn-progress__label"
+        data-vrn-ladder-message
+      >
+        {%- if next_qty > 0 -%}
+          {%- if remaining == 1 -%}
+            {{- 'vrn.ladder.progress_one' | t: percent: next_percent -}}
+          {%- else -%}
+            {{- 'vrn.ladder.progress_other' | t: count: remaining, percent: next_percent -}}
+          {%- endif -%}
+        {%- elsif active_percent > 0 -%}
+          {{- 'vrn.ladder.max_reached' | t: percent: active_percent -}}
+        {%- endif -%}
+      </p>
+      <div
+        class="vrn-progress__track"
+        role="progressbar"
+        aria-label="{{ 'vrn.ladder.aria_progress' | t }}"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="{{ progress | times: 100 | round }}"
+        data-vrn-ladder-progressbar
+      >
+        <div
+          class="vrn-progress__bar"
+          style="--vrn-progress: {{ progress }};"
+          data-vrn-ladder-bar
+        ></div>
+      </div>
+    </div>
+
+  {%- else -%}
+    <div
+      class="vrn-ladder"
+      data-vrn-ladder
+      data-vrn-ladder-variant="list"
+    >
+      {%- if heading != blank -%}
+        <h3 class="vrn-ladder__heading">{{ heading }}</h3>
+      {%- endif -%}
+
+      <ul
+        class="vrn-ladder__tiers"
+        role="list"
+        aria-label="{{ 'vrn.ladder.aria_list' | t }}"
+        data-vrn-ladder-tiers
+      >
+        {%- for i in (1..5) -%}
+          {%- assign key_enabled = 'vrn_tier' | append: i | append: '_enabled' -%}
+          {%- unless settings[key_enabled] -%}{%- continue -%}{%- endunless -%}
+
+          {%- assign key_qty = 'vrn_tier' | append: i | append: '_qty' -%}
+          {%- assign key_percent = 'vrn_tier' | append: i | append: '_percent' -%}
+          {%- assign key_plus = 'vrn_tier' | append: i | append: '_plus' -%}
+          {%- assign qty = settings[key_qty] -%}
+          {%- assign percent = settings[key_percent] -%}
+
+          {%- liquid
+            assign state = 'upcoming'
+            if percent > 0 and percent == active_percent and qty == active_qty
+              assign state = 'active'
+            elsif count >= qty and percent > 0
+              assign state = 'reached'
+            endif
+          -%}
+
+          <li
+            class="vrn-ladder__tier"
+            data-state="{{ state }}"
+            data-vrn-tier-qty="{{ qty }}"
+          >
+            <span>
+              {%- if percent <= 0 -%}
+                {{- 'vrn.ladder.tier_single' | t -}}
+              {%- elsif settings[key_plus] -%}
+                {{- 'vrn.ladder.tier_plus' | t: count: qty, percent: percent -}}
+              {%- else -%}
+                {{- 'vrn.ladder.tier' | t: count: qty, percent: percent -}}
+              {%- endif -%}
+            </span>
+            <span class="vrn-ladder__badge" data-vrn-tier-badge>
+              {%- if state == 'active' -%}{{ 'vrn.ladder.active' | t }}{%- endif -%}
+            </span>
+          </li>
+        {%- endfor -%}
+      </ul>
+
+      <p
+        class="vrn-ladder__saved"
+        data-vrn-ladder-saved
+        {% if cart.total_discount == 0 %}hidden{% endif %}
+      >
+        {{- 'vrn.ladder.saved' | t: amount: saved_amount -}}
+      </p>
+    </div>
+{%- endcase -%}

@@ -190,10 +190,15 @@
         "padding-block-start": 20,
         "padding-block-end": 48
       }
+    },
+    "vrn_ladder_host": {
+      "type": "vrn-ladder-host",
+      "settings": {}
     }
   },
   "order": [
     "footer_m9NzUG",
-    "footer_utilities_jLGE8U"
+    "footer_utilities_jLGE8U",
+    "vrn_ladder_host"
   ]
 }
