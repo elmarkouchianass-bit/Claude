@@ -276,8 +276,19 @@
   .bundle-field { margin-bottom: 1rem; }
   .bundle-field__label { display: block; margin-bottom: 0.5rem; }
 
+  .bundle-field,
+  .bundle-slot {
+    min-width: 0;
+  }
+
+  /* A select sizes itself to its longest option, and min-width:auto lets that
+     beat width:100%. Real product titles are long, so without this the picker
+     pushes past the buy column and gets clipped. */
   .bundle-select {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    text-overflow: ellipsis;
     padding: 0.7rem 0.75rem;
     border: 1px solid var(--color-border-strong);
     background: var(--color-background);

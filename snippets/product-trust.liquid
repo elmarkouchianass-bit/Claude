@@ -1,0 +1,57 @@
+{%- comment -%}
+  Trust badges — four promises, each a headline plus the line that makes it
+  concrete. Params: cfg (section.settings)
+
+  Rendered as a 2x2 card grid sharing hairline rules, so it reads as one
+  panel rather than four loose icons.
+{%- endcomment -%}
+
+{%- assign icons = 'returns,shipping,quality,choice' | split: ',' -%}
+
+<ul class="trust">
+  {%- for i in (1..4) -%}
+    {%- liquid
+      assign title_key = 'trust_title_' | append: i
+      assign sub_key = 'trust_sub_' | append: i
+      assign title = cfg[title_key]
+      assign sub = cfg[sub_key]
+    -%}
+    {%- if title != blank -%}
+      <li class="trust__item">
+        <span class="trust__icon" aria-hidden="true">
+          {%- assign icon = icons[forloop.index0] -%}
+          {%- case icon -%}
+            {%- when 'returns' -%}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 4 3 10 9 10"/>
+                <path d="M3.5 14a9 9 0 1 0 2-7.4L3 10"/>
+              </svg>
+            {%- when 'shipping' -%}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 4h13v11H1z"/>
+                <path d="M14 8h4l3 3v4h-7z"/>
+                <circle cx="5.5" cy="18" r="2"/>
+                <circle cx="17.5" cy="18" r="2"/>
+              </svg>
+            {%- when 'quality' -%}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2.5l2.7 5.6 6 .9-4.3 4.3 1 6.2L12 16.6l-5.4 2.9 1-6.2L3.3 9l6-.9z"/>
+              </svg>
+            {%- else -%}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9.5" cy="7" r="3.5"/>
+                <path d="M19 8.5v5M21.5 11h-5"/>
+              </svg>
+          {%- endcase -%}
+        </span>
+        <span class="trust__body">
+          <span class="trust__title">{{ title | escape }}</span>
+          {%- if sub != blank -%}
+            <span class="trust__sub">{{ sub | escape }}</span>
+          {%- endif -%}
+        </span>
+      </li>
+    {%- endif -%}
+  {%- endfor -%}
+</ul>
