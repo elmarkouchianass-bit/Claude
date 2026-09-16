@@ -1,0 +1,128 @@
+{%- doc -%}
+  Vorreni discount line.
+
+  One quiet line that sums up the volume discount, meant to sit right under the add to cart
+  button on the product page.
+{%- enddoc -%}
+{% liquid
+  capture rows
+    render 'vor-ladder-rows'
+  endcapture
+
+  assign tier_rows = rows | strip | split: ','
+  assign last_index = tier_rows.size
+%}
+
+{% if settings.vor_ladder_enabled and tier_rows.size > 0 %}
+  <p
+    class="vor-ladder-line spacing-style"
+    style="{% render 'spacing-style', settings: block.settings %}text-align: {{ block.settings.alignment }};"
+    {{ block.shopify_attributes }}
+  >
+    {%- for row in tier_rows -%}
+      {%- liquid
+        assign parts = row | split: '|'
+        assign qty = parts[1] | times: 1
+        assign percent = parts[2] | times: 1
+
+        if forloop.index == last_index
+          assign label = 'vor.ladder.tier_short_max' | t: count: qty, percent: percent
+        elsif forloop.first
+          assign label = 'vor.ladder.tier' | t: count: qty, percent: percent
+        else
+          assign label = 'vor.ladder.tier_short' | t: count: qty, percent: percent
+        endif
+      -%}
+      {{- label -}}
+      {%- unless forloop.last %}<span aria-hidden="true"> &middot; </span>{% endunless -%}
+    {%- endfor -%}
+  </p>
+{% endif %}
+
+{% stylesheet %}
+  .vor-ladder-line {
+    margin: 0;
+    color: var(--color-foreground-subdued);
+    font-size: var(--font-size--2xs);
+    letter-spacing: var(--letter-spacing--body-normal);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:vor.names.ladder_line",
+  "tag": null,
+  "settings": [
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:vor.settings.alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "right",
+          "label": "t:options.right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:vor.names.ladder_line",
+      "category": "t:vor.category"
+    }
+  ]
+}
+{% endschema %}

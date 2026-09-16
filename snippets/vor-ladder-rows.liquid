@@ -1,0 +1,35 @@
+{%- doc -%}
+  Outputs the configured volume discount tiers as a sorted, comma separated list.
+
+  Every row is `paddedQty|qty|percent|code`, sorted ascending on quantity. Rows with a
+  quantity or percentage of 0 are skipped, so merchants can empty a row to remove a tier.
+
+  Use it with `capture`, since `render` does not leak assigns to the caller:
+
+  @example
+  {% capture vor_rows %}{% render 'vor-ladder-rows' %}{% endcapture %}
+  {% assign vor_rows = vor_rows | strip | split: ',' %}
+{%- enddoc -%}
+{%- liquid
+  assign rows = ''
+  assign indexes = '1,2,3,4,5,6' | split: ','
+
+  for index in indexes
+    assign qty_key = 'vor_ladder_qty_INDEX' | replace: 'INDEX', index
+    assign percent_key = 'vor_ladder_percent_INDEX' | replace: 'INDEX', index
+    assign code_key = 'vor_ladder_code_INDEX' | replace: 'INDEX', index
+
+    assign qty = settings[qty_key] | default: 0 | at_least: 0
+    assign percent = settings[percent_key] | default: 0 | at_least: 0
+
+    if qty > 0 and percent > 0
+      assign padded_qty = '000' | append: qty | slice: -3, 3
+      assign code = settings[code_key] | default: '' | strip | replace: ',', '' | replace: '|', ''
+      assign row = padded_qty | append: '|' | append: qty | append: '|' | append: percent | append: '|' | append: code
+      assign rows = rows | append: row | append: ','
+    endif
+  endfor
+
+  assign rows = rows | split: ',' | sort_natural | join: ','
+  echo rows
+-%}

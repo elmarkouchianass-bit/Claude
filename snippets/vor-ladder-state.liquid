@@ -1,0 +1,39 @@
+{%- doc -%}
+  Outputs the current ladder state for the cart as `itemCount|activeIndex|nextIndex|remaining`.
+
+  `activeIndex` and `nextIndex` are 1 based positions in the sorted tier list from
+  `vor-ladder-rows`, or 0 when there is no active / next tier. `remaining` is the number of
+  items still needed for the next tier, or 0 when the top tier is reached.
+
+  @param {string} rows - The captured output of `vor-ladder-rows`.
+
+  @example
+  {% capture vor_state %}{% render 'vor-ladder-state', rows: rows %}{% endcapture %}
+{%- enddoc -%}
+{%- liquid
+  assign tier_rows = rows | strip | split: ','
+  assign item_count = cart.item_count | default: 0
+  assign active_index = 0
+  assign next_index = 0
+  assign remaining = 0
+
+  for row in tier_rows
+    assign parts = row | split: '|'
+    assign qty = parts[1] | times: 1
+
+    if item_count >= qty
+      assign active_index = forloop.index
+    elsif next_index == 0
+      assign next_index = forloop.index
+      assign remaining = qty | minus: item_count
+    endif
+  endfor
+
+  echo item_count
+  echo '|'
+  echo active_index
+  echo '|'
+  echo next_index
+  echo '|'
+  echo remaining
+-%}

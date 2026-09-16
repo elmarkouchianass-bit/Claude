@@ -1,0 +1,192 @@
+{%- doc -%}
+  Vorreni fit scale.
+
+  A horizontal scale from small to large with a marker for this product. The position comes
+  from the product metafield `custom.size_fit` (integer 1 to 5) and falls back to the block
+  setting when the metafield is empty.
+{%- enddoc -%}
+{% liquid
+  assign metafield_value = closest.product.metafields.custom.size_fit.value | times: 1
+  assign position = block.settings.fallback_value
+
+  if metafield_value > 0
+    assign position = metafield_value
+  endif
+
+  assign position = position | at_least: 1 | at_most: 5
+
+  if position <= 2
+    assign label = 'vor.size_fit.scale_small' | t
+  elsif position == 3
+    assign label = 'vor.size_fit.scale_true' | t
+  else
+    assign label = 'vor.size_fit.scale_large' | t
+  endif
+
+  assign offset = position | minus: 1 | times: 25
+  assign announcement = 'vor.size_fit.value_announcement' | t: label: label
+%}
+
+<div
+  class="vor-size-fit spacing-style"
+  style="{% render 'spacing-style', settings: block.settings %}"
+  {{ block.shopify_attributes }}
+>
+  <p class="vor-size-fit__heading">{{ 'vor.size_fit.heading' | t }}</p>
+
+  <div class="vor-size-fit__scale" role="img" aria-label="{{ announcement | escape }}">
+    <span class="vor-size-fit__end">{{ 'vor.size_fit.scale_small' | t }}</span>
+    <span class="vor-size-fit__track" aria-hidden="true">
+      {% for step in (1..5) %}
+        <span class="vor-size-fit__step"></span>
+      {% endfor %}
+      <span class="vor-size-fit__marker" style="--vor-fit-offset: {{ offset }}%"></span>
+    </span>
+    <span class="vor-size-fit__end">{{ 'vor.size_fit.scale_large' | t }}</span>
+  </div>
+
+  <p class="vor-size-fit__value" aria-hidden="true">{{ label }}</p>
+</div>
+
+{% stylesheet %}
+  .vor-size-fit {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-2xs);
+  }
+
+  .vor-size-fit__heading {
+    margin: 0;
+    font-family: var(--font-subheading--family);
+    font-size: var(--font-size--2xs);
+    font-weight: var(--font-subheading--weight);
+    letter-spacing: var(--letter-spacing-sm);
+    text-transform: uppercase;
+  }
+
+  .vor-size-fit__scale {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+    font-size: var(--font-size--2xs);
+    color: var(--color-foreground-muted);
+  }
+
+  .vor-size-fit__end {
+    flex: 0 0 auto;
+  }
+
+  .vor-size-fit__track {
+    position: relative;
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 12px;
+  }
+
+  .vor-size-fit__track::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    height: 1px;
+    background-color: rgb(var(--color-border-rgb) / var(--opacity-20));
+  }
+
+  .vor-size-fit__step {
+    position: relative;
+    width: 1px;
+    height: 6px;
+    background-color: rgb(var(--color-border-rgb) / var(--opacity-20));
+  }
+
+  .vor-size-fit__marker {
+    position: absolute;
+    top: 50%;
+    inset-inline-start: var(--vor-fit-offset, 50%);
+    width: 8px;
+    height: 8px;
+    margin-inline-start: -4px;
+    margin-block-start: -4px;
+    background-color: var(--vor-color-accent, #A34426);
+  }
+
+  .vor-size-fit__value {
+    margin: 0;
+    font-size: var(--font-size--2xs);
+    color: var(--color-foreground);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:vor.names.size_fit",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:vor.settings.metafield_info"
+    },
+    {
+      "type": "range",
+      "id": "fallback_value",
+      "label": "t:vor.settings.fallback_value",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:vor.names.size_fit",
+      "category": "t:vor.category"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,129 @@
+{%- doc -%}
+  Vorreni review.
+
+  One short customer quote with a name and the product it is about. Place three of them in a
+  section to build the review row on the homepage.
+{%- enddoc -%}
+<figure
+  class="vor-review spacing-style"
+  style="{% render 'spacing-style', settings: block.settings %}"
+  {{ block.shopify_attributes }}
+>
+  <blockquote class="vor-review__quote">{{ block.settings.quote }}</blockquote>
+  <figcaption class="vor-review__meta">
+    <span class="vor-review__author">{{ block.settings.author }}</span>
+    {% if block.settings.product_name != blank %}
+      <span class="vor-review__product">
+        {{- 'vor.review.about' | t: product: block.settings.product_name -}}
+      </span>
+    {% endif %}
+  </figcaption>
+</figure>
+
+{% stylesheet %}
+  .vor-review {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-sm);
+    margin: 0;
+    max-width: var(--max-width--body-narrow);
+  }
+
+  .vor-review__quote {
+    margin: 0;
+    font-size: var(--font-size--sm);
+    line-height: var(--line-height--body-loose);
+  }
+
+  .vor-review__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-2xs);
+    font-size: var(--font-size--2xs);
+    color: var(--color-foreground-muted);
+  }
+
+  .vor-review__author {
+    font-family: var(--font-subheading--family);
+    letter-spacing: var(--letter-spacing-sm);
+    text-transform: uppercase;
+    color: var(--color-foreground);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:vor.names.review",
+  "tag": null,
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "quote",
+      "label": "t:vor.settings.quote",
+      "default": "t:vor.defaults.review_1_quote"
+    },
+    {
+      "type": "text",
+      "id": "author",
+      "label": "t:vor.settings.author",
+      "default": "t:vor.defaults.review_1_author"
+    },
+    {
+      "type": "text",
+      "id": "product_name",
+      "label": "t:vor.settings.product",
+      "default": "t:vor.defaults.review_1_product"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:vor.names.review",
+      "category": "t:vor.category"
+    }
+  ]
+}
+{% endschema %}

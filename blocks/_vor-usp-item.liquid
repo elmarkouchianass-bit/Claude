@@ -1,0 +1,21 @@
+{%- doc -%}
+  One line inside a Vorreni USP list.
+{%- enddoc -%}
+<li class="vor-list__item vor-usp__item" {{ block.shopify_attributes }}>
+  {{ block.settings.text }}
+</li>
+
+{% schema %}
+{
+  "name": "t:vor.names.usp_item",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "t:vor.settings.text",
+      "default": "t:vor.defaults.usp_1"
+    }
+  ]
+}
+{% endschema %}

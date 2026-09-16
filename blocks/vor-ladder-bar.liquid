@@ -1,0 +1,207 @@
+{%- doc -%}
+  Vorreni discount bar.
+
+  A thin progress bar that tells the shopper how many items are left before the next volume
+  discount tier. Renders nothing while the cart is empty. Meant for the collection page, above
+  the grid on desktop and pinned to the bottom of the viewport on mobile.
+{%- enddoc -%}
+{% liquid
+  capture rows
+    render 'vor-ladder-rows'
+  endcapture
+  capture state
+    render 'vor-ladder-state', rows: rows
+  endcapture
+
+  assign tier_rows = rows | strip | split: ','
+  assign state_parts = state | strip | split: '|'
+  assign item_count = state_parts[0] | times: 1
+  assign active_index = state_parts[1] | times: 1
+  assign next_index = state_parts[2] | times: 1
+  assign remaining = state_parts[3] | times: 1
+
+  assign message = ''
+  assign progress = 0
+
+  if next_index > 0
+    assign next_position = next_index | minus: 1
+    assign next_parts = tier_rows[next_position] | split: '|'
+    assign next_qty = next_parts[1] | times: 1
+    assign next_percent = next_parts[2] | times: 1
+    assign message = 'vor.ladder.progress' | t: count: remaining, percent: next_percent
+    assign progress = item_count | times: 100 | divided_by: next_qty
+  elsif active_index > 0
+    assign active_position = active_index | minus: 1
+    assign active_parts = tier_rows[active_position] | split: '|'
+    assign active_percent = active_parts[2] | times: 1
+    assign message = 'vor.ladder.max_reached' | t: percent: active_percent
+    assign progress = 100
+  endif
+%}
+
+{% if settings.vor_ladder_enabled and tier_rows.size > 0 %}
+  <vor-ladder-bar
+    class="vor-ladder-bar vor-ladder-bar--mobile-{{ block.settings.position_mobile }} spacing-style"
+    style="{% render 'spacing-style', settings: block.settings %}"
+    data-vor-mount="bar"
+    {% if item_count == 0 %}
+      hidden
+    {% endif %}
+    {{ block.shopify_attributes }}
+  >
+    <p class="vor-ladder-bar__message" data-vor-bar-message>{{ message }}</p>
+    {% if block.settings.show_progress %}
+      <div
+        class="vor-ladder-bar__track"
+        data-vor-bar-track
+        role="progressbar"
+        aria-label="{{ 'vor.ladder.progress_label' | t }}"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="{{ progress }}"
+      >
+        <span class="vor-ladder-bar__fill" style="--vor-progress: {{ progress }}%"></span>
+      </div>
+    {% endif %}
+  </vor-ladder-bar>
+{% endif %}
+
+{% stylesheet %}
+  .vor-ladder-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-lg);
+    width: 100%;
+    padding-block: var(--padding-xs);
+    border-block: var(--style-border-width) solid rgb(var(--color-border-rgb) / var(--opacity-15));
+    background-color: var(--color-background);
+    font-size: var(--font-size--2xs);
+  }
+
+  .vor-ladder-bar[hidden] {
+    display: none;
+  }
+
+  .vor-ladder-bar__message {
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .vor-ladder-bar__track {
+    flex: 1 1 auto;
+    height: 2px;
+    background-color: rgb(var(--color-border-rgb) / var(--opacity-15));
+  }
+
+  .vor-ladder-bar__fill {
+    display: block;
+    height: 100%;
+    width: var(--vor-progress, 0%);
+    background-color: var(--vor-color-accent, #A34426);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .vor-ladder-bar__fill {
+      transition: width var(--animation-speed, 0.2s) var(--ease-out-quad);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .vor-ladder-bar--mobile-sticky {
+      position: fixed;
+      inset-inline: 0;
+      bottom: 0;
+      z-index: var(--layer-sticky);
+      padding-inline: var(--padding-lg);
+      padding-block-end: calc(var(--padding-xs) + var(--safe-area-inset-bottom));
+      border-block-end: 0;
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    .vor-ladder-bar {
+      font-size: var(--font-size--xs);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:vor.names.ladder_bar",
+  "tag": null,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_progress",
+      "label": "t:vor.settings.show_progress",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "position_mobile",
+      "label": "t:vor.settings.position_mobile",
+      "options": [
+        {
+          "value": "sticky",
+          "label": "t:vor.settings.sticky"
+        },
+        {
+          "value": "inline",
+          "label": "t:options.default"
+        }
+      ],
+      "default": "sticky"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:vor.names.ladder_bar",
+      "category": "t:vor.category"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,155 @@
+/*
+ * Vorreni brand layer on top of Horizon.
+ *
+ * Only rules that cannot live in a theme setting or in a block's own {% stylesheet %} belong
+ * here: the square bullets inside Horizon's rich text, the focus ring, and the size strip that
+ * is rendered inside Horizon's product card. Everything else (colors, type, radius, spacing)
+ * is driven by theme settings and Horizon's own tokens.
+ */
+
+:root {
+  /* Overridden by the Vorreni brand block with the accent color from theme settings. */
+  --vor-color-accent: #a34426;
+}
+
+/* ---------------------------------------------------------------- square bullets */
+
+.rte ul,
+.shopify-policy__body ul {
+  list-style: none;
+  padding-inline-start: 0;
+}
+
+.rte ul > li,
+.shopify-policy__body ul > li {
+  position: relative;
+  padding-inline-start: 1.1em;
+}
+
+.rte ul > li::before,
+.shopify-policy__body ul > li::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  top: calc(0.5lh - 3px);
+  width: 6px;
+  height: 6px;
+  background-color: var(--vor-color-accent);
+}
+
+/* Nested lists keep the same square, one step lighter. */
+.rte ul ul > li::before {
+  opacity: var(--opacity-50);
+}
+
+/* ---------------------------------------------------------------- focus */
+
+:where(a, button, summary, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--vor-color-accent);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- size strip on product cards */
+
+.vor-card-sizes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2xs);
+  width: 100%;
+}
+
+.vor-card-sizes__legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.vor-card-sizes__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.vor-card-sizes__option {
+  position: relative;
+}
+
+.vor-card-sizes__input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.vor-card-sizes__label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  padding: 0.25rem 0.4rem;
+  border: var(--style-border-width) solid rgb(var(--color-border-rgb) / var(--opacity-20));
+  font-size: var(--font-size--2xs);
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.vor-card-sizes__input:checked + .vor-card-sizes__label {
+  border-color: var(--color-foreground);
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+}
+
+.vor-card-sizes__input:focus-visible + .vor-card-sizes__label {
+  outline: 2px solid var(--vor-color-accent);
+  outline-offset: 2px;
+}
+
+.vor-card-sizes__option--unavailable .vor-card-sizes__label {
+  color: var(--color-foreground-muted);
+  text-decoration: line-through;
+}
+
+.vor-card-sizes__button {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.75rem;
+  border: var(--style-border-width) solid var(--color-foreground);
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+  font-family: var(--font-accent--family);
+  font-size: var(--font-size--2xs);
+  letter-spacing: var(--letter-spacing-sm);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.vor-card-sizes__button[disabled] {
+  background-color: transparent;
+  border-color: rgb(var(--color-border-rgb) / var(--opacity-20));
+  color: var(--color-foreground-muted);
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .vor-card-sizes__label,
+  .vor-card-sizes__button {
+    transition: background-color var(--animation-speed) var(--ease-out-quad),
+      border-color var(--animation-speed) var(--ease-out-quad),
+      color var(--animation-speed) var(--ease-out-quad);
+  }
+}
+
+/* ---------------------------------------------------------------- drawer ladder */
+
+.vor-ladder--drawer {
+  padding-block: var(--padding-md);
+  border-block-end: var(--style-border-width) solid rgb(var(--color-border-rgb) / var(--opacity-15));
+}

@@ -1,0 +1,71 @@
+{%- doc -%}
+  Renders the full volume discount ladder: one row per tier, the active tier marked, and the
+  discount amount Shopify calculated for the cart.
+
+  @param {string} rows - The captured output of `vor-ladder-rows`.
+  @param {string} state - The captured output of `vor-ladder-state`.
+  @param {boolean} [show_saved] - Whether to show the saved amount.
+  @param {boolean} [show_note] - Whether to show the explanatory note.
+  @param {string} [context] - Where the ladder renders, used as a modifier class.
+{%- enddoc -%}
+{%- liquid
+  assign tier_rows = rows | strip | split: ','
+  assign state_parts = state | strip | split: '|'
+  assign active_index = state_parts[1] | times: 1
+  assign last_index = tier_rows.size
+-%}
+{%- if tier_rows.size > 0 -%}
+  <div
+    class="vor-ladder vor-ladder--{{ context | default: 'cart' | escape }}"
+    data-vor-ladder
+    data-vor-active-index="{{ active_index }}"
+  >
+    <p class="vor-ladder__heading">{{ 'vor.ladder.heading' | t }}</p>
+
+    <ul class="vor-list vor-ladder__tiers" role="list">
+      {%- for row in tier_rows -%}
+        {%- liquid
+          assign parts = row | split: '|'
+          assign qty = parts[1] | times: 1
+          assign percent = parts[2] | times: 1
+          assign is_active = false
+          if forloop.index == active_index
+            assign is_active = true
+          endif
+
+          if forloop.index == last_index
+            assign label = 'vor.ladder.tier_max' | t: count: qty, percent: percent
+          else
+            assign label = 'vor.ladder.tier' | t: count: qty, percent: percent
+          endif
+        -%}
+        <li
+          class="vor-list__item vor-ladder__tier{% if is_active %} vor-ladder__tier--active{% endif %}"
+          data-vor-tier="{{ forloop.index }}"
+          data-vor-tier-qty="{{ qty }}"
+          {% if is_active %}
+            aria-current="true"
+          {% endif %}
+        >
+          <span class="vor-ladder__tier-label">{{ label }}</span>
+          {%- if is_active -%}
+            <span class="vor-ladder__tier-state">{{ 'vor.ladder.active' | t }}</span>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+
+    {%- if show_saved and cart.total_discount > 0 -%}
+      {%- assign saved_amount = cart.total_discount | money -%}
+      <p class="vor-ladder__saved" data-vor-saved>
+        {{- 'vor.ladder.saved' | t: amount: saved_amount -}}
+      </p>
+    {%- else -%}
+      <p class="vor-ladder__saved" data-vor-saved hidden></p>
+    {%- endif -%}
+
+    {%- if show_note -%}
+      <p class="vor-ladder__note">{{ 'vor.ladder.codes_note' | t }}</p>
+    {%- endif -%}
+  </div>
+{%- endif -%}

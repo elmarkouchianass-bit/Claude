@@ -1,0 +1,107 @@
+{%- doc -%}
+  Vorreni size strip for a product card.
+
+  Renders the size options of a single option product straight on the card, plus an add button
+  that submits through Horizon's own `product-form-component`, so adding opens the regular cart
+  drawer. Horizon's product card only accepts its own block types, so this snippet is placed
+  through the `custom-liquid` block inside the card:
+
+      {% render 'vor-card-size-add', option_name: 'Maat' %}
+
+  Products with more than one option, or without the named option, render nothing and keep
+  Horizon's own quick add button.
+
+  @param {object} [product] - The product. Defaults to the product of the surrounding card.
+  @param {string} [option_name] - The name of the size option. Defaults to Maat.
+{%- enddoc -%}
+{%- liquid
+  assign card_product = product | default: closest.product
+  assign wanted_option = option_name | default: 'Maat' | downcase
+  assign size_option = null
+
+  if card_product.options.size == 1 and card_product.has_only_default_variant == false
+    assign first_option = card_product.options_with_values | first
+    assign first_option_name = first_option.name | downcase
+
+    if first_option_name == wanted_option or option_name == blank
+      assign size_option = first_option
+    endif
+  endif
+-%}
+{%- if size_option -%}
+  {%- assign form_id = 'VorCardSizeAdd-' | append: card_product.id -%}
+  <vor-card-size-add
+    class="vor-card-sizes"
+    data-product-id="{{ card_product.id }}"
+    data-add-label="{{ 'vor.card.add' | t }}"
+  >
+    <product-form-component
+      data-product-id="{{ card_product.id }}"
+      on:submit="/handleSubmit"
+    >
+      <div
+        class="visually-hidden"
+        aria-live="assertive"
+        role="status"
+        aria-atomic="true"
+        ref="liveRegion"
+      ></div>
+
+      {%- form 'product', card_product, id: form_id, novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+        <input
+          type="hidden"
+          name="id"
+          ref="variantId"
+          value=""
+          disabled
+        >
+        <input type="hidden" name="quantity" value="1">
+
+        <fieldset class="vor-card-sizes__options">
+          <legend class="vor-card-sizes__legend">
+            {{- 'vor.card.size_legend' | t: product: card_product.title -}}
+          </legend>
+
+          {%- for value in size_option.values -%}
+            {%- liquid
+              assign value_variant = value.variant
+              assign is_available = false
+              if value.available and value_variant.id
+                assign is_available = true
+              endif
+              assign input_id = form_id | append: '-' | append: forloop.index
+            -%}
+            <div class="vor-card-sizes__option{% unless is_available %} vor-card-sizes__option--unavailable{% endunless %}">
+              <input
+                class="vor-card-sizes__input"
+                type="radio"
+                id="{{ input_id }}"
+                name="vor-size-{{ card_product.id }}"
+                value="{{ value | escape }}"
+                data-variant-id="{{ value_variant.id }}"
+                {% unless is_available %}
+                  disabled
+                {% endunless %}
+              >
+              <label class="vor-card-sizes__label" for="{{ input_id }}">
+                {{- value -}}
+                {%- unless is_available -%}
+                  <span class="visually-hidden">{{ 'vor.card.sold_out' | t }}</span>
+                {%- endunless -%}
+              </label>
+            </div>
+          {%- endfor -%}
+        </fieldset>
+
+        <button
+          class="vor-card-sizes__button"
+          type="submit"
+          name="add"
+          disabled
+        >
+          {{- 'vor.card.choose_size' | t -}}
+        </button>
+      {%- endform -%}
+    </product-form-component>
+  </vor-card-size-add>
+{%- endif -%}

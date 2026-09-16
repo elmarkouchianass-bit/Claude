@@ -1,0 +1,117 @@
+{%- doc -%}
+  Vorreni brand styles and volume discount runtime.
+
+  Loads the Vorreni stylesheet, publishes the configured discount ladder as JSON and starts
+  the runtime that keeps the right discount code on the cart. Place this block once, in the
+  footer, so it loads on every page. Without it the ladder still renders, but the codes are
+  no longer applied automatically.
+{%- enddoc -%}
+{% liquid
+  capture rows
+    render 'vor-ladder-rows'
+  endcapture
+
+  assign tier_rows = rows | strip | split: ','
+  assign last_index = tier_rows.size
+  assign money_format = shop.money_format | strip_html
+  assign saved_template = 'vor.ladder.saved' | t: amount: '__VOR_AMOUNT__'
+  assign cart_js_url = routes.cart_url | append: '.js'
+%}
+
+{{ 'vor-theme.css' | asset_url | stylesheet_tag }}
+
+{% style %}
+  :root {
+    --vor-color-accent: {{ settings.vor_accent_color }};
+    --vor-color-accent-rgb: {{ settings.vor_accent_color.rgb }};
+  }
+{% endstyle %}
+
+<div class="vor-brand" hidden {{ block.shopify_attributes }}>
+  <script type="application/json" id="vor-ladder-config">
+    {
+      "enabled": {% if settings.vor_ladder_enabled %}true{% else %}false{% endif %},
+      "applyCodes": {% if settings.vor_ladder_apply_codes %}true{% else %}false{% endif %},
+      "cartUpdateUrl": {{ routes.cart_update_url | json }},
+      "cartJsUrl": {{ cart_js_url | json }},
+      "cart": { "itemCount": {{ cart.item_count }}, "totalDiscount": {{ cart.total_discount }} },
+      "moneyFormat": {{ money_format | json }},
+      "currency": {{ cart.currency.iso_code | json }},
+      "drawerSectionId": "cart-drawer-section",
+      "strings": {
+        "heading": {{ 'vor.ladder.heading' | t | json }},
+        "active": {{ 'vor.ladder.active' | t | json }},
+        "saved": {{ saved_template | json }},
+        "note": {{ 'vor.ladder.codes_note' | t | json }},
+        "progressLabel": {{ 'vor.ladder.progress_label' | t | json }}
+      },
+      "tiers": [
+        {% for row in tier_rows %}
+          {%- liquid
+            assign parts = row | split: '|'
+            assign qty = parts[1] | times: 1
+            assign percent = parts[2] | times: 1
+            assign code = parts[3]
+
+            assign is_last = false
+            if forloop.index == last_index
+              assign is_last = true
+            endif
+
+            if is_last
+              assign label = 'vor.ladder.tier_max' | t: count: qty, percent: percent
+              assign label_short = 'vor.ladder.tier_short_max' | t: count: qty, percent: percent
+            else
+              assign label = 'vor.ladder.tier' | t: count: qty, percent: percent
+              assign label_short = 'vor.ladder.tier_short' | t: count: qty, percent: percent
+            endif
+          -%}
+          {
+            "qty": {{ qty }},
+            "percent": {{ percent }},
+            "code": {{ code | json }},
+            "label": {{ label | json }},
+            "labelShort": {{ label_short | json }},
+            "isLast": {% if is_last %}true{% else %}false{% endif %},
+            "maxReached": {{ 'vor.ladder.max_reached' | t: percent: percent | json }},
+            "progress": {
+              {% for remaining in (1..qty) %}
+                {%- assign progress_message = 'vor.ladder.progress' | t: count: remaining, percent: percent -%}
+                "{{ remaining }}": {{ progress_message | json }}{% unless forloop.last %},{% endunless %}
+              {% endfor %}
+            }
+          }{% unless forloop.last %},{% endunless %}
+        {% endfor %}
+      ]
+    }
+  </script>
+
+  <script
+    src="{{ 'vor-volume-discount.js' | asset_url }}"
+    type="module"
+  ></script>
+
+  <script
+    src="{{ 'vor-card-size-add.js' | asset_url }}"
+    type="module"
+  ></script>
+</div>
+
+{% schema %}
+{
+  "name": "t:vor.names.brand_css",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:vor.ladder.info"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:vor.names.brand_css",
+      "category": "t:vor.category"
+    }
+  ]
+}
+{% endschema %}

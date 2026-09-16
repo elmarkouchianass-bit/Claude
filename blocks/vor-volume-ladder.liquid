@@ -1,0 +1,173 @@
+{%- doc -%}
+  Vorreni volume discount ladder.
+
+  Renders every configured tier with the active one marked, plus the discount amount Shopify
+  calculated for the cart. Intended for the cart page; the cart drawer gets the same markup
+  mounted by `vor-volume-discount.js`, because Horizon's drawer has no block slot.
+{%- enddoc -%}
+{% liquid
+  capture rows
+    render 'vor-ladder-rows'
+  endcapture
+  capture state
+    render 'vor-ladder-state', rows: rows
+  endcapture
+  assign tier_count = rows | strip | split: ',' | size
+%}
+
+{% if settings.vor_ladder_enabled and tier_count > 0 %}
+  {% unless block.settings.hide_when_empty and cart.item_count == 0 %}
+    <div
+      class="vor-ladder-block spacing-style"
+      style="{% render 'spacing-style', settings: block.settings %}"
+      data-vor-mount="ladder"
+      {{ block.shopify_attributes }}
+    >
+      {% render 'vor-ladder-list',
+        rows: rows,
+        state: state,
+        show_saved: block.settings.show_saved,
+        show_note: block.settings.show_note,
+        context: 'cart'
+      %}
+    </div>
+  {% endunless %}
+{% endif %}
+
+{% stylesheet %}
+  .vor-ladder {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+    font-size: var(--font-size--sm);
+  }
+
+  .vor-ladder__heading {
+    font-family: var(--font-subheading--family);
+    font-size: var(--font-size--2xs);
+    font-weight: var(--font-subheading--weight);
+    letter-spacing: var(--letter-spacing-sm);
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .vor-ladder__tiers {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-3xs);
+  }
+
+  .vor-ladder__tier {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--gap-xs);
+    color: var(--color-foreground-subdued);
+  }
+
+  .vor-ladder__tier--active {
+    color: var(--color-foreground);
+    font-weight: 600;
+  }
+
+  .vor-ladder__tier-state {
+    font-family: var(--font-subheading--family);
+    font-size: var(--font-size--3xs);
+    letter-spacing: var(--letter-spacing-sm);
+    text-transform: uppercase;
+    color: var(--vor-color-accent, #A34426);
+  }
+
+  .vor-ladder__saved {
+    margin: 0;
+    color: var(--vor-color-accent, #A34426);
+    font-weight: 600;
+  }
+
+  .vor-ladder__saved[hidden] {
+    display: none;
+  }
+
+  .vor-ladder__note {
+    margin: 0;
+    color: var(--color-foreground-muted);
+    font-size: var(--font-size--2xs);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:vor.names.ladder_full",
+  "tag": null,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_saved",
+      "label": "t:vor.settings.show_saved",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_note",
+      "label": "t:vor.settings.show_note",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_when_empty",
+      "label": "t:vor.settings.hide_when_empty",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:vor.names.ladder_full",
+      "category": "t:vor.category"
+    }
+  ]
+}
+{% endschema %}
